@@ -1,11 +1,11 @@
 import React from "react";
-import "./App.css";
 import SidePanel from "./components/SidePanel";
+import "./App.css";
 
 function App() {
     return (
-        <div className="App">
-            <h1>Nardium</h1>
+        <div className="app-container">
+            <h1>Nardium yo yo</h1>
             <SidePanel />
         </div>
     );

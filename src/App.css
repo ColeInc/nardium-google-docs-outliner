@@ -2,4 +2,23 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    background-color: red !important;
+}
+
+.app-container {
+    color: green;
+    background-color: red;
+    /* width: 200px;
+    height: 400px; */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 300px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #c2c2c2;
+    z-index: 999;
+}
+.app-container h1 {
+    color: green;
 }
