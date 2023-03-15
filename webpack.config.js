@@ -1,6 +1,5 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { CacheLoader } = require("cache-loader");
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
@@ -19,20 +18,12 @@ module.exports = {
             {
                 test: /\.(ts|tsx)$/,
                 exclude: /node_modules/,
-                use: [
-                    {
-                        loader: "cache-loader",
-                        options: {
-                            cacheDirectory: path.resolve(__dirname, "node_modules/.cache/cache-loader"),
-                        },
+                use: {
+                    loader: "babel-loader",
+                    options: {
+                        presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
                     },
-                    {
-                        loader: "babel-loader",
-                        options: {
-                            presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
-                        },
-                    },
-                ],
+                },
             },
             {
                 test: /\.css$/i,
@@ -42,10 +33,25 @@ module.exports = {
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
+        fallback: {
+            fs: false,
+            os: false,
+            tls: false,
+            net: false,
+            path: false,
+            zlib: false,
+            http: false,
+            https: false,
+            stream: false,
+            crypto: false,
+            child_process: false,
+            http2: false,
+            "crypto-browserify": require.resolve("crypto-browserify"),
+        },
     },
     plugins: [
         new CopyPlugin({
-            patterns: [{ from: "manifest.json", to: "../manifest.json" }],
+            patterns: [{ from: "public/manifest.json", to: "../manifest.json" }],
         }),
         new HtmlWebpackPlugin({
             template: "./public/index.html",

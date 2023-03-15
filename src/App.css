@@ -2,12 +2,11 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    background-color: red !important;
 }
 
 .app-container {
     color: green;
-    background-color: red;
+    background-color: grey;
     /* width: 200px;
     height: 400px; */
     position: fixed;
@@ -20,5 +19,5 @@
     z-index: 999;
 }
 .app-container h1 {
-    color: green;
+    color: red;
 }
