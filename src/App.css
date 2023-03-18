@@ -5,19 +5,25 @@
 }
 
 .app-container {
-    color: green;
     background-color: grey;
     /* width: 200px;
     height: 400px; */
     position: fixed;
     left: 0;
     top: 0;
-    width: 300px;
+    width: 40vw;
+    min-width: 400px;
     height: 100vh;
     background: #ffffff;
     border-right: 1px solid #c2c2c2;
     z-index: 999;
 }
+
 .app-container h1 {
     color: red;
+}
+
+.app-container p {
+    color: green;
+    font-size: 0.8rem;
 }

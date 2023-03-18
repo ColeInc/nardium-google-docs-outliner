@@ -14,7 +14,7 @@ const SidePanel = () => {
 
     return (
         <div>
-            <div onClick={() => handleAuthenticate()}>Sign In</div>
+            {/* <div onClick={() => handleAuthenticate()}>Sign In</div> */}
             <Login />
             <Logout />
         </div>
