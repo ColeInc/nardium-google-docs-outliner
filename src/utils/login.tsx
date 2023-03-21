@@ -1,30 +1,45 @@
-import React from "react";
-import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
+import React, { Dispatch, FC, SetStateAction } from "react";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { UserAuthObject } from "../models";
 
 const clientId = process.env.REACT_CLIENT_ID || "";
 
-const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-    if ("profileObj" in res) {
-        console.log("Login Success. Current user:", res.profileObj);
-    } else {
-        console.log("Login Success. User is offline.");
-    }
-};
+interface LoginProps {
+    setUserAuth: (authDetails: CredentialResponse) => void;
+}
 
-const onFailure = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-    console.log("Login Success. Current user:", res);
-};
+// const Login = (setUserAuth: { setUserAuth: React.Dispatch<React.SetStateAction<UserAuthObject>> }) => {
+// const Login = (setUserAuth: (userAuth: CredentialResponse) => void) => {
+const Login: FC<LoginProps> = ({ setUserAuth }) => {
+    const onSuccess = (res: CredentialResponse) => {
+        console.log("Login Success :D ", res);
+        setUserAuth(res);
 
-const Login = () => {
+        // if ("profileObj" in res) {
+        //     console.log("Login Success. Current user:", res.profileObj);
+        // } else {
+        //     console.log("Login Success. User is offline.");
+        // }
+    };
+
+    const onError = () => {
+        console.log("Login failed :(");
+    };
+
     return (
         <div className="login-button">
             <GoogleLogin
-                clientId={clientId}
-                buttonText="Login"
+                // buttonText="Login"
                 onSuccess={onSuccess}
-                onFailure={onFailure}
-                cookiePolicy="single_host_origin"
-                isSignedIn={true}
+                onError={onError}
+                // cookiePolicy="single_host_origin"
+                // isSignedIn={true}
+                theme="outline"
+                size="large"
+                text="signin"
+                shape="pill"
+                width="100"
+                auto_select
             />
         </div>
     );

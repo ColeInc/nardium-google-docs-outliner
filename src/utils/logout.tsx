@@ -1,16 +1,22 @@
 import React from "react";
-import { GoogleLogout } from "react-google-login";
+import { googleLogout } from "@react-oauth/google";
 
-const clientId = process.env.REACT_CLIENT_ID || "";
+// const clientId = process.env.REACT_CLIENT_ID || "";
 
-const onSuccess = () => {
+// const onSuccess = () => {
+//     console.log("Logout was Successful.");
+// };
+
+const handleGoogleLogout = () => {
+    googleLogout();
     console.log("Logout was Successful.");
 };
 
 const Logout = () => {
     return (
         <div className="logout-button">
-            <GoogleLogout clientId={clientId} buttonText="Logout" onLogoutSuccess={onSuccess} />
+            {/* <GoogleLogout clientId={clientId} buttonText="Logout" onLogoutSuccess={onSuccess} /> */}
+            <button onClick={handleGoogleLogout}>Log out</button>
         </div>
     );
 };
