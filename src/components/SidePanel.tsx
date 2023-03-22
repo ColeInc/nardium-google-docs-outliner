@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { getAuthUrl } from "../utils/auth";
 // import { gapi } from "gapi-script";
 import { GoogleLogin, CredentialResponse, CodeResponse } from "@react-oauth/google";
 // import { useGoogleAuth, useGoogleUser } from "react-gapi-auth2";
@@ -8,6 +7,8 @@ import Login from "./Login";
 import Logout from "./Logout";
 
 const clientId = process.env.REACT_CLIENT_ID || "";
+const scopes = "https://www.googleapis.com/auth/documents";
+const apiKey = process.env.REACT_API_KEY || "";
 
 const SidePanel = () => {
     // const { googleAuth } = useGoogleAuth();
@@ -20,28 +21,44 @@ const SidePanel = () => {
     const [accessToken, setAccessToken] = useState("");
     const [documentContent, setDocumentContent] = useState<any>();
 
-    useEffect(() => {
-        // const start = () => {
-        //     gapi.client.init({ apiKey, clientId, scope: scopes });
-        // };
-        // gapi.load("client:auth2", start);
-        console.log("bing  gets here 1");
+    // const setAuth2 = async () => {
+    //     // @ts-ignore
+    //     const auth2 = await loadAuth2(gapi, clientId, scopes);
+    //     console.log("auth2", auth2);
+    //     if (auth2.isSignedIn.get()) {
+    //         const userDetails = auth2.currentUser.get();
+    //         // updateUser(auth2.currentUser.get());
+    //         console.log("first user info back", userDetails);
+    //         setUserAuth(userDetails);
+    //     } else {
+    //         console.log("user is not signed in - checked at useEffect");
+    //         // attachSignin(document.getElementById("customBtn"), auth2);
+    //     }
+    // };
 
-        const setAuth2 = async () => {
-            console.log("bing  gets here 2");
-            // @ts-ignore
-            const auth2 = await loadAuth2(gapi, clientId, "");
-            console.log("bing  gets here 3");
-            if (auth2.isSignedIn.get()) {
-                // updateUser(auth2.currentUser.get());
-                console.log("first user info back", auth2.currentUser.get());
-                // setUserAuth(auth2.currentUser.get())
-            } else {
-                console.log("user is not signed in - checked at useEffect");
-                // attachSignin(document.getElementById("customBtn"), auth2);
-            }
+    // useEffect(() => {
+    //     // const start = () => {
+    //     //     gapi.client.init({ apiKey, clientId, scope: scopes });
+    //     // };
+    //     // gapi.load("client:auth2", start);
+
+    //     setAuth2();
+    // }, []);
+
+    // useEffect(() => {
+    //     // const start = () => {
+    //     //     gapi.client.init({ apiKey, clientId, scope: scopes });
+    //     // };
+    //     // gapi.load("client:auth2", start);
+    //     setAuth2();
+    // }, [userAuth]);
+
+    useEffect(() => {
+        const start = () => {
+            gapi.client.init({ apiKey, clientId, scope: scopes });
         };
-        setAuth2();
+
+        gapi.load("client:auth2", start);
     }, []);
 
     // extract items that are H1 or H2 or H3 from entire body
@@ -60,6 +77,39 @@ const SidePanel = () => {
 
     // get access token of logged in user, then use it to call google docs API to fetch document info
     const fetchFileContents = () => {
+        // get access token of logged in user, then use it to call google docs API to fetch document info
+        // const fetchFileContents = () => {
+        // Get the current user's Google Drive API access token
+        // const authResponse = gapi.auth.getToken();
+        const authResponse = gapi.auth.getToken();
+        console.log("first resp", authResponse);
+        const promise = Promise.resolve(authResponse);
+
+        promise.then(authResponse => {
+            console.log("2nd auth repsonse", authResponse);
+            setAccessToken(authResponse.access_token);
+
+            //TODO: make this dynamically fetched from user's current active page
+            const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
+
+            console.log("access token", accessToken);
+
+            fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
+                method: "GET",
+                headers: new Headers({ Authorization: "Bearer " + authResponse.access_token }),
+            })
+                .then(res => {
+                    const response = res.json();
+                    console.log("response", response);
+                    return response;
+                })
+                .then(contents => {
+                    // console.log("content", JSON.stringify(contents));
+                    filterDocumentContent(contents);
+                });
+        });
+        // };
+
         // Get the current user's Google Drive API access token
         // const authResponse = currentUser;
         // // console.log("currentUser Obj:", authResponse);
@@ -109,22 +159,25 @@ const SidePanel = () => {
     //     window.location.href = authUrl;
     // }
 
+    //TODO: remove unneeded parameter here now
     const handleUserLogin = (authDetails: CodeResponse | undefined) => {
-        setUserAuth(authDetails);
+        // setAuth2();
+        // setUserAuth(authDetails);
     };
 
     const fetchUserInfo = async () => {
-        // @ts-ignore
-        const auth2 = await loadAuth2(gapi, clientId, "");
-        console.log("bing  gets here 3");
-        if (auth2.isSignedIn.get()) {
-            // updateUser(auth2.currentUser.get());
-            console.log("first user info back", auth2.currentUser.get());
-            // setUserAuth(auth2.currentUser.get())
-        } else {
-            console.log("user is not signed in - checked at useEffect");
-            // attachSignin(document.getElementById("customBtn"), auth2);
-        }
+        // setAuth2();
+        // // // // @ts-ignore
+        // // // const auth2 = await loadAuth2(gapi, clientId, "");
+        // // // console.log("bing  gets here 3");
+        // // // if (auth2.isSignedIn.get()) {
+        // // //     // updateUser(auth2.currentUser.get());
+        // // //     console.log("first user info back", auth2.currentUser.get());
+        // // //     // setUserAuth(auth2.currentUser.get())
+        // // // } else {
+        // // //     console.log("user is not signed in - checked at useEffect");
+        // // //     // attachSignin(document.getElementById("customBtn"), auth2);
+        // // // }
     };
 
     return (

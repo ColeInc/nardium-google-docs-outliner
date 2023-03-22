@@ -93,7 +93,7 @@
 
 import React from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { GApiProvider } from "react-gapi-auth2";
+// import { GApiProvider } from "react-gapi-auth2";
 import SidePanel from "./components/SidePanel";
 import "./App.css";
 
@@ -110,12 +110,12 @@ const clientConfig = {
 
 const App = () => (
     <GoogleOAuthProvider clientId={clientId}>
-        <GApiProvider clientConfig={clientConfig}>
-            <div className="app-container">
-                <h1>Nardium</h1>
-                <SidePanel />
-            </div>
-        </GApiProvider>
+        {/* <GApiProvider clientConfig={clientConfig}> */}
+        <div className="app-container">
+            <h1>Nardium</h1>
+            <SidePanel />
+        </div>
+        {/* </GApiProvider> */}
     </GoogleOAuthProvider>
 );
 

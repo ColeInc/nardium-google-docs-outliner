@@ -17,13 +17,13 @@ const Login: FC<LoginProps> = ({ setUserAuth }) => {
             flow: "auth-code",
         })();
 
-    const handleLogin = useGoogleLogin({
-        onSuccess: codeResponse => onSuccess(codeResponse),
-        flow: "auth-code",
-    });
+    // const handleLogin = useGoogleLogin({
+    //     onSuccess: codeResponse => onSuccess(codeResponse),
+    //     flow: "auth-code",
+    // });
 
-    const onSuccess = (res: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => {
-        // const onSuccess = (res: CredentialResponse) => {
+    // const onSuccess = (res: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => {
+    const onSuccess = (res: CredentialResponse) => {
         console.log("Login Success :D ", res);
 
         // fetchAuth();
@@ -46,7 +46,7 @@ const Login: FC<LoginProps> = ({ setUserAuth }) => {
 
     return (
         <div className="login-button">
-            {/* <GoogleLogin
+            <GoogleLogin
                 // buttonText="Login"
                 onSuccess={onSuccess}
                 onError={onError}
@@ -58,9 +58,9 @@ const Login: FC<LoginProps> = ({ setUserAuth }) => {
                 shape="pill"
                 width="100"
                 auto_select
-            /> */}
+            />
             {/* <button onClick={() => login()}>Sign in with Google 🚀 </button>; */}
-            <button onClick={() => handleLogin()}>Login v2</button>
+            {/* <button onClick={() => handleLogin()}>Login v2</button> */}
         </div>
     );
 };
