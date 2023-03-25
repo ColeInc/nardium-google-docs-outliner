@@ -112,7 +112,7 @@ const App = () => (
     <GoogleOAuthProvider clientId={clientId}>
         {/* <GApiProvider clientConfig={clientConfig}> */}
         <div className="app-container">
-            <h1>Nardium</h1>
+            {/* <h1>Nardium</h1> */}
             <SidePanel />
         </div>
         {/* </GApiProvider> */}

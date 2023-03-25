@@ -60,7 +60,7 @@ const Login: FC<LoginProps> = ({ setUserAuth }) => {
                 auto_select
             />
             {/* <button onClick={() => login()}>Sign in with Google 🚀 </button>; */}
-            {/* <button onClick={() => handleLogin()}>Login v2</button> */}
+            <button onClick={() => setUserAuth({} as CodeResponse)}>Login v2</button>
         </div>
     );
 };

@@ -20,6 +20,7 @@ const SidePanel = () => {
 
     const [accessToken, setAccessToken] = useState("");
     const [documentContent, setDocumentContent] = useState<any>();
+    const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
 
     // const setAuth2 = async () => {
     //     // @ts-ignore
@@ -54,61 +55,86 @@ const SidePanel = () => {
     // }, [userAuth]);
 
     useEffect(() => {
-        const start = () => {
-            gapi.client.init({ apiKey, clientId, scope: scopes });
-        };
+        console.log("navigator.cookieEnabled", navigator.cookieEnabled);
 
-        gapi.load("client:auth2", start);
+        if (!navigator.cookieEnabled) {
+            try {
+                const start = () => {
+                    gapi.client.init({ apiKey, clientId, scope: scopes });
+                };
+                gapi.load("client:auth2", start);
+            } catch (e) {
+                console.log("error logging in boi:\n", e);
+            }
+            setThirdPartyCookiesEnabled(false);
+        } else {
+            setThirdPartyCookiesEnabled(true);
+            console.error("Cookies are not enabled in the current environment.");
+        }
+        // try {
+        //     const start = () => {
+        //         gapi.client.init({ apiKey, clientId, scope: scopes });
+        //     };
+
+        //     gapi.load("client:auth2", start);
+        // } catch (e) {
+        //     console.log("error logging in boi:\n", e);
+        // }
     }, []);
 
     // extract items that are H1 or H2 or H3 from entire body
     const filterDocumentContent = (unfilteredContent: any) => {
-        // const content = unfilteredContent.body.content.filter((item: any) => {
-        //     const para = item.paragraph;
-        //     if (!para) return false;
-        //     const headingType = para.paragraphStyle?.namedStyleType;
-        //     return headingType === "HEADING_1" || headingType === "HEADING_2" || headingType === "HEADING_3";
-        //     // if (headingType === "HEADING_1" || headingType === "HEADING_2" || headingType === "HEADING_3") {
-        //     //     return item
-        //     // };
-        // });
-        // setDocumentContent(content);
+        const content = unfilteredContent.body.content.filter((item: any) => {
+            const para = item.paragraph;
+            if (!para) return false;
+            const headingType = para.paragraphStyle?.namedStyleType;
+            return headingType === "HEADING_1" || headingType === "HEADING_2" || headingType === "HEADING_3";
+            // if (headingType === "HEADING_1" || headingType === "HEADING_2" || headingType === "HEADING_3") {
+            //     return item
+            // };
+        });
+        setDocumentContent(content);
     };
 
     // get access token of logged in user, then use it to call google docs API to fetch document info
     const fetchFileContents = () => {
-        // get access token of logged in user, then use it to call google docs API to fetch document info
-        // const fetchFileContents = () => {
-        // Get the current user's Google Drive API access token
-        // const authResponse = gapi.auth.getToken();
-        const authResponse = gapi.auth.getToken();
-        console.log("first resp", authResponse);
-        const promise = Promise.resolve(authResponse);
-
-        promise.then(authResponse => {
-            console.log("2nd auth repsonse", authResponse);
+        try {
+            // get access token of logged in user, then use it to call google docs API to fetch document info
+            // const fetchFileContents = () => {
+            // Get the current user's Google Drive API access token
+            // const authResponse = gapi.auth.getToken();
+            const authResponse = gapi.auth.getToken();
+            console.log("first resp", authResponse);
             setAccessToken(authResponse.access_token);
+            const promise = Promise.resolve(authResponse);
 
-            //TODO: make this dynamically fetched from user's current active page
-            const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
+            promise.then(authResponse => {
+                console.log("2nd auth repsonse", authResponse);
+                setAccessToken(authResponse.access_token);
 
-            console.log("access token", accessToken);
+                //TODO: make this dynamically fetched from user's current active page
+                const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
 
-            fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
-                method: "GET",
-                headers: new Headers({ Authorization: "Bearer " + authResponse.access_token }),
-            })
-                .then(res => {
-                    const response = res.json();
-                    console.log("response", response);
-                    return response;
+                console.log("access token", accessToken);
+
+                fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
+                    method: "GET",
+                    headers: new Headers({ Authorization: "Bearer " + authResponse.access_token }),
                 })
-                .then(contents => {
-                    // console.log("content", JSON.stringify(contents));
-                    filterDocumentContent(contents);
-                });
-        });
-        // };
+                    .then(res => {
+                        const response = res.json();
+                        console.log("response", response);
+                        return response;
+                    })
+                    .then(contents => {
+                        // console.log("content", JSON.stringify(contents));
+                        filterDocumentContent(contents);
+                    });
+            });
+            // };
+        } catch (e) {
+            console.log("error sending req ripppp:\n", e);
+        }
 
         // Get the current user's Google Drive API access token
         // const authResponse = currentUser;
@@ -160,7 +186,9 @@ const SidePanel = () => {
     // }
 
     //TODO: remove unneeded parameter here now
-    const handleUserLogin = (authDetails: CodeResponse | undefined) => {
+    const handleUserLogin = async (authDetails: CodeResponse | undefined) => {
+        const authInstance = await gapi.auth2.getAuthInstance();
+        authInstance.signIn();
         // setAuth2();
         // setUserAuth(authDetails);
     };
@@ -180,7 +208,11 @@ const SidePanel = () => {
         // // // }
     };
 
-    return (
+    return !thirdPartyCookiesEnabled ? (
+        <div className="message">
+            <p>Third-party cookies are disabled in your browser. Please enable them to continue using this site.</p>
+        </div>
+    ) : (
         <div>
             {/* <div onClick={() => handleAuthenticate()}>Sign In</div> */}
             <Login setUserAuth={handleUserLogin} />
