@@ -93,29 +93,29 @@
 
 import React from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-// import { GApiProvider } from "react-gapi-auth2";
 import SidePanel from "./components/SidePanel";
 import "./App.css";
+import UserProvider from "./context/UserProvider";
 
 const clientId = process.env.REACT_CLIENT_ID || "";
-const apiKey = process.env.REACT_API_KEY || "";
-const scopes = "https://www.googleapis.com/auth/documents";
+// const apiKey = process.env.REACT_API_KEY || "";
+// const scopes = "https://www.googleapis.com/auth/documents";
 
-const clientConfig = {
-    client_id: clientId,
-    apiKey,
-    scope: scopes,
-    cookie_policy: "single_host_origin",
-};
+// const clientConfig = {
+//     client_id: clientId,
+//     apiKey,
+//     scope: scopes,
+//     cookie_policy: "single_host_origin",
+// };
 
 const App = () => (
     <GoogleOAuthProvider clientId={clientId}>
-        {/* <GApiProvider clientConfig={clientConfig}> */}
-        <div className="app-container">
-            {/* <h1>Nardium</h1> */}
-            <SidePanel />
-        </div>
-        {/* </GApiProvider> */}
+        <UserProvider>
+            <div className="app-container">
+                <h1>Nardium</h1>
+                <SidePanel />
+            </div>
+        </UserProvider>
     </GoogleOAuthProvider>
 );
 

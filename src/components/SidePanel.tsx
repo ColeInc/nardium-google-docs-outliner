@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 // import { gapi } from "gapi-script";
 import { GoogleLogin, CredentialResponse, CodeResponse } from "@react-oauth/google";
 // import { useGoogleAuth, useGoogleUser } from "react-gapi-auth2";
+import UserContext from "../context/user-context";
 import { gapi, loadAuth2 } from "gapi-script";
 import Login from "./Login";
 import Logout from "./Logout";
@@ -21,6 +22,8 @@ const SidePanel = () => {
     const [accessToken, setAccessToken] = useState("");
     const [documentContent, setDocumentContent] = useState<any>();
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
+
+    const userCtx = useContext(UserContext);
 
     // const setAuth2 = async () => {
     //     // @ts-ignore
@@ -57,7 +60,8 @@ const SidePanel = () => {
     useEffect(() => {
         console.log("navigator.cookieEnabled", navigator.cookieEnabled);
 
-        if (!navigator.cookieEnabled) {
+        if (navigator.cookieEnabled) {
+            console.log("we want it to get here");
             try {
                 const start = () => {
                     gapi.client.init({ apiKey, clientId, scope: scopes });
@@ -68,8 +72,10 @@ const SidePanel = () => {
             }
             setThirdPartyCookiesEnabled(false);
         } else {
+            console.log("veddy bad here");
             setThirdPartyCookiesEnabled(true);
             console.error("Cookies are not enabled in the current environment.");
+            alert("please enable 3rd party cookies!");
         }
         // try {
         //     const start = () => {
@@ -104,7 +110,8 @@ const SidePanel = () => {
             // Get the current user's Google Drive API access token
             // const authResponse = gapi.auth.getToken();
             const authResponse = gapi.auth.getToken();
-            console.log("first resp", authResponse);
+            console.log("first resp", JSON.stringify(authResponse));
+            userCtx.updateUserDetails(authResponse);
             setAccessToken(authResponse.access_token);
             const promise = Promise.resolve(authResponse);
 
@@ -113,7 +120,8 @@ const SidePanel = () => {
                 setAccessToken(authResponse.access_token);
 
                 //TODO: make this dynamically fetched from user's current active page
-                const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
+                // const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
+                const documentId = "1all-QMqoXTWuSinTsBdCathMXOty31FWHK9kLGK-8Qs";
 
                 console.log("access token", accessToken);
 
@@ -186,11 +194,15 @@ const SidePanel = () => {
     // }
 
     //TODO: remove unneeded parameter here now
-    const handleUserLogin = async (authDetails: CodeResponse | undefined) => {
-        const authInstance = await gapi.auth2.getAuthInstance();
-        authInstance.signIn();
-        // setAuth2();
-        // setUserAuth(authDetails);
+    const handleUserLogin = (authDetails: CodeResponse | undefined) => {
+        try {
+            const authInstance = gapi.auth2.getAuthInstance();
+            authInstance.signIn();
+            // setAuth2();
+            // setUserAuth(authDetails);
+        } catch (e) {
+            console.log("error running gapi.auth2.getAuthInstance():\n", e);
+        }
     };
 
     const fetchUserInfo = async () => {
@@ -208,7 +220,7 @@ const SidePanel = () => {
         // // // }
     };
 
-    return !thirdPartyCookiesEnabled ? (
+    return thirdPartyCookiesEnabled ? (
         <div className="message">
             <p>Third-party cookies are disabled in your browser. Please enable them to continue using this site.</p>
         </div>
