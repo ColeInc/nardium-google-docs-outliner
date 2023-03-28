@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { ReactNode, useContext, useEffect, useState } from "react";
 // import { gapi } from "gapi-script";
 import { GoogleLogin, CredentialResponse, CodeResponse } from "@react-oauth/google";
 // import { useGoogleAuth, useGoogleUser } from "react-gapi-auth2";
@@ -88,20 +88,6 @@ const SidePanel = () => {
         // }
     }, []);
 
-    // extract items that are H1 or H2 or H3 from entire body
-    const filterDocumentContent = (unfilteredContent: any) => {
-        const content = unfilteredContent.body.content.filter((item: any) => {
-            const para = item.paragraph;
-            if (!para) return false;
-            const headingType = para.paragraphStyle?.namedStyleType;
-            return headingType === "HEADING_1" || headingType === "HEADING_2" || headingType === "HEADING_3";
-            // if (headingType === "HEADING_1" || headingType === "HEADING_2" || headingType === "HEADING_3") {
-            //     return item
-            // };
-        });
-        setDocumentContent(content);
-    };
-
     // get access token of logged in user, then use it to call google docs API to fetch document info
     const fetchFileContents = () => {
         try {
@@ -186,6 +172,80 @@ const SidePanel = () => {
         // // // // //         // console.log("content", JSON.stringify(contents));
         // // // // //         filterDocumentContent(contents);
         // // // // //     });
+    };
+
+    interface Heading {
+        headingDigit: number;
+        headingText: string;
+        headingId: string | undefined;
+    }
+
+    // extract items that are H1 or H2 or H3 from entire body
+    const filterDocumentContent = (unfilteredContent: any): ReactNode[] => {
+        const filteredHeadings = unfilteredContent.body.content.filter((item: any) => {
+            const para = item.paragraph;
+            if (!para) return false;
+            const headingType = para.paragraphStyle?.namedStyleType;
+            return headingType.startsWith("HEADING_");
+            // if (headingType === "HEADING_1" || headingType === "HEADING_2" || headingType === "HEADING_3") {
+            //     return item
+            // };
+        });
+
+        const fetchHeadingRun = (currentHeading: Heading, filteredHeadings: string): JSX.Element => {
+            let currentList: Heading[] = [];
+
+        filteredHeadings.map((item: any, index: number) => {
+            const para = item.paragraph;
+            const headingType = para.paragraphStyle?.namedStyleType;
+            const currHeadingDigit = headingType.substr(headingType.length - 1);
+
+            if (currentHeading.headingDigit < currHeadingDigit ) {
+fetchHeadingRun({headingDigit: currHeadingDigit,
+    headingText: para.elements[0].textRun.content,
+    headingId: para.paragraphStyle?.headingId,
+}, filteredHeadings.substring(index))
+            }
+
+            // return final <ul>
+            return (
+                <li>
+                    <h1>{currentHeading.headingText}</h1>
+                    <ul>
+                        {currentList &&
+                            currentList.map(heading => {
+                                <li key={heading.headingText}>{heading.headingText}</li>;
+                            })}
+                    </ul>
+                </li>
+            );
+        };
+
+        const listItemArray: ReactNode[] = [];
+        let prevHeadingDigit = 0;
+
+        filteredHeadings.map((item: any, index: number) => {
+            const para = item.paragraph;
+            const headingType = para.paragraphStyle?.namedStyleType;
+            const currHeadingDigit = headingType.substr(headingType.length - 1);
+
+            if (currHeadingDigit > prevHeadingDigit) {
+                currentList.push({headingDigit: currHeadingDigit,
+                    headingText: para.elements[0].textRun.content,
+                    headingId: para.paragraphStyle?.headingId,
+                });
+            } else if (currHeadingDigit === prevHeadingDigit) {
+            } else if (currHeadingDigit < prevHeadingDigit) {
+            }
+
+            // return (
+            //     <p key={para.paragraphStyle?.headingId}>
+            //         {"\u00A0".repeat((+currHeadingDigit - 1) * 10) + currHeadingDigit + "> " + para.elements[0].textRun.content}
+            //     </p>
+            // );
+        });
+        console.log("final filteredContent", filteredHeadings);
+        setDocumentContent(filteredHeadings);
     };
 
     // async function handleAuthenticate() {
