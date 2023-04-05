@@ -61,7 +61,6 @@ const SidePanel = () => {
         console.log("navigator.cookieEnabled", navigator.cookieEnabled);
 
         if (navigator.cookieEnabled) {
-            console.log("we want it to get here");
             try {
                 const start = () => {
                     gapi.client.init({ apiKey, clientId, scope: scopes });
@@ -72,7 +71,6 @@ const SidePanel = () => {
             }
             setThirdPartyCookiesEnabled(false);
         } else {
-            console.log("veddy bad here");
             setThirdPartyCookiesEnabled(true);
             console.error("Cookies are not enabled in the current environment.");
             alert("please enable 3rd party cookies!");
@@ -96,7 +94,7 @@ const SidePanel = () => {
             // Get the current user's Google Drive API access token
             // const authResponse = gapi.auth.getToken();
             const authResponse = gapi.auth.getToken();
-            console.log("first resp", JSON.stringify(authResponse));
+            // console.log("first resp", JSON.stringify(authResponse));
             userCtx.updateUserDetails(authResponse);
             setAccessToken(authResponse.access_token);
             const promise = Promise.resolve(authResponse);
@@ -107,7 +105,8 @@ const SidePanel = () => {
 
                 //TODO: make this dynamically fetched from user's current active page
                 // const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
-                const documentId = "1all-QMqoXTWuSinTsBdCathMXOty31FWHK9kLGK-8Qs";
+                // const documentId = "1all-QMqoXTWuSinTsBdCathMXOty31FWHK9kLGK-8Qs";
+                const documentId = "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw";
 
                 console.log("access token", accessToken);
 
@@ -172,8 +171,26 @@ const SidePanel = () => {
         // // // // //         // console.log("content", JSON.stringify(contents));
         // // // // //         filterDocumentContent(contents);
         // // // // //     });
+
+        // const li = (
+        //     <li>
+        //         <h1>{currentHeading.headingText}</h1>
+        //         <ul>
+        //                <li key={heading.headingText}>{heading.headingText}</li>;
+        //                <li key={heading.headingText}>{heading.headingText}</li>;
+        //                <li key={heading.headingText}>{heading.headingText}</li>;
+        //                <li>
+        //                     <h1>{currentHeading.headingText}</h1>
+        //                     <ul>
+        //                        <li key={heading.headingText}>{heading.headingText}</li>;
+        //                        <li key={heading.headingText}>{heading.headingText}</li>;
+        //                 </ul>
+        //         </ul>
+        //     </li>
+        // );
     };
 
+    //TODO: use this and pass info through as attributes:
     interface Heading {
         headingDigit: number;
         headingText: string;
@@ -181,7 +198,8 @@ const SidePanel = () => {
     }
 
     // extract items that are H1 or H2 or H3 from entire body
-    const filterDocumentContent = (unfilteredContent: any): ReactNode[] => {
+    //TODO: convert all any's here to corresponding interface
+    const filterDocumentContent = (unfilteredContent: any) => {
         const filteredHeadings = unfilteredContent.body.content.filter((item: any) => {
             const para = item.paragraph;
             if (!para) return false;
@@ -192,60 +210,204 @@ const SidePanel = () => {
             // };
         });
 
-        const fetchHeadingRun = (currentHeading: Heading, filteredHeadings: string): JSX.Element => {
-            let currentList: Heading[] = [];
+        // const finalListItems: JSX.Element[] = [];
 
-        filteredHeadings.map((item: any, index: number) => {
-            const para = item.paragraph;
+        let newChild = false;
+        let numRemaining = filteredHeadings.length;
+
+        const calculateCurrentListItem = (remainingHeadings: any, prevHeadingDigit: number): JSX.Element => {
+            const para = remainingHeadings[0].paragraph;
             const headingType = para.paragraphStyle?.namedStyleType;
             const currHeadingDigit = headingType.substr(headingType.length - 1);
+            const headingText = para.elements[0].textRun.content;
+            const headingId = para.paragraphStyle?.headingId;
+            numRemaining--;
 
-            if (currentHeading.headingDigit < currHeadingDigit ) {
-fetchHeadingRun({headingDigit: currHeadingDigit,
-    headingText: para.elements[0].textRun.content,
-    headingId: para.paragraphStyle?.headingId,
-}, filteredHeadings.substring(index))
+            // let li = <></>;
+
+            // const li = (
+            //     <li>
+            //         <h1>{currentHeading.headingText}</h1>
+            //         <ul>
+            //             {currentList &&
+            //                 currentList.map(heading => {
+            //                     <li key={heading.headingText}>{heading.headingText}</li>;
+            //                 })}
+            //         </ul>
+            //     </li>
+            // );
+
+            // 0) base case
+            if (remainingHeadings.length === 1) {
+                console.log("0) basecase:", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+
+                return (
+                    <li key={headingId}>
+                        <h1>{headingText}</h1>
+                    </li>
+                );
             }
 
-            // return final <ul>
-            return (
-                <li>
-                    <h1>{currentHeading.headingText}</h1>
-                    <ul>
-                        {currentList &&
-                            currentList.map(heading => {
-                                <li key={heading.headingText}>{heading.headingText}</li>;
-                            })}
-                    </ul>
-                </li>
-            );
+            // 1) if the current heading IS going to be a child of parent (E.g. we go from Heading2 to Heading3):
+            if (currHeadingDigit > prevHeadingDigit) {
+                console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+                let child = calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit);
+
+                const childListItems: JSX.Element[] = [];
+                while (newChild) {
+                    childListItems.push(child);
+                    child = calculateCurrentListItem(filteredHeadings.slice(numRemaining), currHeadingDigit);
+                }
+
+                return (
+                    <>
+                        <li key={headingId}>
+                            <h1>{headingText}</h1>
+                            <ul>
+                                {childListItems}
+                                {/* // ^^^ remove the first item in remainingHeadings and pass it recursively */}
+                            </ul>
+                        </li>
+                        {/* {newChild ? {calculateCurrentListItem(filteredHeadings.slice(numRemaining), currHeadingDigit)}:<></>} */}
+                    </>
+                );
+
+                // if (newChild) {
+                //     newChild = false;
+
+                //     return (
+                //         <>
+                //             <li key={headingId}>
+                //                 <h1>{headingText}</h1>
+                //                 <ul>
+                //                     {}
+                //                     {/* // ^^^ remove the first item in remainingHeadings and pass it recursively */}
+                //                 </ul>
+                //             </li>
+                //             {calculateCurrentListItem(filteredHeadings.slice(numRemaining), currHeadingDigit)}
+                //         </>
+                //     );
+                // } else {
+                //     return (
+                //         <li key={headingId}>
+                //             <h1>{headingText}</h1>
+                //             <ul>
+                //                 {calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit)}
+                //                 {/* // ^^^ remove the first item in remainingHeadings and pass it recursively */}
+                //             </ul>
+                //         </li>
+                //     );
+                // }
+                // finalListItems.push(li);
+                // return li;
+            }
+            // 2) else if previous heading & this heading should be on same level
+            else if (currHeadingDigit === prevHeadingDigit) {
+                console.log("2)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+
+                // return nothing so that current <li> finishes
+                // const li = (
+                //     <li>
+                //         <h1>{JSON.stringify(para)}</h1>
+                //     </li>
+                // );
+                // finalListItems.push(li);
+                // create a new call in next iteration with the next heading so that it creates the next LI
+                // calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit);
+                // return currentLi;
+                return (
+                    <>
+                        <li key={headingId}>
+                            <h1>{headingText}</h1>
+                        </li>
+                        {calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit)}
+                    </>
+                );
+            }
+            // 3) else if current heading is bigger than previous heading (E.g. we go from Heading2 to Heading1)
+            else if (currHeadingDigit < prevHeadingDigit) {
+                console.log("3)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+
+                // return nothing here because it will iterate back up and in next cycle up it should catch it in the 2) second if condition right?
+                return <></>;
+                if (currHeadingDigit === 1) {
+                }
+            } else {
+                // just to keep typescript happy:
+                newChild = true;
+                return <></>;
+            }
+            // return li;
         };
 
-        const listItemArray: ReactNode[] = [];
-        let prevHeadingDigit = 0;
+        // const finalListItems: JSX.Element[] = filteredHeadings.map((item: any) => {
+        //     calculateCurrentListItem(item, 0); // pass prevHeading as 0 by default to tell function this is the first heading
+        // });
+        const finalResponse = (
+            <ul>
+                {
+                    calculateCurrentListItem(filteredHeadings, 0) // pass prevHeading as 0 by default to tell function this is the first heading
+                }
+            </ul>
+        );
 
-        filteredHeadings.map((item: any, index: number) => {
-            const para = item.paragraph;
-            const headingType = para.paragraphStyle?.namedStyleType;
-            const currHeadingDigit = headingType.substr(headingType.length - 1);
+        // const finalResponse = <ul>{finalListItems.map(item => item)}</ul>;
 
-            if (currHeadingDigit > prevHeadingDigit) {
-                currentList.push({headingDigit: currHeadingDigit,
-                    headingText: para.elements[0].textRun.content,
-                    headingId: para.paragraphStyle?.headingId,
-                });
-            } else if (currHeadingDigit === prevHeadingDigit) {
-            } else if (currHeadingDigit < prevHeadingDigit) {
-            }
+        // // // //         const fetchHeadingRun = (currentHeading: Heading, filteredHeadings: string): JSX.Element => {
+        // // // //             let currentList: Heading[] = [];
 
-            // return (
-            //     <p key={para.paragraphStyle?.headingId}>
-            //         {"\u00A0".repeat((+currHeadingDigit - 1) * 10) + currHeadingDigit + "> " + para.elements[0].textRun.content}
-            //     </p>
-            // );
-        });
+        // // // //         filteredHeadings.map((item: any, index: number) => {
+        // // // //             const para = item.paragraph;
+        // // // //             const headingType = para.paragraphStyle?.namedStyleType;
+        // // // //             const currHeadingDigit = headingType.substr(headingType.length - 1);
+
+        // // // //             if (currentHeading.headingDigit < currHeadingDigit ) {
+        // // // // fetchHeadingRun({headingDigit: currHeadingDigit,
+        // // // //     headingText: para.elements[0].textRun.content,
+        // // // //     headingId: para.paragraphStyle?.headingId,
+        // // // // }, filteredHeadings.substring(index))
+        // // // //             }
+
+        // // // //             // return final <ul>
+        // // // //             return (
+        // // // //                 <li>
+        // // // //                     <h1>{currentHeading.headingText}</h1>
+        // // // //                     <ul>
+        // // // //                         {currentList &&
+        // // // //                             currentList.map(heading => {
+        // // // //                                 <li key={heading.headingText}>{heading.headingText}</li>;
+        // // // //                             })}
+        // // // //                     </ul>
+        // // // //                 </li>
+        // // // //             );
+        // // // //         };
+
+        // // // //         const listItemArray: ReactNode[] = [];
+        // // // //         let prevHeadingDigit = 0;
+
+        // // // //         filteredHeadings.map((item: any, index: number) => {
+        // // // //             const para = item.paragraph;
+        // // // //             const headingType = para.paragraphStyle?.namedStyleType;
+        // // // //             const currHeadingDigit = headingType.substr(headingType.length - 1);
+
+        // // // //             if (currHeadingDigit > prevHeadingDigit) {
+        // // // //                 currentList.push({headingDigit: currHeadingDigit,
+        // // // //                     headingText: para.elements[0].textRun.content,
+        // // // //                     headingId: para.paragraphStyle?.headingId,
+        // // // //                 });
+        // // // //             } else if (currHeadingDigit === prevHeadingDigit) {
+        // // // //             } else if (currHeadingDigit < prevHeadingDigit) {
+        // // // //             }
+
+        // return (
+        //     <p key={para.paragraphStyle?.headingId}>
+        //         {"\u00A0".repeat((+currHeadingDigit - 1) * 10) + currHeadingDigit + "> " + para.elements[0].textRun.content}
+        //     </p>
+        // );
+        // });
         console.log("final filteredContent", filteredHeadings);
-        setDocumentContent(filteredHeadings);
+        // setDocumentContent(filteredHeadings);
+        setDocumentContent(finalResponse);
     };
 
     // async function handleAuthenticate() {
@@ -294,7 +456,8 @@ fetchHeadingRun({headingDigit: currHeadingDigit,
             <button onClick={fetchFileContents}>Fetch Contents!</button>
             <button onClick={fetchUserInfo}>try get user info</button>
             <div>
-                {documentContent &&
+                {documentContent}
+                {/* {documentContent &&
                     documentContent.map((item: any, index: number) => {
                         const para = item.paragraph;
                         const headingType = para.paragraphStyle?.namedStyleType;
@@ -308,7 +471,7 @@ fetchHeadingRun({headingDigit: currHeadingDigit,
                                     para.elements[0].textRun.content}
                             </p>
                         );
-                    })}
+                    })} */}
             </div>
         </div>
     );
