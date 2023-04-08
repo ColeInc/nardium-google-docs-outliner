@@ -210,146 +210,225 @@ const SidePanel = () => {
             // };
         });
 
-        // const finalListItems: JSX.Element[] = [];
+        // console.log("filteredHeadings", JSON.stringify(filteredHeadings));
 
-        let newChild = false;
-        let numRemaining = filteredHeadings.length;
+        const appendToPath = (segment: string) => {
+            currentParentPath.push(segment);
+            // if (currentParentPath) {
+            //     currentParentPath.push(segment);
+            // }
+            // else {
+            //     currentParentPath[segment] = segment;
+            // }
+            console.log("latest official path stored:", currentParentPath);
+        };
 
-        const calculateCurrentListItem = (remainingHeadings: any, prevHeadingDigit: number): JSX.Element => {
-            const para = remainingHeadings[0].paragraph;
+        // const headingsHierarchy: string[] = [];
+        const headingsHierarchy: Array<[string, string[]]>;
+        let currentParentPath: string[] = [];
+        let prevHeadingDigit = 0;
+
+        filteredHeadings.forEach((heading: any) => {
+            const para = heading.paragraph;
             const headingType = para.paragraphStyle?.namedStyleType;
             const currHeadingDigit = headingType.substr(headingType.length - 1);
             const headingText = para.elements[0].textRun.content;
             const headingId = para.paragraphStyle?.headingId;
-            numRemaining--;
-
-            // let li = <></>;
-
-            // const li = (
-            //     <li>
-            //         <h1>{currentHeading.headingText}</h1>
-            //         <ul>
-            //             {currentList &&
-            //                 currentList.map(heading => {
-            //                     <li key={heading.headingText}>{heading.headingText}</li>;
-            //                 })}
-            //         </ul>
-            //     </li>
-            // );
 
             // 0) base case
-            if (remainingHeadings.length === 1) {
-                console.log("0) basecase:", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
-
-                return (
-                    <li key={headingId}>
-                        <h1>{headingText}</h1>
-                    </li>
-                );
+            if (currHeadingDigit === 1) {
+                //
+                headingsHierarchy[heading] = heading;
+                // currentParentPath = headingsHierachy[heading];
+                appendToPath(heading);
             }
 
-            // 1) if the current heading IS going to be a child of parent (E.g. we go from Heading2 to Heading3):
-            if (currHeadingDigit > prevHeadingDigit) {
+            //  1) if the current heading IS going to be a child of parent (E.g. we go from Heading2 to Heading3):
+            else if (currHeadingDigit > prevHeadingDigit) {
                 console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
-                let child = calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit);
+                // add new child to current parent:
+                // currentParentPath.reduce((prev, curr, index: number, arr) => {
+                // currentParentPath.reduce((arr, index, i: number, array) => {
+                //     //When the final index in pathToI is reached, we set the value of the current index to newValue.
+                //     if (i === currentParentPath.length - 1) {
+                //         arr[index] = headingText;
+                //     }
+                //     return arr[index];
+                // }, headingsHierachy);
 
-                const childListItems: JSX.Element[] = [];
-                while (newChild) {
-                    childListItems.push(child);
-                    child = calculateCurrentListItem(filteredHeadings.slice(numRemaining), currHeadingDigit);
-                }
+                // currentParentPath.reduce(
+                //     (arr: Array<[string, string[]]>, index: string, i: number, array: string[]) => {
+                //         if (i === currentParentPath.length - 1) {
+                //             arr[index][0] = headingText;
+                //         }
+                //         return arr[index][1];
+                //     },
+                //     headingsHierarchy
+                // );
 
-                return (
-                    <>
-                        <li key={headingId}>
-                            <h1>{headingText}</h1>
-                            <ul>
-                                {childListItems}
-                                {/* // ^^^ remove the first item in remainingHeadings and pass it recursively */}
-                            </ul>
-                        </li>
-                        {/* {newChild ? {calculateCurrentListItem(filteredHeadings.slice(numRemaining), currHeadingDigit)}:<></>} */}
-                    </>
+                currentParentPath.reduce(
+                    (arr: Array<[string, string[]]>, index: string, i: number, array: string[]) => {
+                        if (i === currentParentPath.length - 1) {
+                            arr[parseInt(index)][0] = headingText;
+                        }
+                        return arr[parseInt(index)][1];
+                    },
+                    headingsHierarchy
                 );
-
-                // if (newChild) {
-                //     newChild = false;
-
-                //     return (
-                //         <>
-                //             <li key={headingId}>
-                //                 <h1>{headingText}</h1>
-                //                 <ul>
-                //                     {}
-                //                     {/* // ^^^ remove the first item in remainingHeadings and pass it recursively */}
-                //                 </ul>
-                //             </li>
-                //             {calculateCurrentListItem(filteredHeadings.slice(numRemaining), currHeadingDigit)}
-                //         </>
-                //     );
-                // } else {
-                //     return (
-                //         <li key={headingId}>
-                //             <h1>{headingText}</h1>
-                //             <ul>
-                //                 {calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit)}
-                //                 {/* // ^^^ remove the first item in remainingHeadings and pass it recursively */}
-                //             </ul>
-                //         </li>
-                //     );
-                // }
-                // finalListItems.push(li);
-                // return li;
             }
+
             // 2) else if previous heading & this heading should be on same level
             else if (currHeadingDigit === prevHeadingDigit) {
                 console.log("2)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
-
-                // return nothing so that current <li> finishes
-                // const li = (
-                //     <li>
-                //         <h1>{JSON.stringify(para)}</h1>
-                //     </li>
-                // );
-                // finalListItems.push(li);
-                // create a new call in next iteration with the next heading so that it creates the next LI
-                // calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit);
-                // return currentLi;
-                return (
-                    <>
-                        <li key={headingId}>
-                            <h1>{headingText}</h1>
-                        </li>
-                        {calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit)}
-                    </>
-                );
             }
+
             // 3) else if current heading is bigger than previous heading (E.g. we go from Heading2 to Heading1)
             else if (currHeadingDigit < prevHeadingDigit) {
-                console.log("3)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
-
-                // return nothing here because it will iterate back up and in next cycle up it should catch it in the 2) second if condition right?
-                return <></>;
-                if (currHeadingDigit === 1) {
-                }
-            } else {
-                // just to keep typescript happy:
-                newChild = true;
-                return <></>;
             }
-            // return li;
-        };
 
-        // const finalListItems: JSX.Element[] = filteredHeadings.map((item: any) => {
-        //     calculateCurrentListItem(item, 0); // pass prevHeading as 0 by default to tell function this is the first heading
-        // });
-        const finalResponse = (
-            <ul>
-                {
-                    calculateCurrentListItem(filteredHeadings, 0) // pass prevHeading as 0 by default to tell function this is the first heading
-                }
-            </ul>
-        );
+            prevHeadingDigit = currHeadingDigit;
+        });
+
+        // // // const finalListItems: JSX.Element[] = [];
+
+        // // let newChild = false;
+        // // let numRemaining = filteredHeadings.length;
+
+        // // const calculateCurrentListItem = (remainingHeadings: any, prevHeadingDigit: number): JSX.Element => {
+        // //     const para = remainingHeadings[0].paragraph;
+        // //     const headingType = para.paragraphStyle?.namedStyleType;
+        // //     const currHeadingDigit = headingType.substr(headingType.length - 1);
+        // //     const headingText = para.elements[0].textRun.content;
+        // //     const headingId = para.paragraphStyle?.headingId;
+        // //     numRemaining--;
+
+        // //     // let li = <></>;
+
+        // //     // const li = (
+        // //     //     <li>
+        // //     //         <h1>{currentHeading.headingText}</h1>
+        // //     //         <ul>
+        // //     //             {currentList &&
+        // //     //                 currentList.map(heading => {
+        // //     //                     <li key={heading.headingText}>{heading.headingText}</li>;
+        // //     //                 })}
+        // //     //         </ul>
+        // //     //     </li>
+        // //     // );
+
+        // //     // 0) base case
+        // //     if (remainingHeadings.length === 1) {
+        // //         console.log("0) basecase:", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+
+        // //         return (
+        // //             <li key={headingId}>
+        // //                 <h1>{headingText}</h1>
+        // //             </li>
+        // //         );
+        // //     }
+
+        // //     // 1) if the current heading IS going to be a child of parent (E.g. we go from Heading2 to Heading3):
+        // //     if (currHeadingDigit > prevHeadingDigit) {
+        // //         console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+        // //         let child = calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit);
+
+        // //         const childListItems: JSX.Element[] = [];
+        // //         while (newChild) {
+        // //             childListItems.push(child);
+        // //             child = calculateCurrentListItem(filteredHeadings.slice(numRemaining), currHeadingDigit);
+        // //         }
+
+        // //         return (
+        // //             <>
+        // //                 <li key={headingId}>
+        // //                     <h1>{headingText}</h1>
+        // //                     <ul>
+        // //                         {childListItems}
+        // //                         {/* // ^^^ remove the first item in remainingHeadings and pass it recursively */}
+        // //                     </ul>
+        // //                 </li>
+        // //                 {/* {newChild ? {calculateCurrentListItem(filteredHeadings.slice(numRemaining), currHeadingDigit)}:<></>} */}
+        // //             </>
+        // //         );
+
+        // //         // if (newChild) {
+        // //         //     newChild = false;
+
+        // //         //     return (
+        // //         //         <>
+        // //         //             <li key={headingId}>
+        // //         //                 <h1>{headingText}</h1>
+        // //         //                 <ul>
+        // //         //                     {}
+        // //         //                     {/* // ^^^ remove the first item in remainingHeadings and pass it recursively */}
+        // //         //                 </ul>
+        // //         //             </li>
+        // //         //             {calculateCurrentListItem(filteredHeadings.slice(numRemaining), currHeadingDigit)}
+        // //         //         </>
+        // //         //     );
+        // //         // } else {
+        // //         //     return (
+        // //         //         <li key={headingId}>
+        // //         //             <h1>{headingText}</h1>
+        // //         //             <ul>
+        // //         //                 {calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit)}
+        // //         //                 {/* // ^^^ remove the first item in remainingHeadings and pass it recursively */}
+        // //         //             </ul>
+        // //         //         </li>
+        // //         //     );
+        // //         // }
+        // //         // finalListItems.push(li);
+        // //         // return li;
+        // //     }
+        // //     // 2) else if previous heading & this heading should be on same level
+        // //     else if (currHeadingDigit === prevHeadingDigit) {
+        // //         console.log("2)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+
+        // //         // return nothing so that current <li> finishes
+        // //         // const li = (
+        // //         //     <li>
+        // //         //         <h1>{JSON.stringify(para)}</h1>
+        // //         //     </li>
+        // //         // );
+        // //         // finalListItems.push(li);
+        // //         // create a new call in next iteration with the next heading so that it creates the next LI
+        // //         // calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit);
+        // //         // return currentLi;
+        // //         return (
+        // //             <>
+        // //                 <li key={headingId}>
+        // //                     <h1>{headingText}</h1>
+        // //                 </li>
+        // //                 {calculateCurrentListItem(remainingHeadings.slice(1), currHeadingDigit)}
+        // //             </>
+        // //         );
+        // //     }
+        // //     // 3) else if current heading is bigger than previous heading (E.g. we go from Heading2 to Heading1)
+        // //     else if (currHeadingDigit < prevHeadingDigit) {
+        // //         console.log("3)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+
+        // //         // return nothing here because it will iterate back up and in next cycle up it should catch it in the 2) second if condition right?
+        // //         return <></>;
+        // //         if (currHeadingDigit === 1) {
+        // //         }
+        // //     } else {
+        // //         // just to keep typescript happy:
+        // //         newChild = true;
+        // //         return <></>;
+        // //     }
+        // //     // return li;
+        // // };
+
+        // // // const finalListItems: JSX.Element[] = filteredHeadings.map((item: any) => {
+        // // //     calculateCurrentListItem(item, 0); // pass prevHeading as 0 by default to tell function this is the first heading
+        // // // });
+        // // const finalResponse = (
+        // //     <ul>
+        // //         {
+        // //             calculateCurrentListItem(filteredHeadings, 0) // pass prevHeading as 0 by default to tell function this is the first heading
+        // //         }
+        // //     </ul>
+        // // );
 
         // const finalResponse = <ul>{finalListItems.map(item => item)}</ul>;
 
