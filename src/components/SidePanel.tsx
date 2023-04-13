@@ -205,7 +205,7 @@ const SidePanel = () => {
 
         // console.log("filteredHeadings", JSON.stringify(filteredHeadings));
 
-        const appendToPath = (segment: string) => {
+        const appendToParentPath = (segment: string) => {
             currentParentPath.push(segment);
             // if (currentParentPath) {
             //     currentParentPath.push(segment);
@@ -216,10 +216,50 @@ const SidePanel = () => {
             console.log("latest official path stored:", currentParentPath);
         };
 
-        // type IHeading = {
-        //     name: string[];
-        //     children?: string[];
-        // };
+        const popParentPath = (numTimes = 1) => {
+            currentParentPath.slice(0, -numTimes);
+        };
+
+        const dummyArray: Heading[] = [
+            {
+                headingId: "1",
+                headingText: "Heading 1",
+                children: [
+                    {
+                        headingId: "1.1",
+                        headingText: "Heading 1.1",
+                        children: [
+                            {
+                                headingId: "1.1.1",
+                                headingText: "Heading 1.1.1",
+                            },
+                            {
+                                headingId: "1.1.2",
+                                headingText: "Heading 1.1.2",
+                            },
+                        ],
+                    },
+                    {
+                        headingId: "1.2",
+                        headingText: "Heading 1.2",
+                    },
+                ],
+            },
+            {
+                headingId: "2",
+                headingText: "Heading 2",
+                children: [
+                    {
+                        headingId: "2.1",
+                        headingText: "Heading 2.1",
+                    },
+                    {
+                        headingId: "2.2",
+                        headingText: "Heading 2.2",
+                    },
+                ],
+            },
+        ];
 
         //TODO: use this and pass info through as attributes:
         //TODO: make these fields all mandatory (except children) and fill them in corresponding places
@@ -229,6 +269,15 @@ const SidePanel = () => {
             headingText?: string;
             children?: Heading[];
         }
+
+        const placeholderChild = (): Heading => {
+            const randomString = "PLACEHOLDER_" + Math.random().toString(32).substring(2, 12);
+            return {
+                headingId: randomString,
+                headingDigit: 0,
+                headingText: randomString,
+            };
+        };
 
         // interface Heading extends Array<Heading> {
         //     headingId: string;
@@ -244,9 +293,67 @@ const SidePanel = () => {
         // const headingsHierarchy: string[] = [];
         // const headingsHierarchy: Array<[Heading[], Heading[]?]> = [];
         // const headingsHierarchy: Array<[string[], string[]?]> = [];
+
+        const calcHeadingDiff = (parent: Heading, child: Heading) => {
+            let diff = 0;
+            if (parent.headingDigit && child.headingDigit) {
+                // diff = Math.abs(parent.headingDigit - child.headingDigit);
+                diff = parent.headingDigit - child.headingDigit;
+            }
+            return diff;
+        };
+
+        const appendChildHeading = (child: Heading) => {
+            let currentParentHeading: Heading | undefined;
+
+            // first find the parent we want to append to:
+            currentParentPath.forEach((pathItem: string) => {
+                const headingFound = headingsHierarchy.find(element => element.headingId === pathItem);
+                // if we search all headings at this level of headingsHierarchy and find a match, assign new currentParentHeading:
+                if (headingFound) {
+                    currentParentHeading = headingFound;
+                }
+            });
+            console.log("final Heading found:", currentParentHeading);
+
+            // if we find a valid final parent heading, append the new child to it:
+            if (currentParentHeading) {
+                // first calculate how many children down we need to nest this child
+                const diff = calcHeadingDiff(currentParentHeading, child);
+
+                // iterate and nest children till we hit the correct level heading should be at:
+                for (let i = 0; i < diff; i++) {
+                    // if we are on last iteration insert the real child heading itself, else insert PLACEHOLDER
+                    const heading = i === diff - 1 ? child : placeholderChild();
+
+                    if (currentParentHeading?.children) {
+                        currentParentHeading?.children.push(heading);
+                    } else {
+                        currentParentHeading["children"] = [heading];
+                    }
+
+                    // assign this new child to be the updated parent:
+                    const newParent: Heading | undefined = currentParentHeading?.children.find(
+                        element => element.headingId === heading.headingId
+                    );
+                    currentParentHeading = newParent ? newParent : currentParentHeading;
+
+                    appendToParentPath(heading.headingId);
+                }
+            } else {
+                console.error("No heading found.");
+            }
+
+            console.log("final headingsHierarchy", JSON.stringify(headingsHierarchy));
+        };
+
         let headingsHierarchy: Heading[] = [];
         let currentParentPath: string[] = [];
         let prevHeadingDigit = 0;
+
+        // TODO: remove these 2, just hardcoded tests:
+        headingsHierarchy = dummyArray;
+        currentParentPath = ["2", "2.1"];
 
         filteredHeadings.forEach((heading: any) => {
             const para = heading.paragraph;
@@ -255,167 +362,47 @@ const SidePanel = () => {
             const headingText = para.elements[0].textRun.content;
             const headingId = para.paragraphStyle?.headingId;
 
+            const newChild = {
+                headingId,
+                headingText,
+                headingDigit: currHeadingDigit,
+            };
+
             // 0) base case - if our heading is a top lvl H1 OR if there is nothing currently stored in currentParentPath, then create a new item in our final array of arrays:
             if (currHeadingDigit === 1 || !currentParentPath) {
                 //
                 headingsHierarchy[heading] = heading;
                 // currentParentPath = headingsHierachy[heading];
-                appendToPath(heading);
+                appendToParentPath(heading);
             }
 
             //  1) if the current heading IS going to be a child of parent (E.g. we go from Heading2 to Heading3):
             else if (currHeadingDigit > prevHeadingDigit) {
-                console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+                // console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+                // console.log("original headingsHierarchy", headingsHierarchy);
+
                 // add new child to current parent:
-                // currentParentPath.reduce((prev, curr, index: number, arr) => {
-                // currentParentPath.reduce((arr, index, i: number, array) => {
-                //     //When the final index in pathToI is reached, we set the value of the current index to newValue.
-                //     if (i === currentParentPath.length - 1) {
-                //         arr[index] = headingText;
-                //     }
-                //     return arr[index];
-                // }, headingsHierachy);
-
-                // currentParentPath.reduce(
-                //     (arr: Array<[string, string[]]>, index: string, i: number, array: string[]) => {
-                //         if (i === currentParentPath.length - 1) {
-                //             arr[index][0] = headingText;
-                //         }
-                //         return arr[index][1];
-                //     },
-                //     headingsHierarchy
-                // );
-
-                const dummyArray: Heading[] = [
-                    {
-                        headingId: "1",
-                        headingText: "Heading 1",
-                        children: [
-                            {
-                                headingId: "1.1",
-                                headingText: "Heading 1.1",
-                                children: [
-                                    {
-                                        headingId: "1.1.1",
-                                        headingText: "Heading 1.1.1",
-                                    },
-                                    {
-                                        headingId: "1.1.2",
-                                        headingText: "Heading 1.1.2",
-                                    },
-                                ],
-                            },
-                            {
-                                headingId: "1.2",
-                                headingText: "Heading 1.2",
-                            },
-                        ],
-                    },
-                    {
-                        headingId: "2",
-                        headingText: "Heading 2",
-                        children: [
-                            {
-                                headingId: "2.1",
-                                headingText: "Heading 2.1",
-                            },
-                            {
-                                headingId: "2.2",
-                                headingText: "Heading 2.2",
-                            },
-                        ],
-                    },
-                ];
-
-                // console.log(
-                //     "accessing dis",
-                //     dummyArray.find(element => element.headingId === "2")
-                // );
-
-                headingsHierarchy = dummyArray;
-                currentParentPath = ["2", "2.1"];
-
-                console.log("original headingsHierarchy", headingsHierarchy);
-                // const c = currentParentPath.reduce((obj, key) => obj[key as keyof typeof obj], headingsHierarchy);
-                // const c = currentParentPath.reduce((obj: Heading | undefined, key: string) => obj?.find(element => element.headingId === key), headingsHierarchy);
-                // TODO: ahhh its complaining because obj comes in as a string first but then after that it will always be a heading... need to cater for that!
-                // const c = currentParentPath.reduce(
-                //     (obj: Heading | string, key: string) =>
-                //         {
-                //             console.log("current obj", obj);
-                //             // return  obj?.find(element => element.headingId === key)?.children}
-                //             // return {
-                //             //     headingId: "2.2",
-                //             //     headingText: "Heading 2.2",
-                //             // } as Heading
-                //             return "beans"
-                //     // headingsHierarchy
-                //     dummyArray
-                // );
-
-                // const c = currentParentPath.reduce(
-                //     (obj: Heading | string, key: string, index: number) => {
-                //         console.log("current obj", obj);
-                //         console.log("current key", key);
-                //         // console.log("current keys", Object.keys(obj));
-                //         // return Object.keys(obj)?.find(element => element.headingId === currentParentPath[index])?.children;
-                //         // return Object.keys(key)?.find(element => element.headingId === currentParentPath[index])
-                //         //     ?.children;
-                //         currentParent
-                //     },
-                //     // return {
-                //     //     headingId: "2.2",
-                //     //     headingText: "Heading 2.2",
-                //     // } as Heading
-                //     // return "beans"
-                //     headingsHierarchy
-                //     // dummyArray
-                // );
-
-                const newChild = {
-                    headingId: "yeeeet",
-                    headingText: "coles heading",
-                } as Heading;
-
-                let currentParentHeading: Heading | undefined;
-
-                currentParentPath.forEach((pathItem: string) => {
-                    const headingFound = headingsHierarchy.find(element => element.headingId === pathItem);
-                    // if we search all headings at this level of headingsHierarchy and find a match, assign new currentParentHeading:
-                    if (headingFound) {
-                        currentParentHeading = headingFound;
-                    }
-                });
-                console.log("final Heading found:", currentParentHeading);
-                // if we find a valid final parent heading, append the new child to it:
-                if (currentParentHeading) {
-                    if (currentParentHeading?.children) {
-                        currentParentHeading?.children.push(newChild);
-                    } else {
-                        currentParentHeading["children"] = [newChild];
-                    }
-                }
-                console.log("final headingsHierarchy", headingsHierarchy);
-
-                // const c = currentParentPath.reduce((obj: Heading | undefined, key: string) => obj?.[1]?.find(([h]) => h === key), headingsHierarchy);
-                // currentParentPath.reduce(
-                //     (sumArr: Array<[string, string[]]>, currItem: string, index: number, initArray: string[]) => {
-                //         if (index === currentParentPath.length - 1) {
-                //             sumArr[parseInt(currItem)][0] = headingText;
-                //         }
-                //         return sumArr[parseInt(currItem)][1];
-                //     },
-                //     headingsHierarchy
-                // );
+                appendChildHeading(newChild);
             }
 
             // 2) else if previous heading & this heading should be on same level
             else if (currHeadingDigit === prevHeadingDigit) {
-                console.log("2)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+                // console.log("2)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+
+                // pop one from parent path
+                popParentPath();
+                // add new child to current parent
+                appendChildHeading(newChild);
             }
 
             // 3) else if current heading is bigger than previous heading (E.g. we go from Heading2 to Heading1)
             else if (currHeadingDigit < prevHeadingDigit) {
+                const headingDiff = prevHeadingDigit - currHeadingDigit;
+
+                // pop n from parent path where n is the diff between prev and curr heading digit
+                popParentPath(headingDiff);
+                // append new child at this level
+                appendChildHeading(newChild);
             }
 
             prevHeadingDigit = currHeadingDigit;
