@@ -6,6 +6,8 @@ import UserContext from "../context/user-context";
 import { gapi, loadAuth2 } from "gapi-script";
 import Login from "./Login";
 import Logout from "./Logout";
+import { Heading } from "../models/heading";
+import Headings from "./Headings";
 
 const clientId = process.env.REACT_CLIENT_ID || "";
 const scopes = "https://www.googleapis.com/auth/documents";
@@ -20,7 +22,7 @@ const SidePanel = () => {
     const [userAuth, setUserAuth] = useState<CodeResponse | undefined>();
 
     const [accessToken, setAccessToken] = useState("");
-    const [documentContent, setDocumentContent] = useState<any>();
+    const [documentContent, setDocumentContent] = useState<Heading[]>();
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
 
     const userCtx = useContext(UserContext);
@@ -263,12 +265,6 @@ const SidePanel = () => {
 
         //TODO: use this and pass info through as attributes:
         //TODO: make these fields all mandatory (except children) and fill them in corresponding places
-        interface Heading {
-            headingId: string;
-            headingDigit?: number;
-            headingText?: string;
-            children?: Heading[];
-        }
 
         const placeholderChild = (): Heading => {
             const randomString = "PLACEHOLDER_" + Math.random().toString(32).substring(2, 12);
@@ -297,8 +293,9 @@ const SidePanel = () => {
         const calcHeadingDiff = (parent: Heading, child: Heading) => {
             let diff = 0;
             if (parent.headingDigit && child.headingDigit) {
-                // diff = Math.abs(parent.headingDigit - child.headingDigit);
                 diff = parent.headingDigit - child.headingDigit;
+                // if the difference is a negative number (E.g. goes H1 to H2), just return 0 instead:
+                diff = diff < 0 ? 0 : diff;
             }
             return diff;
         };
@@ -314,17 +311,19 @@ const SidePanel = () => {
                     currentParentHeading = headingFound;
                 }
             });
-            console.log("final Heading found:", currentParentHeading);
+            console.log("final parent Heading found:", currentParentHeading);
 
             // if we find a valid final parent heading, append the new child to it:
             if (currentParentHeading) {
+                console.log("gets in here?");
                 // first calculate how many children down we need to nest this child
-                const diff = calcHeadingDiff(currentParentHeading, child);
+                let diff = calcHeadingDiff(currentParentHeading, child);
 
                 // iterate and nest children till we hit the correct level heading should be at:
-                for (let i = 0; i < diff; i++) {
+                for (let i = 0; i <= diff; i++) {
+                    console.log("gets in here v2");
                     // if we are on last iteration insert the real child heading itself, else insert PLACEHOLDER
-                    const heading = i === diff - 1 ? child : placeholderChild();
+                    const heading = i === diff ? child : placeholderChild();
 
                     if (currentParentHeading?.children) {
                         currentParentHeading?.children.push(heading);
@@ -352,15 +351,16 @@ const SidePanel = () => {
         let prevHeadingDigit = 0;
 
         // TODO: remove these 2, just hardcoded tests:
-        headingsHierarchy = dummyArray;
-        currentParentPath = ["2", "2.1"];
+        // headingsHierarchy = dummyArray;
+        // currentParentPath = ["2", "2.1"];
 
         filteredHeadings.forEach((heading: any) => {
+            // console.log("foreach heading", heading);
             const para = heading.paragraph;
             const headingType = para.paragraphStyle?.namedStyleType;
-            const currHeadingDigit = headingType.substr(headingType.length - 1);
-            const headingText = para.elements[0].textRun.content;
             const headingId = para.paragraphStyle?.headingId;
+            const headingText = para.elements[0].textRun.content;
+            const currHeadingDigit = headingType.substr(headingType.length - 1);
 
             const newChild = {
                 headingId,
@@ -368,17 +368,21 @@ const SidePanel = () => {
                 headingDigit: currHeadingDigit,
             };
 
+            console.log("current heading", currHeadingDigit, currentParentPath);
+
             // 0) base case - if our heading is a top lvl H1 OR if there is nothing currently stored in currentParentPath, then create a new item in our final array of arrays:
-            if (currHeadingDigit === 1 || !currentParentPath) {
-                //
-                headingsHierarchy[heading] = heading;
+            if (currHeadingDigit === "1" || !currentParentPath) {
+                console.log("0) base", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+                headingsHierarchy.push(newChild);
                 // currentParentPath = headingsHierachy[heading];
-                appendToParentPath(heading);
+                appendToParentPath(headingId);
+
+                console.log("final headingsHierarchy", JSON.stringify(headingsHierarchy));
             }
 
             //  1) if the current heading IS going to be a child of parent (E.g. we go from Heading2 to Heading3):
             else if (currHeadingDigit > prevHeadingDigit) {
-                // console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+                console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
                 // console.log("original headingsHierarchy", headingsHierarchy);
 
                 // add new child to current parent:
@@ -387,7 +391,7 @@ const SidePanel = () => {
 
             // 2) else if previous heading & this heading should be on same level
             else if (currHeadingDigit === prevHeadingDigit) {
-                // console.log("2)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+                console.log("2)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
 
                 // pop one from parent path
                 popParentPath();
@@ -397,6 +401,7 @@ const SidePanel = () => {
 
             // 3) else if current heading is bigger than previous heading (E.g. we go from Heading2 to Heading1)
             else if (currHeadingDigit < prevHeadingDigit) {
+                console.log("3)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
                 const headingDiff = prevHeadingDigit - currHeadingDigit;
 
                 // pop n from parent path where n is the diff between prev and curr heading digit
@@ -603,9 +608,9 @@ const SidePanel = () => {
         //     </p>
         // );
         // });
-        console.log("final filteredContent", filteredHeadings);
-        // setDocumentContent(filteredHeadings);
-        setDocumentContent(finalResponse);
+        console.log("final filteredContent", JSON.stringify(headingsHierarchy));
+        setDocumentContent(headingsHierarchy);
+        // setDocumentContent(finalResponse);
     };
 
     // async function handleAuthenticate() {
@@ -654,7 +659,7 @@ const SidePanel = () => {
             <button onClick={fetchFileContents}>Fetch Contents!</button>
             <button onClick={fetchUserInfo}>try get user info</button>
             <div>
-                {documentContent}
+                <Headings headings={documentContent} />
                 {/* {documentContent &&
                     documentContent.map((item: any, index: number) => {
                         const para = item.paragraph;
