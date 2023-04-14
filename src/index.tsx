@@ -3,8 +3,12 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 
-const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
-const clientId = process.env.REACT_CLIENT_ID || "";
+const rootElement = document.createElement("div");
+rootElement.id = "nardium";
+document.body.appendChild(rootElement);
+
+// const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+const root = ReactDOM.createRoot(rootElement);
 
 root.render(
     <React.StrictMode>

@@ -53,7 +53,7 @@ module.exports = {
     },
     plugins: [
         new CopyPlugin({
-            patterns: [{ from: "public/manifest.json", to: "../manifest.json" }],
+            patterns: [{ from: "public/manifest.json", to: "manifest.json" }],
         }),
         new HtmlWebpackPlugin({
             template: "./public/index.html",
