@@ -1,4 +1,4 @@
-import { gapi, loadAuth2 } from "gapi-script";
+import { gapi } from "gapi-script";
 
 // console.log("Background script loaded");
 
@@ -29,6 +29,7 @@ import { gapi, loadAuth2 } from "gapi-script";
 //     };
 //     document.body.appendChild(script);
 // });
+let window = self;
 
 chrome.runtime.onInstalled.addListener(() => {
     const clientId = process.env.REACT_CLIENT_ID || "";

@@ -10,9 +10,10 @@ module.exports = {
         background: "./src/background.ts",
     },
     output: {
-        filename: "content.js",
+        filename: "[name].js",
         path: path.resolve(__dirname, "dist"),
     },
+
     module: {
         rules: [
             {

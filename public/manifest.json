@@ -21,6 +21,7 @@
     "background": {
         "service_worker": "background.js"
     },
-    "permissions": ["activeTab", "https://accounts.google.com/*", "https://apis.google.com/*"],
-    "optional_permissions": ["<all_urls>"]
+    "permissions": ["activeTab"],
+    "optional_permissions": [],
+    "host_permissions": ["https://accounts.google.com/*", "https://apis.google.com/*"]
 }
