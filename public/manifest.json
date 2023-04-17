@@ -4,15 +4,23 @@
     "description": "A Chrome extension to interact with Google Docs and perform actions on headings.",
     "version": "1.0.0",
     "manifest_version": 3,
+    "externally_connectable": {
+        "matches": ["*://*/*"]
+    },
+
     "content_security_policy": {
-        "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'wasm-unsafe-eval' 'inline-speculation-rules' http://localhost:* http://127.0.0.1:* https://apis.google.com https://accounts.google.com;",
-        "sandbox": "sandbox allow-scripts; script-src 'self' 'https://accounts.google.com' 'https://apis.google.com'; object-src 'self';"
+        "extension_pages": "script-src 'self'; object-src 'self'",
+        "sandbox": "sandbox allow-scripts; script-src 'self' https://accounts.google.com https://apis.google.com; object-src 'self';"
     },
     "content_scripts": [
         {
-            "matches": ["<all_urls>"],
+            "matches": ["https://*.google.com/*"],
             "js": ["content.js"]
         }
     ],
-    "permissions": ["activeTab", "https://*/*", "http://*/*"]
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": ["activeTab", "https://accounts.google.com/*", "https://apis.google.com/*"],
+    "optional_permissions": ["<all_urls>"]
 }

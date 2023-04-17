@@ -5,7 +5,10 @@ const Dotenv = require("dotenv-webpack");
 
 module.exports = {
     mode: "development",
-    entry: "./src/index.tsx",
+    entry: {
+        content: "./src/index.tsx",
+        background: "./src/background.ts",
+    },
     output: {
         filename: "content.js",
         path: path.resolve(__dirname, "dist"),

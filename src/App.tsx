@@ -91,7 +91,7 @@
 
 // export default App;
 
-import React from "react";
+import React, { useEffect } from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import SidePanel from "./components/SidePanel";
 import "./App.css";
@@ -108,15 +108,41 @@ const clientId = process.env.REACT_CLIENT_ID || "";
 //     cookie_policy: "single_host_origin",
 // };
 
-const App = () => (
-    <GoogleOAuthProvider clientId={clientId}>
-        <UserProvider>
-            <div className="app-container">
-                <h1>Nardium</h1>
-                <SidePanel />
-            </div>
-        </UserProvider>
-    </GoogleOAuthProvider>
-);
+const App = () => {
+    // // useEffect(() => {
+    // //     const script1 = document.createElement("script");
+    // //     const script2 = document.createElement("script");
+    // //     script1.type = "text/javascript";
+    // //     script2.type = "text/javascript";
+    // //     script1.async = true;
+    // //     script2.async = true;
+    // //     script1.src = "https://accounts.google.com/gsi/client";
+    // //     script2.src =
+    // //         "https://apis.google.com/_/scs/apps-static/_/js/k=oz.gapi.pt_BR.l4Bv_WkVC6g.O/m=auth2,client/rt=j/sv=1/d=1/ed=1/am=wQE/rs=AGLTcCOuH5S2uqmF6E8zOW7n3yiqiwhzNQ/cb=gapi.loaded_0";
+    // //     // script.src = "https://apis.google.com";
+
+    // //     // Find <head> element and append the script element to it
+    // //     const head = document.head;
+    // //     head.appendChild(script1);
+    // //     head.appendChild(script2);
+
+    // //     // Clean up function to remove the script element when the component unmounts
+    // //     // return () => {
+    // //     //     head.removeChild(script1);
+    // //     //     head.removeChild(script2);
+    // //     // };
+    // // }, []);
+
+    return (
+        <GoogleOAuthProvider clientId={clientId}>
+            <UserProvider>
+                <div className="app-container">
+                    <h1>Nardium</h1>
+                    <SidePanel />
+                </div>
+            </UserProvider>
+        </GoogleOAuthProvider>
+    );
+};
 
 export default App;
