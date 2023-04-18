@@ -1,4 +1,4 @@
-import { CodeResponse, googleLogout } from "@react-oauth/google";
+// import { CodeResponse, googleLogout } from "@react-oauth/google";
 import React, { FC } from "react";
 
 // import { gapi } from "gapi-script";
@@ -9,22 +9,23 @@ import React, { FC } from "react";
 //     console.log("Logout was Successful.");
 // };
 
-interface LogoutProps {
-    setUserAuth: (authDetails: CodeResponse | undefined) => void;
-}
+// interface LogoutProps {
+//     setUserAuth: (authDetails: CodeResponse | undefined) => void;
+// }
 
-const Logout: FC<LogoutProps> = ({ setUserAuth }) => {
+const Logout: FC = () => {
     const handleGoogleLogout = () => {
-        googleLogout();
+        // googleLogout();
 
-        const signOut = () => {
-            const auth2 = gapi.auth2.getAuthInstance();
-            auth2.signOut().then(() => {
-                setUserAuth(undefined);
-                console.log("User signed out.");
-            });
-        };
-        signOut();
+        // const signOut = () => {
+        //     const auth2 = gapi.auth2.getAuthInstance();
+        //     auth2.signOut().then(() => {
+        //         // setUserAuth(undefined);
+        //         console.log("User signed out.");
+        //     });
+        // };
+        // signOut();
+        // TODO: call
 
         console.log("Logout was Successful.");
     };

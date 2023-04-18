@@ -1,9 +1,9 @@
 import React, { ReactNode, useContext, useEffect, useState } from "react";
 // import { gapi } from "gapi-script";
-import { GoogleLogin, CredentialResponse, CodeResponse } from "@react-oauth/google";
+// import { GoogleLogin, CredentialResponse, CodeResponse } from "@react-oauth/google";
 // import { useGoogleAuth, useGoogleUser } from "react-gapi-auth2";
 import UserContext from "../context/user-context";
-import { gapi, loadAuth2 } from "gapi-script";
+// import { gapi, loadAuth2 } from "gapi-script";
 import Login from "./Login";
 import Logout from "./Logout";
 import { Heading } from "../models/heading";
@@ -19,7 +19,8 @@ const SidePanel = () => {
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     // const [userAuth, setUserAuth] = useState<UserAuthObject | undefined>();
-    const [userAuth, setUserAuth] = useState<CodeResponse | undefined>();
+    // const [userAuth, setUserAuth] = useState<CodeResponse | undefined>();
+    const [user, setUser] = React.useState(undefined);
 
     const [accessToken, setAccessToken] = useState("");
     const [documentContent, setDocumentContent] = useState<Heading[]>();
@@ -59,18 +60,42 @@ const SidePanel = () => {
     //     setAuth2();
     // }, [userAuth]);
 
+    //     useEffect(() =>
+    //   {
+    //     auth.onAuthStateChanged(user =>
+    //     {
+    //       setUser(user && user.uid ? user : null)
+    //     })
+    //   }, [])
+
+    //   if ( undefined === user )
+    //     return <h1>Loading...</h1>
+
+    //   if ( user != null )
+    //     return (
+    //       <div>
+    //         <h1>Signed in as {user.displayName}.</h1>
+    //         <button onClick={auth.signOut.bind(auth)}>Sign Out?</button>
+    //       </div>
+    //     )
+
+    //   return (
+    //     <button onClick={signIn}>Sign In with Google</button>
+    //   )
+    // }
+
     useEffect(() => {
         console.log("navigator.cookieEnabled", navigator.cookieEnabled);
 
         if (navigator.cookieEnabled) {
-            try {
-                const start = () => {
-                    gapi.client.init({ apiKey, clientId, scope: scopes });
-                };
-                gapi.load("client:auth2", start);
-            } catch (e) {
-                console.log("error logging in boi:\n", e);
-            }
+            // try {
+            //     const start = () => {
+            //         gapi.client.init({ apiKey, clientId, scope: scopes });
+            //     };
+            //     gapi.load("client:auth2", start);
+            // } catch (e) {
+            //     console.log("error logging in boi:\n", e);
+            // }
             setThirdPartyCookiesEnabled(false);
         } else {
             setThirdPartyCookiesEnabled(true);
@@ -95,37 +120,62 @@ const SidePanel = () => {
             // const fetchFileContents = () => {
             // Get the current user's Google Drive API access token
             // const authResponse = gapi.auth.getToken();
-            const authResponse = gapi.auth.getToken();
-            // console.log("first resp", JSON.stringify(authResponse));
-            userCtx.updateUserDetails(authResponse);
-            setAccessToken(authResponse.access_token);
-            const promise = Promise.resolve(authResponse);
+            // const authResponse = gapi.auth.getToken();
+            // // console.log("first resp", JSON.stringify(authResponse));
+            // userCtx.updateUserDetails(authResponse);
+            // setAccessToken(authResponse.access_token);
+            // setAccessToken("bean");
+            // // const promise = Promise.resolve(accessToken);
 
-            promise.then(authResponse => {
-                console.log("2nd auth repsonse", authResponse);
-                setAccessToken(authResponse.access_token);
+            // // promise.then(authResponse => {
+            // //     console.log("2nd auth repsonse", authResponse);
+            // //     setAccessToken("bean");
 
-                //TODO: make this dynamically fetched from user's current active page
-                // const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
-                // const documentId = "1all-QMqoXTWuSinTsBdCathMXOty31FWHK9kLGK-8Qs";
-                const documentId = "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw";
+            // //     //TODO: make this dynamically fetched from user's current active page
+            // //     // const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
+            // //     // const documentId = "1all-QMqoXTWuSinTsBdCathMXOty31FWHK9kLGK-8Qs";
+            // //     const documentId = "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw";
 
-                console.log("access token", accessToken);
+            // //     console.log("access token", accessToken);
+            // //     const token = userCtx.userDetails?.token;
 
-                fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
-                    method: "GET",
-                    headers: new Headers({ Authorization: "Bearer " + authResponse.access_token }),
+            // //     fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
+            // //         method: "GET",
+            // //         headers: new Headers({ Authorization: "Bearer " + authResponse }),
+            // //     })
+            // //         .then(res => {
+            // //             const response = res.json();
+            // //             console.log("response", response);
+            // //             return response;
+            // //         })
+            // //         .then(contents => {
+            // //             // console.log("content", JSON.stringify(contents));
+            // //             filterDocumentContent(contents);
+            // //         });
+
+            //TODO: make this dynamically fetched from user's current active page
+            // const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
+            // const documentId = "1all-QMqoXTWuSinTsBdCathMXOty31FWHK9kLGK-8Qs";
+            const documentId = "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw";
+
+            console.log("userCtx.userDetails", userCtx.userDetails);
+            const token = userCtx.userDetails?.token;
+            console.log("token going out", token);
+
+            fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
+                method: "GET",
+                headers: new Headers({ Authorization: "Bearer " + token }),
+            })
+                .then(res => {
+                    const response = res.json();
+                    // console.log("response", response);
+                    return response;
                 })
-                    .then(res => {
-                        const response = res.json();
-                        console.log("response", response);
-                        return response;
-                    })
-                    .then(contents => {
-                        // console.log("content", JSON.stringify(contents));
-                        filterDocumentContent(contents);
-                    });
-            });
+                .then(contents => {
+                    console.log("docs API call response (content)", JSON.stringify(contents));
+                    filterDocumentContent(contents);
+                });
+
             // };
         } catch (e) {
             console.log("error sending req ripppp:\n", e);
@@ -619,16 +669,16 @@ const SidePanel = () => {
     // }
 
     //TODO: remove unneeded parameter here now
-    const handleUserLogin = (authDetails: CodeResponse | undefined) => {
-        try {
-            const authInstance = gapi.auth2.getAuthInstance();
-            authInstance.signIn();
-            // setAuth2();
-            // setUserAuth(authDetails);
-        } catch (e) {
-            console.log("error running gapi.auth2.getAuthInstance():\n", e);
-        }
-    };
+    // const handleUserLogin = (authDetails: CodeResponse | undefined) => {
+    //     try {
+    //         const authInstance = gapi.auth2.getAuthInstance();
+    //         authInstance.signIn();
+    //         // setAuth2();
+    //         // setUserAuth(authDetails);
+    //     } catch (e) {
+    //         console.log("error running gapi.auth2.getAuthInstance():\n", e);
+    //     }
+    // };
 
     const fetchUserInfo = async () => {
         // setAuth2();
@@ -652,11 +702,12 @@ const SidePanel = () => {
     ) : (
         <div>
             {/* <div onClick={() => handleAuthenticate()}>Sign In</div> */}
-            <Login setUserAuth={handleUserLogin} />
-            <Logout setUserAuth={handleUserLogin} />
+            <Login />
+            <Logout />
             {/* {googleAuth && googleAuth.isSignedIn && <button onClick={fetchFileContents}>Fetch Contents!</button>} */}
             {/* <button onClick={() => googleAuth?.signIn()}>Sign In V3</button> */}
             <button onClick={fetchFileContents}>Fetch Contents!</button>
+            <br />
             <button onClick={fetchUserInfo}>try get user info</button>
             <div>
                 <Headings headings={documentContent} />

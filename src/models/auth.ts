@@ -1,9 +1,9 @@
-export interface UserAuthObject {
-    // credential: string;
-    // clientId: string;
-    // select_by: string;
-    authUser: string;
-    code: string;
-    prompt: string;
-    scope: string;
+export interface GoogleAuthDetails {
+    token: string;
+    email: string;
+}
+
+export interface IUserContext {
+    userDetails: GoogleAuthDetails | undefined;
+    updateUserDetails: (details: GoogleAuthDetails) => void;
 }

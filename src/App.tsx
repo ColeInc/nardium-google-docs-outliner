@@ -92,7 +92,7 @@
 // export default App;
 
 import React, { useEffect } from "react";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+// import { GoogleOAuthProvider } from "@react-oauth/google";
 import SidePanel from "./components/SidePanel";
 import "./App.css";
 import UserProvider from "./context/UserProvider";
@@ -134,14 +134,14 @@ const App = () => {
     // // }, []);
 
     return (
-        <GoogleOAuthProvider clientId={clientId}>
-            <UserProvider>
-                <div className="app-container">
-                    <h1>Nardium</h1>
-                    <SidePanel />
-                </div>
-            </UserProvider>
-        </GoogleOAuthProvider>
+        // <GoogleOAuthProvider clientId={clientId}>
+        <UserProvider>
+            <div className="app-container">
+                <h1>Nardium</h1>
+                <SidePanel />
+            </div>
+        </UserProvider>
+        // </GoogleOAuthProvider>
     );
 };
 
