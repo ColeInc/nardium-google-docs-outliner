@@ -1,5 +1,7 @@
 // import { CodeResponse, googleLogout } from "@react-oauth/google";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
+import UserContext from "../context/user-context";
+import { GoogleAuthDetails } from "../models";
 
 // import { gapi } from "gapi-script";
 
@@ -14,20 +16,16 @@ import React, { FC } from "react";
 // }
 
 const Logout: FC = () => {
-    const handleGoogleLogout = () => {
-        // googleLogout();
+    const userCtx = useContext(UserContext);
+    const token = userCtx.userDetails?.token;
 
-        // const signOut = () => {
-        //     const auth2 = gapi.auth2.getAuthInstance();
-        //     auth2.signOut().then(() => {
-        //         // setUserAuth(undefined);
-        //         console.log("User signed out.");
-        //     });
-        // };
-        // signOut();
-        // TODO: call
+    const handleGoogleLogout = async () => {
+        chrome.runtime.sendMessage({ type: "logoutUser", token }, (response: any) => {
+            // remove token from our UserProvider:
+            userCtx.updateUserDetails({ token: "" } as GoogleAuthDetails);
 
-        console.log("Logout was Successful.");
+            console.log("Logout was Successful. v2");
+        });
     };
 
     return (

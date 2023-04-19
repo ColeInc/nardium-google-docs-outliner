@@ -6,8 +6,14 @@ interface UserProviderProps {
     children: ReactNode;
 }
 
+export const defaultUserState = {
+    token: "",
+    email: "",
+    documentId: "",
+} as GoogleAuthDetails;
+
 const UserProvider = (props: UserProviderProps) => {
-    const [userDetails, setUserDetails] = useState<GoogleAuthDetails | undefined>(undefined);
+    const [userDetails, setUserDetails] = useState<GoogleAuthDetails>(defaultUserState);
     console.log("userDeatils", userDetails);
 
     const updateUserDetails = (details: GoogleAuthDetails) => {

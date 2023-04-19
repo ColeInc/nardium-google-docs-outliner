@@ -8,6 +8,8 @@ import Login from "./Login";
 import Logout from "./Logout";
 import { Heading } from "../models/heading";
 import Headings from "./Headings";
+// import { getDocumentId } from "../lib/getDocumentId";
+import { GoogleAuthDetails } from "../models";
 
 const clientId = process.env.REACT_CLIENT_ID || "";
 const scopes = "https://www.googleapis.com/auth/documents";
@@ -113,54 +115,24 @@ const SidePanel = () => {
         // }
     }, []);
 
+    const getDocumentId = () => {
+        chrome.runtime.sendMessage({ type: "getDocumentId" }, (response: any) => {
+            userCtx.updateUserDetails({ token: response.token } as GoogleAuthDetails);
+
+            console.log("fetched dis documentId (back at content.js!)", response.documentId);
+            response.documentId
+                ? userCtx.updateUserDetails({ documentId: response.documentId } as GoogleAuthDetails)
+                : null;
+        });
+    };
+
     // get access token of logged in user, then use it to call google docs API to fetch document info
     const fetchFileContents = () => {
         try {
-            // get access token of logged in user, then use it to call google docs API to fetch document info
-            // const fetchFileContents = () => {
-            // Get the current user's Google Drive API access token
-            // const authResponse = gapi.auth.getToken();
-            // const authResponse = gapi.auth.getToken();
-            // // console.log("first resp", JSON.stringify(authResponse));
-            // userCtx.updateUserDetails(authResponse);
-            // setAccessToken(authResponse.access_token);
-            // setAccessToken("bean");
-            // // const promise = Promise.resolve(accessToken);
+            // const documentId = "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw";
+            // const documentId = getDocumentId();
 
-            // // promise.then(authResponse => {
-            // //     console.log("2nd auth repsonse", authResponse);
-            // //     setAccessToken("bean");
-
-            // //     //TODO: make this dynamically fetched from user's current active page
-            // //     // const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
-            // //     // const documentId = "1all-QMqoXTWuSinTsBdCathMXOty31FWHK9kLGK-8Qs";
-            // //     const documentId = "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw";
-
-            // //     console.log("access token", accessToken);
-            // //     const token = userCtx.userDetails?.token;
-
-            // //     fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
-            // //         method: "GET",
-            // //         headers: new Headers({ Authorization: "Bearer " + authResponse }),
-            // //     })
-            // //         .then(res => {
-            // //             const response = res.json();
-            // //             console.log("response", response);
-            // //             return response;
-            // //         })
-            // //         .then(contents => {
-            // //             // console.log("content", JSON.stringify(contents));
-            // //             filterDocumentContent(contents);
-            // //         });
-
-            //TODO: make this dynamically fetched from user's current active page
-            // const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
-            // const documentId = "1all-QMqoXTWuSinTsBdCathMXOty31FWHK9kLGK-8Qs";
-            const documentId = "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw";
-
-            console.log("userCtx.userDetails", userCtx.userDetails);
-            const token = userCtx.userDetails?.token;
-            console.log("token going out", token);
+            const { token, documentId } = userCtx.userDetails;
 
             fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
                 method: "GET",
@@ -175,71 +147,9 @@ const SidePanel = () => {
                     console.log("docs API call response (content)", JSON.stringify(contents));
                     filterDocumentContent(contents);
                 });
-
-            // };
         } catch (e) {
             console.log("error sending req ripppp:\n", e);
         }
-
-        // Get the current user's Google Drive API access token
-        // const authResponse = currentUser;
-        // // console.log("currentUser Obj:", authResponse);
-        // // // const authResponse = gapi.auth.getToken();
-        // // const promise = Promise.resolve(authResponse);
-        // // promise.then(authResponse => {
-        // //     // setAccessToken(authResponse?.access_token || "");
-        // //     //TODO: make this dynamically fetched from user's current active page
-        // //     const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
-        // //     console.log("access token", accessToken);
-        // //     fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
-        // //         method: "GET",
-        // //         headers: new Headers({ Authorization: "Bearer " + userAuth?.credential }),
-        // //         // headers: new Headers({ Authorization: "Bearer " + authResponse.access_token }),
-        // //     })
-        // //         .then(res => {
-        // //             const response = res.json();
-        // //             console.log("response", response);
-        // //             return response;
-        // //         })
-        // //         .then(contents => {
-        // //             // console.log("content", JSON.stringify(contents));
-        // //             filterDocumentContent(contents);
-        // //         });
-        // // });
-        // // // // // //TODO: make this dynamically fetched from user's current active page
-        // // // // // const documentId = "18tRHWnmXnJijMa8Q1JDmjvpWnc7BSt1R9Q5iGeqs9Ok";
-        // // // // // console.log("should be credential:", userAuth?.code);
-        // // // // // fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
-        // // // // //     method: "GET",
-        // // // // //     headers: new Headers({ Authorization: "Bearer " + userAuth?.code }),
-        // // // // //     // headers: new Headers({ Authorization: "Bearer " + authResponse.access_token }),
-        // // // // // })
-        // // // // //     .then(res => {
-        // // // // //         const response = res.json();
-        // // // // //         console.log("response", response);
-        // // // // //         return response;
-        // // // // //     })
-        // // // // //     .then(contents => {
-        // // // // //         // console.log("content", JSON.stringify(contents));
-        // // // // //         filterDocumentContent(contents);
-        // // // // //     });
-
-        // const li = (
-        //     <li>
-        //         <h1>{currentHeading.headingText}</h1>
-        //         <ul>
-        //                <li key={heading.headingText}>{heading.headingText}</li>;
-        //                <li key={heading.headingText}>{heading.headingText}</li>;
-        //                <li key={heading.headingText}>{heading.headingText}</li>;
-        //                <li>
-        //                     <h1>{currentHeading.headingText}</h1>
-        //                     <ul>
-        //                        <li key={heading.headingText}>{heading.headingText}</li>;
-        //                        <li key={heading.headingText}>{heading.headingText}</li>;
-        //                 </ul>
-        //         </ul>
-        //     </li>
-        // );
     };
 
     // extract items that are H1 or H2 or H3 from entire body
@@ -411,11 +321,15 @@ const SidePanel = () => {
             const headingId = para.paragraphStyle?.headingId;
             const headingText = para.elements[0].textRun.content;
             const currHeadingDigit = headingType.substr(headingType.length - 1);
+            const startIndex = heading.startIndex;
+            const endIndex = heading.endIndex;
 
             const newChild = {
                 headingId,
                 headingText,
                 headingDigit: currHeadingDigit,
+                startIndex,
+                endIndex,
             };
 
             console.log("current heading", currHeadingDigit, currentParentPath);
@@ -680,19 +594,12 @@ const SidePanel = () => {
     //     }
     // };
 
-    const fetchUserInfo = async () => {
-        // setAuth2();
-        // // // // @ts-ignore
-        // // // const auth2 = await loadAuth2(gapi, clientId, "");
-        // // // console.log("bing  gets here 3");
-        // // // if (auth2.isSignedIn.get()) {
-        // // //     // updateUser(auth2.currentUser.get());
-        // // //     console.log("first user info back", auth2.currentUser.get());
-        // // //     // setUserAuth(auth2.currentUser.get())
-        // // // } else {
-        // // //     console.log("user is not signed in - checked at useEffect");
-        // // //     // attachSignin(document.getElementById("customBtn"), auth2);
-        // // // }
+    // main set of steps to fire on load of extension:
+    const onLoad = () => {
+        console.log("bing");
+        getDocumentId();
+        console.log("bing2");
+        fetchFileContents();
     };
 
     return thirdPartyCookiesEnabled ? (
@@ -706,26 +613,11 @@ const SidePanel = () => {
             <Logout />
             {/* {googleAuth && googleAuth.isSignedIn && <button onClick={fetchFileContents}>Fetch Contents!</button>} */}
             {/* <button onClick={() => googleAuth?.signIn()}>Sign In V3</button> */}
-            <button onClick={fetchFileContents}>Fetch Contents!</button>
+            <button onClick={() => onLoad}>Fetch Contents!</button>
             <br />
-            <button onClick={fetchUserInfo}>try get user info</button>
+            {/* <button onClick={fetchUserInfo}>try get user info</button> */}
             <div>
                 <Headings headings={documentContent} />
-                {/* {documentContent &&
-                    documentContent.map((item: any, index: number) => {
-                        const para = item.paragraph;
-                        const headingType = para.paragraphStyle?.namedStyleType;
-                        const headingDigit = headingType.substr(headingType.length - 1);
-
-                        return (
-                            <p key={para.paragraphStyle?.headingId}>
-                                {"\u00A0".repeat((+headingDigit - 1) * 10) +
-                                    headingDigit +
-                                    "> " +
-                                    para.elements[0].textRun.content}
-                            </p>
-                        );
-                    })} */}
             </div>
         </div>
     );

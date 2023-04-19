@@ -1,10 +1,6 @@
 import React from "react";
 import { GoogleAuthDetails, IUserContext } from "../models";
-
-const defaultUserState = {
-    token: "",
-    email: "",
-} as GoogleAuthDetails;
+import { defaultUserState } from "./UserProvider";
 
 const UserContext = React.createContext<IUserContext>({
     userDetails: defaultUserState,

@@ -51,8 +51,6 @@ const Login: FC = () => {
     const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
-        console.log("gets here");
-
         // TODO: convert this response into valid type once we have final user object shape:
         chrome.runtime.sendMessage({ type: "getAuthToken" }, (response: any) => {
             // alert(response.token);
