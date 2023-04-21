@@ -66,7 +66,7 @@ interface ChromeMessageRequest {
     startIndex?: string;
 }
 
-chrome.runtime.onMessage.addListener(function (request: ChromeMessageRequest, sender, sendResponse) {
+chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sendResponse) => {
     // Login User:
     if (request.type === "getAuthToken") {
         if (!chrome.identity) {
@@ -74,7 +74,7 @@ chrome.runtime.onMessage.addListener(function (request: ChromeMessageRequest, se
             return;
         }
 
-        chrome.identity.getAuthToken({ interactive: true }, function (token) {
+        chrome.identity.getAuthToken({ interactive: true }, token => {
             if (chrome.runtime.lastError || !token) {
                 alert(`SSO ended with an error: ${JSON.stringify(chrome.runtime.lastError)}`);
                 return;
@@ -94,17 +94,17 @@ chrome.runtime.onMessage.addListener(function (request: ChromeMessageRequest, se
     // Fetch documentId:
     else if (request.type === "getDocumentId") {
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
-            let url = tabs[0].url;
-            console.log("url");
-            const match = /\/document\/d\/([a-zA-Z0-9-_]+)/.exec(url);
-            console.log("match 1", match);
+            const url = tabs[0].url;
+            const match = /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(url);
             const documentId = match && match[1];
-            return documentId;
+            sendResponse({ documentId });
         });
+        return true;
     }
     // Update Cursor Position:
     else if (request.type === "updateCursor") {
-        if (request.token && request.documentId && request.startIndex) {
+        try {
+            console.log("sending updateCursor req from background.js");
             fetch(`https://docs.googleapis.com/v1/documents/${request.documentId}:batchUpdate`, {
                 method: "PUT",
                 headers: {
@@ -122,10 +122,18 @@ chrome.runtime.onMessage.addListener(function (request: ChromeMessageRequest, se
                         },
                     ],
                 }),
-            }).catch(error => console.error(error));
-        } else {
-            console.log("Invalid token, documentId or startIndex provided.");
-            sendResponse({ message: "Invalid token, documentId or startIndex provided." });
+            })
+                .then(resp => {
+                    console.log(" updateCursor SUCCESS from background.js. resp:", resp);
+                    // chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+                    //     sendResponse({ tabId: tabs[0].id, cursorIndex: request.startIndex });
+                    // });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        } catch (e) {
+            console.log("Error jumping to heading", e);
         }
     }
 });

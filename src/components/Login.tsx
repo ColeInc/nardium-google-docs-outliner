@@ -1,8 +1,8 @@
 import React, { Dispatch, FC, SetStateAction, useContext } from "react";
 // import { GoogleLogin, CredentialResponse, useGoogleLogin, CodeResponse } from "@react-oauth/google";
 // import { UserAuthObject } from "../models";
-import UserContext from "../context/user-context";
-import { GoogleAuthDetails } from "../models";
+import DocumentContext from "../context/document-context";
+import { DocumentInfo } from "../models";
 
 // const clientId = process.env.REACT_CLIENT_ID || "";
 
@@ -13,7 +13,7 @@ import { GoogleAuthDetails } from "../models";
 // const Login = (setUserAuth: { setUserAuth: React.Dispatch<React.SetStateAction<UserAuthObject>> }) => {
 // const Login = (setUserAuth: (userAuth: CredentialResponse) => void) => {
 const Login: FC = () => {
-    const userCtx = useContext(UserContext);
+    const userCtx = useContext(DocumentContext);
 
     // const fetchAuth = () =>
     // useGoogleLogin({
@@ -56,8 +56,8 @@ const Login: FC = () => {
             // alert(response.token);
             console.log("repsonse fetched back at content.js!", response);
             console.log("token fetched back at content.js!", response.token);
-            // setTok
-            userCtx.updateUserDetails({ token: response.token } as GoogleAuthDetails);
+            // set token
+            userCtx.updateDocumentDetails({ token: response.token } as DocumentInfo);
         });
     };
 

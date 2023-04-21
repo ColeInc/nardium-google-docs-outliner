@@ -1,19 +1,37 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Heading } from "../models/heading";
 import { updateCursor } from "../lib/updateCursor";
 import { useContext } from "react";
-import UserContext from "../context/user-context";
+import DocumentContext from "../context/document-context";
 
 const Headings = ({ headings }: { headings: Heading[] | undefined }) => {
-    const userCtx = useContext(UserContext);
+    const userCtx = useContext(DocumentContext);
+    // const { documentContent } = userCtx.documentDetails;
+
+    // useEffect(() => {
+    //     chrome.tabs.executeScript(
+    //         {
+    //             code: `
+    //         ${getActiveDocument.toString()};
+    //         getActiveDocument();
+    //       `,
+    //         },
+    //         ([result]) => {
+    //             setActiveDoc(result);
+    //             jumpToHeading(result);
+    //         }
+    //     );
+    // }, []);
 
     if (!headings) {
         return <div>---</div>;
     }
 
     const handleHeadingClick = (startIndex: string | undefined) => {
-        const { token, documentId } = userCtx.userDetails;
+        const { token, documentId, documentContent } = userCtx.documentDetails;
         updateCursor(token, documentId, startIndex);
+        const position = documentContent.newPosition(startIndex);
+        documentContent.setCursor(position);
     };
 
     const renderHeadings = (headings: Heading[]) => (

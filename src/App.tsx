@@ -91,13 +91,13 @@
 
 // export default App;
 
-import React, { useEffect } from "react";
+import React from "react";
 // import { GoogleOAuthProvider } from "@react-oauth/google";
 import SidePanel from "./components/SidePanel";
 import "./App.css";
-import UserProvider from "./context/UserProvider";
+import DocumentProvider from "./context/DocumentProvider";
 
-const clientId = process.env.REACT_CLIENT_ID || "";
+// const clientId = process.env.REACT_CLIENT_ID || "";
 // const apiKey = process.env.REACT_API_KEY || "";
 // const scopes = "https://www.googleapis.com/auth/documents";
 
@@ -135,12 +135,12 @@ const App = () => {
 
     return (
         // <GoogleOAuthProvider clientId={clientId}>
-        <UserProvider>
+        <DocumentProvider>
             <div className="app-container">
                 <h1>Nardium</h1>
                 <SidePanel />
             </div>
-        </UserProvider>
+        </DocumentProvider>
         // </GoogleOAuthProvider>
     );
 };

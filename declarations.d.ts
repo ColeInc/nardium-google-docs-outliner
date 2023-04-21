@@ -265,5 +265,17 @@ declare namespace chrome {
              */
             extensionId?: string;
         }
+
+        function executeScript(
+            details: {
+                code?: string;
+                file?: string;
+                allFrames?: boolean;
+                frameId?: number;
+                matchAboutBlank?: boolean;
+                runAt?: "document_start" | "document_end" | "document_idle";
+            },
+            callback?: (result: any[]) => void
+        ): void;
     }
 }

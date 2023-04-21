@@ -2,14 +2,14 @@ import React, { ReactNode, useContext, useEffect, useState } from "react";
 // import { gapi } from "gapi-script";
 // import { GoogleLogin, CredentialResponse, CodeResponse } from "@react-oauth/google";
 // import { useGoogleAuth, useGoogleUser } from "react-gapi-auth2";
-import UserContext from "../context/user-context";
+import DocumentContext from "../context/document-context";
 // import { gapi, loadAuth2 } from "gapi-script";
 import Login from "./Login";
 import Logout from "./Logout";
 import { Heading } from "../models/heading";
 import Headings from "./Headings";
 // import { getDocumentId } from "../lib/getDocumentId";
-import { GoogleAuthDetails } from "../models";
+import { DocumentInfo } from "../models";
 
 const clientId = process.env.REACT_CLIENT_ID || "";
 const scopes = "https://www.googleapis.com/auth/documents";
@@ -19,26 +19,27 @@ const SidePanel = () => {
     // const { googleAuth } = useGoogleAuth();
     // const { currentUser } = useGoogleUser();
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // const [isAuthenticated, setIsAuthenticated] = useState(false);
     // const [userAuth, setUserAuth] = useState<UserAuthObject | undefined>();
     // const [userAuth, setUserAuth] = useState<CodeResponse | undefined>();
-    const [user, setUser] = React.useState(undefined);
+    // const [user, setUser] = React.useState(undefined);
 
-    const [accessToken, setAccessToken] = useState("");
+    // const [accessToken, setAccessToken] = useState("");
     const [documentContent, setDocumentContent] = useState<Heading[]>();
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
+    const [activeDoc, setActiveDoc] = useState(null);
 
-    const userCtx = useContext(UserContext);
+    const userCtx = useContext(DocumentContext);
 
     // const setAuth2 = async () => {
     //     // @ts-ignore
     //     const auth2 = await loadAuth2(gapi, clientId, scopes);
     //     console.log("auth2", auth2);
     //     if (auth2.isSignedIn.get()) {
-    //         const userDetails = auth2.currentUser.get();
+    //         const documentDetails = auth2.currentUser.get();
     //         // updateUser(auth2.currentUser.get());
-    //         console.log("first user info back", userDetails);
-    //         setUserAuth(userDetails);
+    //         console.log("first user info back", documentDetails);
+    //         setUserAuth(documentDetails);
     //     } else {
     //         console.log("user is not signed in - checked at useEffect");
     //         // attachSignin(document.getElementById("customBtn"), auth2);
@@ -116,13 +117,15 @@ const SidePanel = () => {
     }, []);
 
     const getDocumentId = () => {
+        console.log("triggering req to getDocumentId");
         chrome.runtime.sendMessage({ type: "getDocumentId" }, (response: any) => {
-            userCtx.updateUserDetails({ token: response.token } as GoogleAuthDetails);
+            // userCtx.updateDocumentDetails({ documentId: response.documentId } as DocumentInfo);
 
             console.log("fetched dis documentId (back at content.js!)", response.documentId);
             response.documentId
-                ? userCtx.updateUserDetails({ documentId: response.documentId } as GoogleAuthDetails)
+                ? userCtx.updateDocumentDetails({ documentId: response.documentId } as DocumentInfo)
                 : null;
+            console.log("2)");
         });
     };
 
@@ -132,21 +135,28 @@ const SidePanel = () => {
             // const documentId = "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw";
             // const documentId = getDocumentId();
 
-            const { token, documentId } = userCtx.userDetails;
+            const { token, documentId } = userCtx.documentDetails;
+            if (token && documentId) {
+                console.log("going wid deeze", token, "\n/////\n", documentId);
+                console.log("4)");
 
-            fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
-                method: "GET",
-                headers: new Headers({ Authorization: "Bearer " + token }),
-            })
-                .then(res => {
-                    const response = res.json();
-                    // console.log("response", response);
-                    return response;
+                fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
+                    method: "GET",
+                    headers: new Headers({ Authorization: "Bearer " + token }),
                 })
-                .then(contents => {
-                    console.log("docs API call response (content)", JSON.stringify(contents));
-                    filterDocumentContent(contents);
-                });
+                    .then(res => {
+                        const response = res.json();
+                        // console.log("response", response);
+                        return response;
+                    })
+                    .then(contents => {
+                        console.log("docs API call response (content)", JSON.stringify(contents));
+                        userCtx.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
+                        filterDocumentContent(contents);
+                    });
+            } else {
+                console.log("No authToken or google docs documentId found");
+            }
         } catch (e) {
             console.log("error sending req ripppp:\n", e);
         }
@@ -596,9 +606,9 @@ const SidePanel = () => {
 
     // main set of steps to fire on load of extension:
     const onLoad = () => {
-        console.log("bing");
+        console.log("1)");
         getDocumentId();
-        console.log("bing2");
+        console.log("3)");
         fetchFileContents();
     };
 
@@ -613,7 +623,7 @@ const SidePanel = () => {
             <Logout />
             {/* {googleAuth && googleAuth.isSignedIn && <button onClick={fetchFileContents}>Fetch Contents!</button>} */}
             {/* <button onClick={() => googleAuth?.signIn()}>Sign In V3</button> */}
-            <button onClick={() => onLoad}>Fetch Contents!</button>
+            <button onClick={onLoad}>Fetch Contents!</button>
             <br />
             {/* <button onClick={fetchUserInfo}>try get user info</button> */}
             <div>
