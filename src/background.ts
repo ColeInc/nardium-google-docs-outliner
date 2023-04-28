@@ -103,6 +103,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     }
     // Update Cursor Position:
     else if (request.type === "updateCursor") {
+        console.log("starting updateCursor at background.js:");
         try {
             // // console.log("sending updateCursor req from background.js");
             // // fetch(`https://docs.googleapis.com/v1/documents/${request.documentId}:batchUpdate`, {
@@ -140,11 +141,14 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                 documentId,
                 startIndex,
             };
+            console.log("params going out", scriptUrl, requestBody);
 
             fetch(scriptUrl, {
                 method: "POST",
+                // method: "GET",
                 body: JSON.stringify(requestBody),
                 headers: {
+                    Authorization: "Bearer " + request.token,
                     "Content-Type": "application/json",
                 },
             })
@@ -153,7 +157,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                     console.log(" updateCursor SUCCESS from background.js. resp:", data);
                 })
                 .catch(error => {
-                    console.error("Error executing script:", error);
+                    console.error("Error executing script :( Message:\n", error);
                 });
         } catch (e) {
             console.log("Error jumping to heading", e);

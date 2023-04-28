@@ -30,8 +30,8 @@ const Headings = ({ headings }: { headings: Heading[] | undefined }) => {
     const handleHeadingClick = (startIndex: string | undefined) => {
         const { token, documentId, documentContent } = userCtx.documentDetails;
         updateCursor(token, documentId, startIndex);
-        const position = documentContent.newPosition(startIndex);
-        documentContent.setCursor(position);
+        // const position = documentContent.newPosition(startIndex);
+        // documentContent.setCursor(position);
     };
 
     const renderHeadings = (headings: Heading[]) => (

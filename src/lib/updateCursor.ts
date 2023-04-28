@@ -52,6 +52,6 @@ export const updateCursor = (token: string, documentId: string, startIndex: stri
         //     console.log("Error jumping to heading", e);
         // }
     } else {
-        console.log("Invalid token, documentId or startIndex provided.");
+        console.log("Invalid token, documentId or startIndex provided to updateCursor().");
     }
 };
