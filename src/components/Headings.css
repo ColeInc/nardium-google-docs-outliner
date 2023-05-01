@@ -1,0 +1,37 @@
+.headings ul .hidden {
+    display: none;
+}
+
+.headings .heading-arrow-container {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.headings h1 {
+    color: red;
+    font-size: 8pt;
+    font-weight: 400;
+}
+
+.headings .heading1 {
+    padding-left: 0;
+}
+.headings .heading2 {
+    padding-left: 32px;
+}
+.headings .heading3 {
+    padding-left: 64px;
+}
+.headings .heading4 {
+    padding-left: 96px;
+}
+.headings .heading5 {
+    padding-left: 128px;
+}
+.headings .heading6 {
+    padding-left: 160px;
+}
+
+.headings a {
+    text-decoration: none !important;
+}

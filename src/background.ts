@@ -101,68 +101,6 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         });
         return true;
     }
-    // Update Cursor Position:
-    else if (request.type === "updateCursor") {
-        console.log("starting updateCursor at background.js:");
-        try {
-            // // console.log("sending updateCursor req from background.js");
-            // // fetch(`https://docs.googleapis.com/v1/documents/${request.documentId}:batchUpdate`, {
-            // //     method: "PUT",
-            // //     headers: {
-            // //         Authorization: `Bearer ${request.token}`,
-            // //         "Content-Type": "application/json",
-            // //     },
-            // //     body: JSON.stringify({
-            // //         requests: [
-            // //             {
-            // //                 updateCursor: {
-            // //                     location: {
-            // //                         index: request.startIndex,
-            // //                     },
-            // //                 },
-            // //             },
-            // //         ],
-            // //     }),
-            // // })
-            // //     .then(resp => {
-            // //         console.log(" updateCursor SUCCESS from background.js. resp:", resp);
-            // //         // chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-            // //         //     sendResponse({ tabId: tabs[0].id, cursorIndex: request.startIndex });
-            // //         // });
-            // //     })
-            // //     .catch(error => {
-            // //         console.log(error);
-            // //     });
-
-            console.log("sending updateCursor req from background.js");
-            const { documentId, startIndex } = request;
-            const scriptUrl = process.env.APPS_SCRIPT_URL ?? "";
-            const requestBody = {
-                documentId,
-                startIndex,
-            };
-            console.log("params going out", scriptUrl, requestBody);
-
-            fetch(scriptUrl, {
-                method: "POST",
-                // method: "GET",
-                body: JSON.stringify(requestBody),
-                headers: {
-                    Authorization: "Bearer " + request.token,
-                    "Content-Type": "application/json",
-                },
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(" updateCursor SUCCESS from background.js. resp:", data);
-                })
-                .catch(error => {
-                    console.error("Error executing script :( Message:\n", error);
-                });
-        } catch (e) {
-            console.log("Error jumping to heading", e);
-        }
-    }
 });
 
 // chrome.identity.getAuthToken({ interactive: true }, token => {
