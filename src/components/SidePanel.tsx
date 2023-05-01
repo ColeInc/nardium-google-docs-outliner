@@ -612,6 +612,36 @@ const SidePanel = () => {
         fetchFileContents();
     };
 
+    const handleHeadingJump = () => {
+        // get the current URL
+        const currentUrl = new URL(window.location.href);
+
+        // get the heading ID from the URL hash
+        const currentHeadingId = currentUrl.hash.replace("#heading=", "");
+
+        // set the new heading ID
+        const newHeadingId = "h.nmmcd9p22vqn";
+
+        // create a new URL with the updated hash
+        const newUrl = new URL(currentUrl.origin + currentUrl.pathname + currentUrl.search);
+        newUrl.hash = "#heading=" + newHeadingId;
+
+        // push the new URL to the browser history
+        history.pushState(null, "", newUrl.href);
+
+        // TODO: remove this or make more efficient if it even works/does what it is supposed to
+        const nardiumElement = document.getElementById("nardium");
+        if (nardiumElement && nardiumElement.parentNode) {
+            nardiumElement.parentNode.removeChild(nardiumElement);
+        }
+
+        // scroll to the selected heading
+        const headingElement = document.getElementById(newHeadingId);
+        if (headingElement) {
+            headingElement.scrollIntoView();
+        }
+    };
+
     return thirdPartyCookiesEnabled ? (
         <div className="message">
             <p>Third-party cookies are disabled in your browser. Please enable them to continue using this site.</p>
@@ -624,6 +654,10 @@ const SidePanel = () => {
             {/* {googleAuth && googleAuth.isSignedIn && <button onClick={fetchFileContents}>Fetch Contents!</button>} */}
             {/* <button onClick={() => googleAuth?.signIn()}>Sign In V3</button> */}
             <button onClick={onLoad}>Fetch Contents!</button>
+            <br />
+            <button onClick={handleHeadingJump}>Jump</button>
+            <br />
+            <a href="#heading=h.l8cebt3x129a">Jump v2</a>
             <br />
             {/* <button onClick={fetchUserInfo}>try get user info</button> */}
             <div>

@@ -27,9 +27,9 @@ const Headings = ({ headings }: { headings: Heading[] | undefined }) => {
         return <div>---</div>;
     }
 
-    const handleHeadingClick = (startIndex: string | undefined) => {
+    const handleParentHeadingCollapse = (startIndex: string | undefined) => {
         const { token, documentId, documentContent } = userCtx.documentDetails;
-        updateCursor(token, documentId, startIndex);
+        // updateCursor(token, documentId, startIndex);
         // const position = documentContent.newPosition(startIndex);
         // documentContent.setCursor(position);
     };
@@ -37,8 +37,11 @@ const Headings = ({ headings }: { headings: Heading[] | undefined }) => {
     const renderHeadings = (headings: Heading[]) => (
         <ul>
             {headings.map(heading => (
-                <li key={heading.headingId} onClick={() => handleHeadingClick(heading.startIndex)}>
-                    <h1>{heading.headingText}</h1>
+                <li key={heading.headingId} onClick={() => handleParentHeadingCollapse(heading.startIndex)}>
+                    <a href={`#heading=${heading.headingId}`}>
+                        <h1>{heading.headingText}</h1>
+                    </a>
+
                     {heading.children && renderHeadings(heading.children)}
                 </li>
             ))}
