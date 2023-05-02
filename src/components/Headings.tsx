@@ -11,7 +11,7 @@ const Headings = ({ headings }: { headings: IHeading[] | undefined }) => {
     return (
         <>
             {headings.map(heading => (
-                <Heading heading={heading} />
+                <Heading heading={heading} key={heading.headingId} />
             ))}
         </>
     );

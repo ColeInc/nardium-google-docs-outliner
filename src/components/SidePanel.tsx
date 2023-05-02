@@ -657,10 +657,8 @@ const SidePanel = () => {
             const para = item.paragraph;
             if (!para) return false;
             const headingType = para.paragraphStyle?.namedStyleType;
+            // return anything to this .filter() that starts with "HEADING_"
             return headingType.startsWith("HEADING_");
-            // if (headingType === "HEADING_1" || headingType === "HEADING_2" || headingType === "HEADING_3") {
-            //     return item
-            // };
         });
 
         // console.log("filteredHeadings", JSON.stringify(filteredHeadings));
@@ -677,7 +675,10 @@ const SidePanel = () => {
         };
 
         const popParentPath = (numTimes = 1) => {
-            currentParentPath.slice(0, -numTimes);
+            console.log("popParentPath NUM TIMES", numTimes);
+            console.log("popParentPath BEFORE", currentParentPath);
+            currentParentPath = currentParentPath.slice(0, -numTimes);
+            console.log("popParentPath AFTER", currentParentPath);
         };
 
         const dummyArray: IHeading[] = [
@@ -759,29 +760,37 @@ const SidePanel = () => {
         };
 
         const appendChildHeading = (child: IHeading) => {
+            let currentHeadingLayer = headingsHierarchy;
             let currentParentHeading: IHeading | undefined;
+            // let currentParentHeading = headingsHierarchy[0];
 
             // first find the parent we want to append to:
             currentParentPath.forEach((pathItem: string) => {
-                const headingFound = headingsHierarchy.find(element => element.headingId === pathItem);
+                // console.log("headingsHierarchy being searched:", JSON.stringify(currentHeadingLayer));
+                const headingFound = currentHeadingLayer.find(element => element.headingId === pathItem);
+                // console.log("headingFound", headingFound);
                 // if we search all headings at this level of headingsHierarchy and find a match, assign new currentParentHeading:
                 if (headingFound) {
                     currentParentHeading = headingFound;
+                    // if there is another child to search, assign the found heading's child element to currentHeadingLayer to be searched on next iteration:
+                    if (headingFound.children) {
+                        currentHeadingLayer = headingFound.children;
+                    }
                 }
             });
             console.log("final parent Heading found:", currentParentHeading);
 
             // if we find a valid final parent heading, append the new child to it:
             if (currentParentHeading) {
-                console.log("gets in here?");
                 // first calculate how many children down we need to nest this child
                 let diff = calcHeadingDiff(currentParentHeading, child);
+                console.log("diff between headings", diff);
 
                 // iterate and nest children till we hit the correct level heading should be at:
                 for (let i = 0; i <= diff; i++) {
-                    console.log("gets in here v2");
                     // if we are on last iteration insert the real child heading itself, else insert PLACEHOLDER
                     const heading = i === diff ? child : placeholderChild();
+                    console.log("child getting appended", heading);
 
                     if (currentParentHeading?.children) {
                         currentParentHeading?.children.push(heading);
@@ -812,6 +821,7 @@ const SidePanel = () => {
         // headingsHierarchy = dummyArray;
         // currentParentPath = ["2", "2.1"];
 
+        // TODO: remove any here
         filteredHeadings.forEach((heading: any) => {
             // console.log("foreach heading", heading);
             const para = heading.paragraph;
@@ -835,6 +845,13 @@ const SidePanel = () => {
             // 0) base case - if our heading is a top lvl H1 OR if there is nothing currently stored in currentParentPath, then create a new item in our final array of arrays:
             if (currHeadingDigit === "1" || !currentParentPath) {
                 console.log("0) base", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+
+                const headingDiff = prevHeadingDigit - currHeadingDigit;
+                console.log("basecase headingDiff", headingDiff);
+                // pop n from parent path where n is the diff between prev and curr heading digit
+                popParentPath(headingDiff + 1);
+                console.log("basecase new parent path:", currentParentPath);
+
                 headingsHierarchy.push(newChild);
                 // currentParentPath = headingsHierachy[heading];
                 appendToParentPath(headingId);
@@ -867,7 +884,7 @@ const SidePanel = () => {
                 const headingDiff = prevHeadingDigit - currHeadingDigit;
 
                 // pop n from parent path where n is the diff between prev and curr heading digit
-                popParentPath(headingDiff);
+                popParentPath(headingDiff + 1);
                 // append new child at this level
                 appendChildHeading(newChild);
             }
