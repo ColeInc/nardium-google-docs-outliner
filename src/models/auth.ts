@@ -1,4 +1,6 @@
+// TODO: convert documentContent to proper type
 export interface DocumentInfo {
+    isLoggedIn: boolean;
     token: string;
     email: string;
     documentId: string;

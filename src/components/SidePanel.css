@@ -1,0 +1,40 @@
+.side-panel-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 30vw;
+    min-width: 400px;
+    height: 100vh;
+    /* background: #ffffff; */
+    /* border-right: 1px solid #c2c2c2; */
+    z-index: 999;
+    padding: 10px;
+}
+
+.side-panel {
+    background-color: #070707;
+    border-radius: 15px;
+    /* width: 200px;
+    height: 400px; */
+    /* position: fixed;
+    left: 0;
+    top: 0;
+    width: 40vw;
+    min-width: 400px;
+    height: 100vh;
+    /* background: #ffffff; */
+    /* border-right: 1px solid #c2c2c2;
+    z-index: 999; */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 10px;
+}
+
+.side-panel h1 {
+    color: #fff;
+}

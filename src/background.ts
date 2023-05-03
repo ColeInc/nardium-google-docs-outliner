@@ -71,6 +71,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     if (request.type === "getAuthToken") {
         if (!chrome.identity) {
             console.error("Chrome Identity API not available :(");
+            sendResponse(undefined);
             return;
         }
 

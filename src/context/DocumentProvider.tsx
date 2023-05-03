@@ -7,6 +7,7 @@ interface DocumentProviderProps {
 }
 
 export const defaultDocumentState = {
+    isLoggedIn: false,
     token: "",
     email: "",
     documentId: "",
@@ -18,8 +19,8 @@ const DocumentProvider = (props: DocumentProviderProps) => {
 
     const updateDocumentDetails = (details: DocumentInfo) => {
         setdocumentDetails(prevState => {
-            console.log("prevState", prevState);
-            console.log("new Provider:", { ...prevState, ...details });
+            // console.log("prevState", prevState);
+            // console.log("new Provider:", { ...prevState, ...details });
             return { ...prevState, ...details } as DocumentInfo;
         });
     };

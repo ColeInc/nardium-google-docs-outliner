@@ -22,7 +22,7 @@ const Logout: FC = () => {
     const handleGoogleLogout = async () => {
         chrome.runtime.sendMessage({ type: "logoutUser", token }, (response: any) => {
             // remove token from our UserProvider:
-            userCtx.updateDocumentDetails({ token: "" } as DocumentInfo);
+            userCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo);
 
             console.log("Logout was Successful. v2");
         });

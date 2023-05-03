@@ -10,6 +10,8 @@ import { IHeading } from "../models/heading";
 import Headings from "./Headings";
 // import { getDocumentId } from "../lib/getDocumentId";
 import { DocumentInfo } from "../models";
+import "./SidePanel.css";
+import HeadingsWrapper from "./HeadingsWrapper";
 
 const clientId = process.env.REACT_CLIENT_ID || "";
 const scopes = "https://www.googleapis.com/auth/documents";
@@ -25,11 +27,12 @@ const SidePanel = () => {
     // const [user, setUser] = React.useState(undefined);
 
     // const [accessToken, setAccessToken] = useState("");
-    const [documentContent, setDocumentContent] = useState<IHeading[]>();
+    // const [documentContent, setDocumentContent] = useState<IHeading[]>();
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [activeDoc, setActiveDoc] = useState(null);
 
     const userCtx = useContext(DocumentContext);
+    const { isLoggedIn } = userCtx.documentDetails;
 
     // const setAuth2 = async () => {
     //     // @ts-ignore
@@ -116,508 +119,508 @@ const SidePanel = () => {
         // }
     }, []);
 
-    // // const getDocumentId = () => {
-    // //     console.log("triggering req to getDocumentId");
-    // //     chrome.runtime.sendMessage({ type: "getDocumentId" }, (response: any) => {
-    // //         // userCtx.updateDocumentDetails({ documentId: response.documentId } as DocumentInfo);
+    // const getDocumentId = () => {
+    //     console.log("triggering req to getDocumentId");
+    //     chrome.runtime.sendMessage({ type: "getDocumentId" }, (response: any) => {
+    //         // userCtx.updateDocumentDetails({ documentId: response.documentId } as DocumentInfo);
 
-    // //         console.log("fetched dis documentId (back at content.js!)", response.documentId);
-    // //         response.documentId
-    // //             ? userCtx.updateDocumentDetails({ documentId: response.documentId } as DocumentInfo)
-    // //             : null;
-    // //         console.log("2)");
-    // //     });
-    // // };
+    //         console.log("fetched dis documentId (back at content.js!)", response.documentId);
+    //         response.documentId
+    //             ? userCtx.updateDocumentDetails({ documentId: response.documentId } as DocumentInfo)
+    //             : null;
+    //         console.log("2)");
+    //     });
+    // };
 
     // get access token of logged in user, then use it to call google docs API to fetch document info
     const fetchFileContents = () => {
-        //  MOCK TODO: remove dis:
-        const contents = {
-            title: "Nardium Headlines Testing",
-            body: {
-                content: [
-                    {
-                        endIndex: 1,
-                        sectionBreak: {
-                            sectionStyle: {
-                                columnSeparatorStyle: "NONE",
-                                contentDirection: "LEFT_TO_RIGHT",
-                                sectionType: "CONTINUOUS",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 1,
-                        endIndex: 8,
-                        paragraph: {
-                            elements: [{ startIndex: 1, endIndex: 8, textRun: { content: "H1 - 1\n", textStyle: {} } }],
-                            paragraphStyle: {
-                                headingId: "h.opb284gdria0",
-                                namedStyleType: "HEADING_1",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 8,
-                        endIndex: 15,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 8, endIndex: 15, textRun: { content: "H2 - 2\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.6z3v76uflp1r",
-                                namedStyleType: "HEADING_2",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 15,
-                        endIndex: 22,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 15, endIndex: 22, textRun: { content: "H3 - 3\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.i8wwhibh4v7v",
-                                namedStyleType: "HEADING_3",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 22,
-                        endIndex: 29,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 22, endIndex: 29, textRun: { content: "H4 - 4\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.jg2jpfu79bzz",
-                                namedStyleType: "HEADING_4",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 29,
-                        endIndex: 36,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 29, endIndex: 36, textRun: { content: "H1 - 5\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.ux7bmvz95wyy",
-                                namedStyleType: "HEADING_1",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 36,
-                        endIndex: 43,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 36, endIndex: 43, textRun: { content: "H2 - 6\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.i6zu16fw3tuj",
-                                namedStyleType: "HEADING_2",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 43,
-                        endIndex: 50,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 43, endIndex: 50, textRun: { content: "H3 - 7\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.vbp8nl9eg1s",
-                                namedStyleType: "HEADING_3",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 50,
-                        endIndex: 57,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 50, endIndex: 57, textRun: { content: "H4 - 8\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.2x3fvugxehv6",
-                                namedStyleType: "HEADING_4",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 57,
-                        endIndex: 64,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 57, endIndex: 64, textRun: { content: "H5 - 9\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.dyh4t2z0z770",
-                                namedStyleType: "HEADING_5",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 64,
-                        endIndex: 72,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 64, endIndex: 72, textRun: { content: "H2 - 10\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.2jd7ibwmaahh",
-                                namedStyleType: "HEADING_2",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 72,
-                        endIndex: 80,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 72, endIndex: 80, textRun: { content: "H1 - 11\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.gd6zllnwyt32",
-                                namedStyleType: "HEADING_1",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 80,
-                        endIndex: 88,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 80, endIndex: 88, textRun: { content: "H2 - 12\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.2pt74a6zl0ii",
-                                namedStyleType: "HEADING_2",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 88,
-                        endIndex: 96,
-                        paragraph: {
-                            elements: [
-                                { startIndex: 88, endIndex: 96, textRun: { content: "H1 - 13\n", textStyle: {} } },
-                            ],
-                            paragraphStyle: {
-                                headingId: "h.b70vuc8fttbq",
-                                namedStyleType: "HEADING_1",
-                                direction: "LEFT_TO_RIGHT",
-                            },
-                        },
-                    },
-                    {
-                        startIndex: 96,
-                        endIndex: 97,
-                        paragraph: {
-                            elements: [{ startIndex: 96, endIndex: 97, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                    {
-                        startIndex: 97,
-                        endIndex: 98,
-                        paragraph: {
-                            elements: [{ startIndex: 97, endIndex: 98, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                    {
-                        startIndex: 98,
-                        endIndex: 99,
-                        paragraph: {
-                            elements: [{ startIndex: 98, endIndex: 99, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                    {
-                        startIndex: 99,
-                        endIndex: 100,
-                        paragraph: {
-                            elements: [{ startIndex: 99, endIndex: 100, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                    {
-                        startIndex: 100,
-                        endIndex: 101,
-                        paragraph: {
-                            elements: [{ startIndex: 100, endIndex: 101, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                    {
-                        startIndex: 101,
-                        endIndex: 102,
-                        paragraph: {
-                            elements: [{ startIndex: 101, endIndex: 102, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                    {
-                        startIndex: 102,
-                        endIndex: 103,
-                        paragraph: {
-                            elements: [{ startIndex: 102, endIndex: 103, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                    {
-                        startIndex: 103,
-                        endIndex: 104,
-                        paragraph: {
-                            elements: [{ startIndex: 103, endIndex: 104, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                    {
-                        startIndex: 104,
-                        endIndex: 105,
-                        paragraph: {
-                            elements: [{ startIndex: 104, endIndex: 105, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                    {
-                        startIndex: 105,
-                        endIndex: 106,
-                        paragraph: {
-                            elements: [{ startIndex: 105, endIndex: 106, textRun: { content: "\n", textStyle: {} } }],
-                            paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
-                        },
-                    },
-                ],
-            },
-            documentStyle: {
-                background: { color: {} },
-                pageNumberStart: 1,
-                marginTop: { magnitude: 72, unit: "PT" },
-                marginBottom: { magnitude: 72, unit: "PT" },
-                marginRight: { magnitude: 72, unit: "PT" },
-                marginLeft: { magnitude: 72, unit: "PT" },
-                pageSize: { height: { magnitude: 792, unit: "PT" }, width: { magnitude: 612, unit: "PT" } },
-                marginHeader: { magnitude: 36, unit: "PT" },
-                marginFooter: { magnitude: 36, unit: "PT" },
-                useCustomHeaderFooterMargins: true,
-            },
-            namedStyles: {
-                styles: [
-                    {
-                        namedStyleType: "NORMAL_TEXT",
-                        textStyle: {
-                            bold: false,
-                            italic: false,
-                            underline: false,
-                            strikethrough: false,
-                            smallCaps: false,
-                            backgroundColor: {},
-                            foregroundColor: { color: { rgbColor: {} } },
-                            fontSize: { magnitude: 11, unit: "PT" },
-                            weightedFontFamily: { fontFamily: "Arial", weight: 400 },
-                            baselineOffset: "NONE",
-                        },
-                        paragraphStyle: {
-                            namedStyleType: "NORMAL_TEXT",
-                            alignment: "START",
-                            lineSpacing: 115,
-                            direction: "LEFT_TO_RIGHT",
-                            spacingMode: "COLLAPSE_LISTS",
-                            spaceAbove: { unit: "PT" },
-                            spaceBelow: { unit: "PT" },
-                            borderBetween: {
-                                color: {},
-                                width: { unit: "PT" },
-                                padding: { unit: "PT" },
-                                dashStyle: "SOLID",
-                            },
-                            borderTop: {
-                                color: {},
-                                width: { unit: "PT" },
-                                padding: { unit: "PT" },
-                                dashStyle: "SOLID",
-                            },
-                            borderBottom: {
-                                color: {},
-                                width: { unit: "PT" },
-                                padding: { unit: "PT" },
-                                dashStyle: "SOLID",
-                            },
-                            borderLeft: {
-                                color: {},
-                                width: { unit: "PT" },
-                                padding: { unit: "PT" },
-                                dashStyle: "SOLID",
-                            },
-                            borderRight: {
-                                color: {},
-                                width: { unit: "PT" },
-                                padding: { unit: "PT" },
-                                dashStyle: "SOLID",
-                            },
-                            indentFirstLine: { unit: "PT" },
-                            indentStart: { unit: "PT" },
-                            indentEnd: { unit: "PT" },
-                            keepLinesTogether: false,
-                            keepWithNext: false,
-                            avoidWidowAndOrphan: true,
-                            shading: { backgroundColor: {} },
-                            pageBreakBefore: false,
-                        },
-                    },
-                    {
-                        namedStyleType: "HEADING_1",
-                        textStyle: { fontSize: { magnitude: 20, unit: "PT" } },
-                        paragraphStyle: {
-                            namedStyleType: "NORMAL_TEXT",
-                            direction: "LEFT_TO_RIGHT",
-                            spaceAbove: { magnitude: 20, unit: "PT" },
-                            spaceBelow: { magnitude: 6, unit: "PT" },
-                            keepLinesTogether: true,
-                            keepWithNext: true,
-                            pageBreakBefore: false,
-                        },
-                    },
-                    {
-                        namedStyleType: "HEADING_2",
-                        textStyle: { bold: false, fontSize: { magnitude: 16, unit: "PT" } },
-                        paragraphStyle: {
-                            namedStyleType: "NORMAL_TEXT",
-                            direction: "LEFT_TO_RIGHT",
-                            spaceAbove: { magnitude: 18, unit: "PT" },
-                            spaceBelow: { magnitude: 6, unit: "PT" },
-                            keepLinesTogether: true,
-                            keepWithNext: true,
-                            pageBreakBefore: false,
-                        },
-                    },
-                    {
-                        namedStyleType: "HEADING_3",
-                        textStyle: {
-                            bold: false,
-                            foregroundColor: {
-                                color: { rgbColor: { red: 0.2627451, green: 0.2627451, blue: 0.2627451 } },
-                            },
-                            fontSize: { magnitude: 14, unit: "PT" },
-                        },
-                        paragraphStyle: {
-                            namedStyleType: "NORMAL_TEXT",
-                            direction: "LEFT_TO_RIGHT",
-                            spaceAbove: { magnitude: 16, unit: "PT" },
-                            spaceBelow: { magnitude: 4, unit: "PT" },
-                            keepLinesTogether: true,
-                            keepWithNext: true,
-                            pageBreakBefore: false,
-                        },
-                    },
-                    {
-                        namedStyleType: "HEADING_4",
-                        textStyle: {
-                            foregroundColor: { color: { rgbColor: { red: 0.4, green: 0.4, blue: 0.4 } } },
-                            fontSize: { magnitude: 12, unit: "PT" },
-                        },
-                        paragraphStyle: {
-                            namedStyleType: "NORMAL_TEXT",
-                            direction: "LEFT_TO_RIGHT",
-                            spaceAbove: { magnitude: 14, unit: "PT" },
-                            spaceBelow: { magnitude: 4, unit: "PT" },
-                            keepLinesTogether: true,
-                            keepWithNext: true,
-                            pageBreakBefore: false,
-                        },
-                    },
-                    {
-                        namedStyleType: "HEADING_5",
-                        textStyle: {
-                            foregroundColor: { color: { rgbColor: { red: 0.4, green: 0.4, blue: 0.4 } } },
-                            fontSize: { magnitude: 11, unit: "PT" },
-                        },
-                        paragraphStyle: {
-                            namedStyleType: "NORMAL_TEXT",
-                            direction: "LEFT_TO_RIGHT",
-                            spaceAbove: { magnitude: 12, unit: "PT" },
-                            spaceBelow: { magnitude: 4, unit: "PT" },
-                            keepLinesTogether: true,
-                            keepWithNext: true,
-                            pageBreakBefore: false,
-                        },
-                    },
-                    {
-                        namedStyleType: "HEADING_6",
-                        textStyle: {
-                            italic: true,
-                            foregroundColor: { color: { rgbColor: { red: 0.4, green: 0.4, blue: 0.4 } } },
-                            fontSize: { magnitude: 11, unit: "PT" },
-                        },
-                        paragraphStyle: {
-                            namedStyleType: "NORMAL_TEXT",
-                            direction: "LEFT_TO_RIGHT",
-                            spaceAbove: { magnitude: 12, unit: "PT" },
-                            spaceBelow: { magnitude: 4, unit: "PT" },
-                            keepLinesTogether: true,
-                            keepWithNext: true,
-                            pageBreakBefore: false,
-                        },
-                    },
-                    {
-                        namedStyleType: "TITLE",
-                        textStyle: { fontSize: { magnitude: 26, unit: "PT" } },
-                        paragraphStyle: {
-                            namedStyleType: "NORMAL_TEXT",
-                            direction: "LEFT_TO_RIGHT",
-                            spaceAbove: { unit: "PT" },
-                            spaceBelow: { magnitude: 3, unit: "PT" },
-                            keepLinesTogether: true,
-                            keepWithNext: true,
-                            pageBreakBefore: false,
-                        },
-                    },
-                    {
-                        namedStyleType: "SUBTITLE",
-                        textStyle: {
-                            italic: false,
-                            foregroundColor: { color: { rgbColor: { red: 0.4, green: 0.4, blue: 0.4 } } },
-                            fontSize: { magnitude: 15, unit: "PT" },
-                            weightedFontFamily: { fontFamily: "Arial", weight: 400 },
-                        },
-                        paragraphStyle: {
-                            namedStyleType: "NORMAL_TEXT",
-                            direction: "LEFT_TO_RIGHT",
-                            spaceAbove: { unit: "PT" },
-                            spaceBelow: { magnitude: 16, unit: "PT" },
-                            keepLinesTogether: true,
-                            keepWithNext: true,
-                            pageBreakBefore: false,
-                        },
-                    },
-                ],
-            },
-            revisionId: "ANeT5PQlsUDwq3soyg43Z1ryEgbH-MeWooo8R-swFY24aWKPhc9cOoKFGx8POPTXM5nyPMJp5Lj_2Bd5f2N3Xw",
-            suggestionsViewMode: "SUGGESTIONS_INLINE",
-            documentId: "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw",
-        };
-        userCtx.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
-        filterDocumentContent(contents);
-        return;
+        // // // //  MOCK FOR VANILLA REACT. TODO: remove this:
+        // // // const contents = {
+        // // //     title: "Nardium Headlines Testing",
+        // // //     body: {
+        // // //         content: [
+        // // //             {
+        // // //                 endIndex: 1,
+        // // //                 sectionBreak: {
+        // // //                     sectionStyle: {
+        // // //                         columnSeparatorStyle: "NONE",
+        // // //                         contentDirection: "LEFT_TO_RIGHT",
+        // // //                         sectionType: "CONTINUOUS",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 1,
+        // // //                 endIndex: 8,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 1, endIndex: 8, textRun: { content: "H1 - 1\n", textStyle: {} } }],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.opb284gdria0",
+        // // //                         namedStyleType: "HEADING_1",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 8,
+        // // //                 endIndex: 15,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 8, endIndex: 15, textRun: { content: "H2 - 2\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.6z3v76uflp1r",
+        // // //                         namedStyleType: "HEADING_2",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 15,
+        // // //                 endIndex: 22,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 15, endIndex: 22, textRun: { content: "H3 - 3\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.i8wwhibh4v7v",
+        // // //                         namedStyleType: "HEADING_3",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 22,
+        // // //                 endIndex: 29,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 22, endIndex: 29, textRun: { content: "H4 - 4\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.jg2jpfu79bzz",
+        // // //                         namedStyleType: "HEADING_4",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 29,
+        // // //                 endIndex: 36,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 29, endIndex: 36, textRun: { content: "H1 - 5\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.ux7bmvz95wyy",
+        // // //                         namedStyleType: "HEADING_1",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 36,
+        // // //                 endIndex: 43,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 36, endIndex: 43, textRun: { content: "H2 - 6\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.i6zu16fw3tuj",
+        // // //                         namedStyleType: "HEADING_2",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 43,
+        // // //                 endIndex: 50,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 43, endIndex: 50, textRun: { content: "H3 - 7\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.vbp8nl9eg1s",
+        // // //                         namedStyleType: "HEADING_3",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 50,
+        // // //                 endIndex: 57,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 50, endIndex: 57, textRun: { content: "H4 - 8\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.2x3fvugxehv6",
+        // // //                         namedStyleType: "HEADING_4",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 57,
+        // // //                 endIndex: 64,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 57, endIndex: 64, textRun: { content: "H5 - 9\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.dyh4t2z0z770",
+        // // //                         namedStyleType: "HEADING_5",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 64,
+        // // //                 endIndex: 72,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 64, endIndex: 72, textRun: { content: "H2 - 10\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.2jd7ibwmaahh",
+        // // //                         namedStyleType: "HEADING_2",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 72,
+        // // //                 endIndex: 80,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 72, endIndex: 80, textRun: { content: "H1 - 11\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.gd6zllnwyt32",
+        // // //                         namedStyleType: "HEADING_1",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 80,
+        // // //                 endIndex: 88,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 80, endIndex: 88, textRun: { content: "H2 - 12\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.2pt74a6zl0ii",
+        // // //                         namedStyleType: "HEADING_2",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 88,
+        // // //                 endIndex: 96,
+        // // //                 paragraph: {
+        // // //                     elements: [
+        // // //                         { startIndex: 88, endIndex: 96, textRun: { content: "H1 - 13\n", textStyle: {} } },
+        // // //                     ],
+        // // //                     paragraphStyle: {
+        // // //                         headingId: "h.b70vuc8fttbq",
+        // // //                         namedStyleType: "HEADING_1",
+        // // //                         direction: "LEFT_TO_RIGHT",
+        // // //                     },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 96,
+        // // //                 endIndex: 97,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 96, endIndex: 97, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 97,
+        // // //                 endIndex: 98,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 97, endIndex: 98, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 98,
+        // // //                 endIndex: 99,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 98, endIndex: 99, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 99,
+        // // //                 endIndex: 100,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 99, endIndex: 100, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 100,
+        // // //                 endIndex: 101,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 100, endIndex: 101, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 101,
+        // // //                 endIndex: 102,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 101, endIndex: 102, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 102,
+        // // //                 endIndex: 103,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 102, endIndex: 103, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 103,
+        // // //                 endIndex: 104,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 103, endIndex: 104, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 104,
+        // // //                 endIndex: 105,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 104, endIndex: 105, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 startIndex: 105,
+        // // //                 endIndex: 106,
+        // // //                 paragraph: {
+        // // //                     elements: [{ startIndex: 105, endIndex: 106, textRun: { content: "\n", textStyle: {} } }],
+        // // //                     paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+        // // //                 },
+        // // //             },
+        // // //         ],
+        // // //     },
+        // // //     documentStyle: {
+        // // //         background: { color: {} },
+        // // //         pageNumberStart: 1,
+        // // //         marginTop: { magnitude: 72, unit: "PT" },
+        // // //         marginBottom: { magnitude: 72, unit: "PT" },
+        // // //         marginRight: { magnitude: 72, unit: "PT" },
+        // // //         marginLeft: { magnitude: 72, unit: "PT" },
+        // // //         pageSize: { height: { magnitude: 792, unit: "PT" }, width: { magnitude: 612, unit: "PT" } },
+        // // //         marginHeader: { magnitude: 36, unit: "PT" },
+        // // //         marginFooter: { magnitude: 36, unit: "PT" },
+        // // //         useCustomHeaderFooterMargins: true,
+        // // //     },
+        // // //     namedStyles: {
+        // // //         styles: [
+        // // //             {
+        // // //                 namedStyleType: "NORMAL_TEXT",
+        // // //                 textStyle: {
+        // // //                     bold: false,
+        // // //                     italic: false,
+        // // //                     underline: false,
+        // // //                     strikethrough: false,
+        // // //                     smallCaps: false,
+        // // //                     backgroundColor: {},
+        // // //                     foregroundColor: { color: { rgbColor: {} } },
+        // // //                     fontSize: { magnitude: 11, unit: "PT" },
+        // // //                     weightedFontFamily: { fontFamily: "Arial", weight: 400 },
+        // // //                     baselineOffset: "NONE",
+        // // //                 },
+        // // //                 paragraphStyle: {
+        // // //                     namedStyleType: "NORMAL_TEXT",
+        // // //                     alignment: "START",
+        // // //                     lineSpacing: 115,
+        // // //                     direction: "LEFT_TO_RIGHT",
+        // // //                     spacingMode: "COLLAPSE_LISTS",
+        // // //                     spaceAbove: { unit: "PT" },
+        // // //                     spaceBelow: { unit: "PT" },
+        // // //                     borderBetween: {
+        // // //                         color: {},
+        // // //                         width: { unit: "PT" },
+        // // //                         padding: { unit: "PT" },
+        // // //                         dashStyle: "SOLID",
+        // // //                     },
+        // // //                     borderTop: {
+        // // //                         color: {},
+        // // //                         width: { unit: "PT" },
+        // // //                         padding: { unit: "PT" },
+        // // //                         dashStyle: "SOLID",
+        // // //                     },
+        // // //                     borderBottom: {
+        // // //                         color: {},
+        // // //                         width: { unit: "PT" },
+        // // //                         padding: { unit: "PT" },
+        // // //                         dashStyle: "SOLID",
+        // // //                     },
+        // // //                     borderLeft: {
+        // // //                         color: {},
+        // // //                         width: { unit: "PT" },
+        // // //                         padding: { unit: "PT" },
+        // // //                         dashStyle: "SOLID",
+        // // //                     },
+        // // //                     borderRight: {
+        // // //                         color: {},
+        // // //                         width: { unit: "PT" },
+        // // //                         padding: { unit: "PT" },
+        // // //                         dashStyle: "SOLID",
+        // // //                     },
+        // // //                     indentFirstLine: { unit: "PT" },
+        // // //                     indentStart: { unit: "PT" },
+        // // //                     indentEnd: { unit: "PT" },
+        // // //                     keepLinesTogether: false,
+        // // //                     keepWithNext: false,
+        // // //                     avoidWidowAndOrphan: true,
+        // // //                     shading: { backgroundColor: {} },
+        // // //                     pageBreakBefore: false,
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 namedStyleType: "HEADING_1",
+        // // //                 textStyle: { fontSize: { magnitude: 20, unit: "PT" } },
+        // // //                 paragraphStyle: {
+        // // //                     namedStyleType: "NORMAL_TEXT",
+        // // //                     direction: "LEFT_TO_RIGHT",
+        // // //                     spaceAbove: { magnitude: 20, unit: "PT" },
+        // // //                     spaceBelow: { magnitude: 6, unit: "PT" },
+        // // //                     keepLinesTogether: true,
+        // // //                     keepWithNext: true,
+        // // //                     pageBreakBefore: false,
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 namedStyleType: "HEADING_2",
+        // // //                 textStyle: { bold: false, fontSize: { magnitude: 16, unit: "PT" } },
+        // // //                 paragraphStyle: {
+        // // //                     namedStyleType: "NORMAL_TEXT",
+        // // //                     direction: "LEFT_TO_RIGHT",
+        // // //                     spaceAbove: { magnitude: 18, unit: "PT" },
+        // // //                     spaceBelow: { magnitude: 6, unit: "PT" },
+        // // //                     keepLinesTogether: true,
+        // // //                     keepWithNext: true,
+        // // //                     pageBreakBefore: false,
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 namedStyleType: "HEADING_3",
+        // // //                 textStyle: {
+        // // //                     bold: false,
+        // // //                     foregroundColor: {
+        // // //                         color: { rgbColor: { red: 0.2627451, green: 0.2627451, blue: 0.2627451 } },
+        // // //                     },
+        // // //                     fontSize: { magnitude: 14, unit: "PT" },
+        // // //                 },
+        // // //                 paragraphStyle: {
+        // // //                     namedStyleType: "NORMAL_TEXT",
+        // // //                     direction: "LEFT_TO_RIGHT",
+        // // //                     spaceAbove: { magnitude: 16, unit: "PT" },
+        // // //                     spaceBelow: { magnitude: 4, unit: "PT" },
+        // // //                     keepLinesTogether: true,
+        // // //                     keepWithNext: true,
+        // // //                     pageBreakBefore: false,
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 namedStyleType: "HEADING_4",
+        // // //                 textStyle: {
+        // // //                     foregroundColor: { color: { rgbColor: { red: 0.4, green: 0.4, blue: 0.4 } } },
+        // // //                     fontSize: { magnitude: 12, unit: "PT" },
+        // // //                 },
+        // // //                 paragraphStyle: {
+        // // //                     namedStyleType: "NORMAL_TEXT",
+        // // //                     direction: "LEFT_TO_RIGHT",
+        // // //                     spaceAbove: { magnitude: 14, unit: "PT" },
+        // // //                     spaceBelow: { magnitude: 4, unit: "PT" },
+        // // //                     keepLinesTogether: true,
+        // // //                     keepWithNext: true,
+        // // //                     pageBreakBefore: false,
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 namedStyleType: "HEADING_5",
+        // // //                 textStyle: {
+        // // //                     foregroundColor: { color: { rgbColor: { red: 0.4, green: 0.4, blue: 0.4 } } },
+        // // //                     fontSize: { magnitude: 11, unit: "PT" },
+        // // //                 },
+        // // //                 paragraphStyle: {
+        // // //                     namedStyleType: "NORMAL_TEXT",
+        // // //                     direction: "LEFT_TO_RIGHT",
+        // // //                     spaceAbove: { magnitude: 12, unit: "PT" },
+        // // //                     spaceBelow: { magnitude: 4, unit: "PT" },
+        // // //                     keepLinesTogether: true,
+        // // //                     keepWithNext: true,
+        // // //                     pageBreakBefore: false,
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 namedStyleType: "HEADING_6",
+        // // //                 textStyle: {
+        // // //                     italic: true,
+        // // //                     foregroundColor: { color: { rgbColor: { red: 0.4, green: 0.4, blue: 0.4 } } },
+        // // //                     fontSize: { magnitude: 11, unit: "PT" },
+        // // //                 },
+        // // //                 paragraphStyle: {
+        // // //                     namedStyleType: "NORMAL_TEXT",
+        // // //                     direction: "LEFT_TO_RIGHT",
+        // // //                     spaceAbove: { magnitude: 12, unit: "PT" },
+        // // //                     spaceBelow: { magnitude: 4, unit: "PT" },
+        // // //                     keepLinesTogether: true,
+        // // //                     keepWithNext: true,
+        // // //                     pageBreakBefore: false,
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 namedStyleType: "TITLE",
+        // // //                 textStyle: { fontSize: { magnitude: 26, unit: "PT" } },
+        // // //                 paragraphStyle: {
+        // // //                     namedStyleType: "NORMAL_TEXT",
+        // // //                     direction: "LEFT_TO_RIGHT",
+        // // //                     spaceAbove: { unit: "PT" },
+        // // //                     spaceBelow: { magnitude: 3, unit: "PT" },
+        // // //                     keepLinesTogether: true,
+        // // //                     keepWithNext: true,
+        // // //                     pageBreakBefore: false,
+        // // //                 },
+        // // //             },
+        // // //             {
+        // // //                 namedStyleType: "SUBTITLE",
+        // // //                 textStyle: {
+        // // //                     italic: false,
+        // // //                     foregroundColor: { color: { rgbColor: { red: 0.4, green: 0.4, blue: 0.4 } } },
+        // // //                     fontSize: { magnitude: 15, unit: "PT" },
+        // // //                     weightedFontFamily: { fontFamily: "Arial", weight: 400 },
+        // // //                 },
+        // // //                 paragraphStyle: {
+        // // //                     namedStyleType: "NORMAL_TEXT",
+        // // //                     direction: "LEFT_TO_RIGHT",
+        // // //                     spaceAbove: { unit: "PT" },
+        // // //                     spaceBelow: { magnitude: 16, unit: "PT" },
+        // // //                     keepLinesTogether: true,
+        // // //                     keepWithNext: true,
+        // // //                     pageBreakBefore: false,
+        // // //                 },
+        // // //             },
+        // // //         ],
+        // // //     },
+        // // //     revisionId: "ANeT5PQlsUDwq3soyg43Z1ryEgbH-MeWooo8R-swFY24aWKPhc9cOoKFGx8POPTXM5nyPMJp5Lj_2Bd5f2N3Xw",
+        // // //     suggestionsViewMode: "SUGGESTIONS_INLINE",
+        // // //     documentId: "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw",
+        // // // };
+        // // // userCtx.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
+        // // // filterDocumentContent(contents);
+        // // // return;
 
         try {
             // const documentId = "1fMp6Wfal8e-AMH5F5gj-wscCFpYFp6CXMwrcZIFyatw";
@@ -1110,29 +1113,29 @@ const SidePanel = () => {
     // };
 
     // main set of steps to fire on load of extension:
-    const onLoad = () => {
-        console.log("1)");
-        // getDocumentId();
-        console.log("3)");
-        fetchFileContents();
-    };
+    // const onLoad = () => {
+    //     console.log("1)");
+    //     getDocumentId();
+    //     console.log("3)");
+    //     fetchFileContents();
+    // };
 
-    return thirdPartyCookiesEnabled ? (
-        <div className="message">
-            <p>Third-party cookies are disabled in your browser. Please enable them to continue using this site.</p>
-        </div>
-    ) : (
-        <div>
-            {/* <div onClick={() => handleAuthenticate()}>Sign In</div> */}
-            <Login />
-            <Logout />
-            {/* {googleAuth && googleAuth.isSignedIn && <button onClick={fetchFileContents}>Fetch Contents!</button>} */}
-            {/* <button onClick={() => googleAuth?.signIn()}>Sign In V3</button> */}
-            <button onClick={onLoad}>Fetch Contents!</button>
-            <div className="headings">
-                <ul>
-                    <Headings headings={documentContent} />
-                </ul>
+    if (thirdPartyCookiesEnabled) {
+        return (
+            <div className="message">
+                <p>Third-party cookies are disabled in your browser. Please enable them to continue using this site.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="side-panel-container">
+            <div className="side-panel">
+                <h1>Nardium</h1>
+
+                {!isLoggedIn ? <Login /> : <HeadingsWrapper />}
+
+                <button>SETTINGS</button>
             </div>
         </div>
     );

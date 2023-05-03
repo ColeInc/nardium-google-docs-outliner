@@ -5,12 +5,18 @@
 .headings .heading-arrow-container {
     display: flex;
     justify-content: flex-start;
+    align-items: center;
+}
+
+.headings .heading-arrow-container:hover .heading-chevron-button svg {
+    fill: grey;
 }
 
 .headings h1 {
-    color: red;
+    color: #fff;
     font-size: 8pt;
     font-weight: 400;
+    margin-left: 0.5rem;
 }
 
 .headings .heading1 {
@@ -37,4 +43,32 @@
 
 .headings a {
     text-decoration: none !important;
+}
+
+.heading-chevron-button {
+    /* background-color: red; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+}
+
+.heading-chevron-button svg {
+    transform: rotate(270deg);
+    /* transform: rotate(90deg); */
+    fill: transparent;
+}
+
+.heading-chevron-button:hover svg {
+    fill: #fff !important;
+}
+
+.clicked svg {
+    transform: rotate(90deg);
+    /* transform: rotate(270deg); */
+}
+
+.headings ul {
+    list-style: none;
 }

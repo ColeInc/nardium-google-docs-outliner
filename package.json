@@ -48,6 +48,8 @@
         }
     },
     "devDependencies": {
+        "@svgr/webpack": "^7.0.0",
+        "@types/chrome": "^0.0.235",
         "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^6.7.3",
         "dotenv-webpack": "^8.0.1",

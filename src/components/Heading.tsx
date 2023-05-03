@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { IHeading } from "../models/heading";
 import Headings from "./Headings";
-import { ReactComponent as Chevron } from "../../public/assets/chevron.svg";
+import Chevron from "../../public/assets/chevron.svg";
 
 const Heading = ({ heading }: { heading: IHeading }) => {
     const [isHidden, setIsHidden] = useState(false);
+    // const [isClicked, setIsClicked] = useState(false);
 
     const toggleHidden = () => {
         setIsHidden(s => !s);
@@ -20,12 +21,12 @@ const Heading = ({ heading }: { heading: IHeading }) => {
         <li key={heading.headingId}>
             {!isPlaceholder && (
                 <div className={`heading-arrow-container heading${heading.headingDigit}`}>
-                    {heading.children && <button onClick={toggleHidden}>v</button>}
+                    {/* {heading.children && <button onClick={toggleHidden}>v</button>} */}
 
                     {heading.children && (
-                        <button onClick={toggleHidden}>
+                        <div className={`heading-chevron-button ${isHidden && "clicked"}`} onClick={toggleHidden}>
                             <Chevron />
-                        </button>
+                        </div>
                     )}
                     <a href={`#heading=${heading.headingId}`}>
                         <h1>{heading.headingText}</h1>
