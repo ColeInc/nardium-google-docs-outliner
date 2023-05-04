@@ -1,22 +1,27 @@
-import React, { FC, useContext } from "react";
+import React, { FC, useContext, useEffect } from "react";
 import DocumentContext from "../context/document-context";
 import { DocumentInfo } from "../models";
 import Logout from "./Logout";
 import "./Login.css";
 
 const Login: FC = () => {
-    const userCtx = useContext(DocumentContext);
+    const documentCtx = useContext(DocumentContext);
 
-    const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
+    // attempt to log user in on page load:
+    useEffect(() => {
+        // console.log("triggers handleLogin");
+        handleLogin();
+    }, []);
 
+    const handleLogin = () => {
         // TODO: convert this response into valid type once we have final user object shape:
         chrome.runtime.sendMessage({ type: "getAuthToken" }, (response: any) => {
             if (response) {
                 console.log("repsonse fetched back at content.js", response);
-                userCtx.updateDocumentDetails({ token: response.token, isLoggedIn: true } as DocumentInfo);
+                documentCtx.updateDocumentDetails({ token: response.token, isLoggedIn: true } as DocumentInfo);
             } else {
-                userCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
+                console.log("Invalid response back from chrome Login background.js function");
+                documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
             }
         });
     };

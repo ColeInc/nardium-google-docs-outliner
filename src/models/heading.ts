@@ -2,7 +2,7 @@ export interface IHeading {
     headingId: string;
     headingDigit?: number;
     headingText?: string;
-    startIndex?: string;
-    endIndex?: string;
+    startIndex?: number;
+    endIndex?: number;
     children?: IHeading[];
 }

@@ -16,13 +16,13 @@ import { DocumentInfo } from "../models";
 // }
 
 const Logout: FC = () => {
-    const userCtx = useContext(DocumentContext);
-    const token = userCtx.documentDetails?.token;
+    const documentCtx = useContext(DocumentContext);
+    const token = documentCtx.documentDetails?.token;
 
     const handleGoogleLogout = async () => {
         chrome.runtime.sendMessage({ type: "logoutUser", token }, (response: any) => {
             // remove token from our UserProvider:
-            userCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo);
+            documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo);
 
             console.log("Logout was Successful. v2");
         });

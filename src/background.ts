@@ -78,6 +78,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         chrome.identity.getAuthToken({ interactive: true }, token => {
             if (chrome.runtime.lastError || !token) {
                 alert(`SSO ended with an error: ${JSON.stringify(chrome.runtime.lastError)}`);
+                sendResponse(undefined);
                 return;
             }
             sendResponse({ token: token });
@@ -98,7 +99,11 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             const url = tabs[0].url;
             const match = /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(url);
             const documentId = match && match[1];
-            sendResponse({ documentId });
+            if (!documentId) {
+                sendResponse({ error: "Failed to get document ID" });
+            } else {
+                sendResponse({ documentId });
+            }
         });
         return true;
     }
