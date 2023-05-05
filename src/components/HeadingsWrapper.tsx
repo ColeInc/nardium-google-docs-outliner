@@ -21,8 +21,9 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     useEffect(() => {
         const onLoad = async () => {
             console.log("1)");
-            const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
+            // const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
             console.log("3)");
+            const documentId = "bean";
             const fileContents = await fetchFileContents(documentId, documentCtx);
 
             // TODO: instead of if statement here i think just do a try catch and if error occurs at any point render an error component instead of <Headings>

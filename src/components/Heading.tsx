@@ -17,10 +17,20 @@ const Heading = ({ heading }: { heading: IHeading }) => {
     //     return null;
     // }
 
+    // calculate the necessary left padding for heading item (depends whether it has collapse arrow or not)
+    // const headerStyle = heading.children ? {paddingLeft: heading.headingDigit - 1 * 32} : {paddingLeft: (heading.headingDigit * 16) + 12}
+    const digit = heading.headingDigit ?? 0;
+    let headerStyle;
+    if (heading.children) {
+        headerStyle = { paddingLeft: (digit - 1) * 24 };
+    } else {
+        headerStyle = { paddingLeft: (digit - 1) * 24 + 12 };
+    }
+
     return (
         <li key={heading.headingId}>
             {!isPlaceholder && (
-                <div className={`heading-arrow-container heading${heading.headingDigit}`}>
+                <div className={`heading-arrow-container heading${heading.headingDigit}`} style={headerStyle}>
                     {/* {heading.children && <button onClick={toggleHidden}>v</button>} */}
 
                     {heading.children && (
