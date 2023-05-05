@@ -18,14 +18,9 @@ const Heading = ({ heading }: { heading: IHeading }) => {
     // }
 
     // calculate the necessary left padding for heading item (depends whether it has collapse arrow or not)
-    // const headerStyle = heading.children ? {paddingLeft: heading.headingDigit - 1 * 32} : {paddingLeft: (heading.headingDigit * 16) + 12}
-    const digit = heading.headingDigit ?? 0;
-    let headerStyle;
-    if (heading.children) {
-        headerStyle = { paddingLeft: (digit - 1) * 24 };
-    } else {
-        headerStyle = { paddingLeft: (digit - 1) * 24 + 12 };
-    }
+    const digit = heading.headingDigit || 0;
+    const paddingLeft = (digit - 1) * 24 + (heading.children ? 0 : 12);
+    const headerStyle = { paddingLeft };
 
     return (
         <li key={heading.headingId}>
