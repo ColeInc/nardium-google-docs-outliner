@@ -38,3 +38,10 @@
 .side-panel h1 {
     color: #fff;
 }
+
+.loading-spinner-container {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}

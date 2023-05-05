@@ -3,8 +3,11 @@ import DocumentContext from "../context/document-context";
 import { DocumentInfo } from "../models";
 import Logout from "./Logout";
 import "./Login.css";
+interface LoginProps {
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const Login: FC = () => {
+const Login: FC<LoginProps> = ({ setIsLoading }) => {
     const documentCtx = useContext(DocumentContext);
 
     // attempt to log user in on page load:
@@ -24,6 +27,7 @@ const Login: FC = () => {
                 documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
             }
         });
+        setIsLoading(false);
     };
 
     return (

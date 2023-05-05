@@ -3,11 +3,13 @@ import DocumentContext from "../context/document-context";
 import HeadingsWrapper from "./HeadingsWrapper";
 import Login from "./Login";
 import "./SidePanel.css";
+import LoadingSpinner from "./LoadingSpinner";
 
 const SidePanel = () => {
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         console.log("cookies enabled?", navigator.cookieEnabled);
@@ -42,7 +44,13 @@ const SidePanel = () => {
             <div className="side-panel">
                 <h1>Nardium</h1>
 
-                {!isLoggedIn ? <Login /> : <HeadingsWrapper />}
+                {isLoading && (
+                    <div className="loading-spinner-container">
+                        <LoadingSpinner />
+                    </div>
+                )}
+
+                {!isLoggedIn ? <Login setIsLoading={setIsLoading} /> : <HeadingsWrapper setIsLoading={setIsLoading} />}
 
                 <button>SETTINGS</button>
             </div>
