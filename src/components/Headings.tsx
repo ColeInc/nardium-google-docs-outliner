@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import { IHeading } from "../models/heading";
 import "./Headings.css";
 import Heading from "./Heading";
 
-const Headings = ({ headings }: { headings: IHeading[] | undefined }) => {
+interface HeadingsProps {
+    headings: IHeading[] | undefined;
+    visibleHeadings: number;
+}
+
+const Headings: FC<HeadingsProps> = ({ headings, visibleHeadings }) => {
     if (!headings) {
         return <div>---</div>;
     }
@@ -11,7 +16,7 @@ const Headings = ({ headings }: { headings: IHeading[] | undefined }) => {
     return (
         <>
             {headings.map(heading => (
-                <Heading heading={heading} key={heading.headingId} />
+                <Heading heading={heading} visibleHeadings={visibleHeadings} key={heading.headingId} />
             ))}
         </>
     );

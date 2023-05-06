@@ -13,9 +13,11 @@ interface HeadingsWrapperProps {
 
 const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     const [documentContent, setDocumentContent] = useState<IHeading[]>();
+    const [visibleHeadings, setVisibleHeadings] = useState(3); // default value of which headings are collapsed
+    console.log("visibleHeadings", visibleHeadings);
     const documentCtx = useContext(DocumentContext);
 
-    console.log("init documentContent", documentContent, !!documentContent);
+    // console.log("init documentContent", documentContent, !!documentContent);
 
     // main onLoad steps:
     useEffect(() => {
@@ -52,10 +54,19 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
             {documentContent && (
                 <div className="headings">
                     <ul>
-                        <Headings headings={documentContent} />
+                        <Headings headings={documentContent} visibleHeadings={visibleHeadings} />
                     </ul>
                 </div>
             )}
+
+            <div className="headings-grid-container">
+                <button onClick={() => setVisibleHeadings(1)}>H1</button>
+                <button onClick={() => setVisibleHeadings(2)}>H2</button>
+                <button onClick={() => setVisibleHeadings(3)}>H3</button>
+                <button onClick={() => setVisibleHeadings(4)}>H4</button>
+                <button onClick={() => setVisibleHeadings(5)}>H5</button>
+                <button onClick={() => setVisibleHeadings(6)}>H6</button>
+            </div>
         </div>
     );
 };

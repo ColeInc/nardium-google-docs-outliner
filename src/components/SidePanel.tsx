@@ -50,6 +50,7 @@ const SidePanel = () => {
                     </div>
                 )}
 
+                {/* TODO: perhaps global loading provider LoadingProvider */}
                 {!isLoggedIn ? <Login setIsLoading={setIsLoading} /> : <HeadingsWrapper setIsLoading={setIsLoading} />}
 
                 <button>SETTINGS</button>
