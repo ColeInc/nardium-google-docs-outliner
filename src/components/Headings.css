@@ -1,6 +1,5 @@
-/* TODO: make this dynamically updated by user settings so they can set font size themselves */
 :root {
-    --user-height: 11px;
+    --user-zoom: 11px;
 }
 
 .headings ul .hidden {
@@ -11,7 +10,8 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    height: calc(2 * var(--user-height));
+    /* height: calc(2 * var(--user-zoom)); */
+    height: calc(1.8 * var(--user-zoom));
     /* background-color: green; */
 }
 
@@ -20,9 +20,10 @@
 }
 
 .headings h1 {
-    color: #fff;
+    /* color: #fff; */
+    color: green;
     /* font-size: 8pt; */
-    font-size: var(--user-height);
+    font-size: var(--user-zoom);
     font-weight: 400;
     margin-left: 4px;
     white-space: nowrap; /* Prevents the text from wrapping */
@@ -86,12 +87,4 @@
 
 .headings ul {
     list-style: none;
-}
-
-.zzzzzzzzzzzzz .heading-arrow-container-v2 h1 {
-    white-space: nowrap; /* Prevents the text from wrapping */
-    overflow: hidden; /* Hides the overflow text */
-    text-overflow: ellipsis; /* Shows ellipsis when the text is truncated */
-    width: 80px;
-    color: white;
 }

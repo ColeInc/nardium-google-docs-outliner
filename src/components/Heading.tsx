@@ -15,7 +15,7 @@ const Heading: FC<HeadingProps> = ({ heading, visibleHeadings }) => {
     const digit = heading.headingDigit || 0;
 
     useEffect(() => {
-        console.log("cur heading digit", digit, " > ", visibleHeadings, " = ", digit > visibleHeadings);
+        // console.log("cur heading digit", digit, " > ", visibleHeadings, " = ", digit > visibleHeadings);
         // if this heading's Heading Digit is more than the current visibleHeadings value we want, then hide it. E.g. if user wants to see only H1H2H3, collapse all H4+
         if (digit > visibleHeadings - 1) {
             setIsHidden(true);

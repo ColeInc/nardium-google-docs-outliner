@@ -19,17 +19,8 @@ const SidePanel = () => {
         } else {
             setThirdPartyCookiesEnabled(true);
             console.error("Cookies are not enabled in the current environment.");
-            // alert("please enable 3rd party cookies!");
         }
     }, []);
-
-    // main set of steps to fire on load of extension:
-    // const onLoad = () => {
-    //     console.log("1)");
-    //     getDocumentId();
-    //     console.log("3)");
-    //     fetchFileContents();
-    // };
 
     if (thirdPartyCookiesEnabled) {
         return (

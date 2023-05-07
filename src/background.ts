@@ -3,6 +3,10 @@ interface ChromeMessageRequest {
     token?: string;
     documentId?: string;
     startIndex?: string;
+    key?: string;
+    payload?: {
+        [key: string]: number;
+    };
 }
 
 chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sendResponse) => {
@@ -45,5 +49,36 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             }
         });
         return true;
+    }
+    // SET - Store the passed payload under the passed key in Local Storage (Store User's Heading Lvl or Current Zoom Setting in Local Storage):
+    else if (request.type === "setLocalStorage") {
+        const { key, payload } = request;
+        // If key or payload is missing, send an error message back
+        if (!key || !payload) {
+            chrome.runtime.sendMessage({ type: "error", message: "Invalid parameters" });
+            return;
+        }
+
+        chrome.storage.local.set({ [key]: payload }, () => {
+            console.log(`Data saved to local storage for key >${key}<`);
+        });
+    }
+    // GET - Check Localstorage for anything stored under key parameter. (Store the passed payload under the passed key in Local Storage (Fetch User's Heading Lvl or Zoom lvl from Local Storage):
+    else if (request.type === "getLocalStorage") {
+        console.log("fetching localStorage for this key...", request.key);
+        if (!request.key) {
+            chrome.runtime.sendMessage({ error: "Invalid key passed to fetch from Localstorage." });
+            return;
+        }
+
+        chrome.storage.local.get(request.key, result => {
+            if (result.key) {
+                console.log("Data retrieved from local storage:", result.key);
+                sendResponse({ data: result.key });
+            } else {
+                console.log("Unable to find item in local storage for", request.key);
+                sendResponse({ error: "Item not found" });
+            }
+        });
     }
 });
