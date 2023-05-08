@@ -9,7 +9,7 @@ export const getLocalStorage = (key: string): Promise<any> => {
                 if (chrome.runtime.lastError) {
                     reject(chrome.runtime.lastError);
                 } else {
-                    console.log("response from getLocalStorage: ", response);
+                    // console.log("response from getLocalStorage: ", response);
                     resolve(response);
                 }
             }

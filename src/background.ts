@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         const { key, payload } = request;
         // If key or payload is missing, send an error message back
         if (!key || !payload) {
-            chrome.runtime.sendMessage({ type: "error", message: "Invalid parameters" });
+            sendResponse({ type: "error", message: "Invalid parameters" });
             return;
         }
 
@@ -67,18 +67,23 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     else if (request.type === "getLocalStorage") {
         console.log("fetching localStorage for this key...", request.key);
         if (!request.key) {
-            chrome.runtime.sendMessage({ error: "Invalid key passed to fetch from Localstorage." });
+            sendResponse({ error: "Invalid key passed to fetch from Localstorage." });
             return;
         }
 
         chrome.storage.local.get(request.key, result => {
-            if (result.key) {
-                console.log("Data retrieved from local storage:", result.key);
-                sendResponse({ data: result.key });
+            console.log("fetched raw from local:", result);
+            const data = result[request.key as string];
+            // sendResponse("bean");
+            // return;
+            if (data) {
+                console.log("Data retrieved from local storage:", data);
+                sendResponse({ data });
             } else {
                 console.log("Unable to find item in local storage for", request.key);
                 sendResponse({ error: "Item not found" });
             }
         });
+        return true;
     }
 });

@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useState } from "react";
+import React, { FC, useContext, useEffect, useRef, useState } from "react";
 import Headings from "./Headings";
 import { IHeading } from "../models/heading";
 import { getDocumentId } from "../helpers/getDocumentId";
@@ -18,6 +18,8 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     const [documentContent, setDocumentContent] = useState<IHeading[]>();
     const [visibleHeadings, setVisibleHeadings] = useState(3); // default value of which headings are collapsed
     const [userZoom, setUserZoom] = useState(11);
+    const isFirstRender = useRef(true);
+
     console.log("visibleHeadings", visibleHeadings);
     const documentCtx = useContext(DocumentContext);
 
@@ -50,16 +52,14 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     useEffect(() => {
         getLocalStorage("userZoom")
             .then(response => {
-                // console.log(response);
-                updateCssUserZoom(response);
+                setUserZoom(response.data["userZoom"]);
             })
             .catch(error => {
                 console.error(error);
             });
         getLocalStorage("userHeadingLvl")
             .then(response => {
-                // console.log(response);
-                setVisibleHeadings(response);
+                setVisibleHeadings(response.data["userHeadingLvl"]);
             })
             .catch(error => {
                 console.error(error);
@@ -68,13 +68,19 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
 
     // any time user clicks +/- zoom buttons, update corresponding --user-zoom CSS variable
     useEffect(() => {
+        // if its the first render don't run this bc we will try load from localStorage instead:
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
         updateCssUserZoom(userZoom);
         // save current user zoom into LocalStorage:
         setLocalStorage("userZoom", { userZoom: userZoom });
     }, [userZoom]);
 
     const updateCssUserZoom = (userZoom: number) => {
-        console.log("new user zoom", `${userZoom}px`);
+        console.log("cole new user zoom", `${userZoom}px`);
         document.documentElement.style.setProperty("--user-zoom", `${userZoom}px`);
     };
 
