@@ -1,17 +1,10 @@
 import React, { ReactNode, useMemo, useState } from "react";
-import DocumentContext from "./document-context";
+import DocumentContext, { defaultDocumentState } from "./document-context";
 import { DocumentInfo } from "../models";
 
 interface DocumentProviderProps {
     children: ReactNode;
 }
-
-export const defaultDocumentState = {
-    isLoggedIn: false,
-    token: "",
-    email: "",
-    documentId: "",
-} as DocumentInfo;
 
 const DocumentProvider = (props: DocumentProviderProps) => {
     const [documentDetails, setdocumentDetails] = useState<DocumentInfo>(defaultDocumentState);

@@ -72,10 +72,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         }
 
         chrome.storage.local.get(request.key, result => {
-            console.log("fetched raw from local:", result);
             const data = result[request.key as string];
-            // sendResponse("bean");
-            // return;
             if (data) {
                 console.log("Data retrieved from local storage:", data);
                 sendResponse({ data });

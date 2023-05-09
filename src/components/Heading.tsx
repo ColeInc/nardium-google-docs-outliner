@@ -1,38 +1,36 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import { IHeading } from "../models/heading";
 import Headings from "./Headings";
 import Chevron from "../../public/assets/chevron.svg";
+import SettingsContext from "../context/settings-context";
 
 interface HeadingProps {
     heading: IHeading;
-    visibleHeadings: number;
 }
 
-const Heading: FC<HeadingProps> = ({ heading, visibleHeadings }) => {
+const Heading: FC<HeadingProps> = ({ heading }) => {
     const [isHidden, setIsHidden] = useState(false);
-    // const [isClicked, setIsClicked] = useState(false);
+
+    const settingsCtx = useContext(SettingsContext);
+    const { userSettings } = settingsCtx;
+    const { userHeadingLvl } = userSettings;
 
     const digit = heading.headingDigit || 0;
 
     useEffect(() => {
-        // console.log("cur heading digit", digit, " > ", visibleHeadings, " = ", digit > visibleHeadings);
         // if this heading's Heading Digit is more than the current visibleHeadings value we want, then hide it. E.g. if user wants to see only H1H2H3, collapse all H4+
-        if (digit > visibleHeadings - 1) {
+        if (digit > userHeadingLvl - 1) {
             setIsHidden(true);
         } else {
             setIsHidden(false);
         }
-    }, [visibleHeadings]);
+    }, [userHeadingLvl]);
 
     const toggleHidden = () => {
         setIsHidden(s => !s);
     };
 
     const isPlaceholder = heading.headingId.startsWith("PLACEHOLDER_");
-
-    // if (isPlaceholder) {
-    //     return null;
-    // }
 
     // calculate the necessary left padding for heading item (depends whether it has collapse arrow or not)
     const paddingLeft = (digit - 1) * 24 + (heading.children ? 0 : 12);
@@ -42,8 +40,6 @@ const Heading: FC<HeadingProps> = ({ heading, visibleHeadings }) => {
         <li key={heading.headingId}>
             {!isPlaceholder && (
                 <div className={`heading-arrow-container heading${heading.headingDigit}`} style={headerStyle}>
-                    {/* {heading.children && <button onClick={toggleHidden}>v</button>} */}
-
                     {heading.children && (
                         <div className={`heading-chevron-button ${isHidden && "clicked"}`} onClick={toggleHidden}>
                             <Chevron />
@@ -57,7 +53,7 @@ const Heading: FC<HeadingProps> = ({ heading, visibleHeadings }) => {
 
             {heading.children && (
                 <ul className={isHidden ? "hidden" : ""}>
-                    <Headings headings={heading.children} visibleHeadings={visibleHeadings} />
+                    <Headings headings={heading.children} />
                 </ul>
             )}
         </li>

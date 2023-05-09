@@ -1,14 +1,17 @@
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
-import Headings from "./Headings";
-import { IHeading } from "../models/heading";
-import { getDocumentId } from "../helpers/getDocumentId";
+import DocumentContext from "../context/document-context";
+import SettingsContext from "../context/settings-context";
 import { fetchFileContents } from "../helpers/fetchFileContents";
 import { filterDocumentContent } from "../helpers/filterDocumentContent";
 import { generateHeadingsHierarchy } from "../helpers/generateHeadingsHierarchy";
-import DocumentContext from "../context/document-context";
-import { setLocalStorage } from "../helpers/setLocalStorage";
+import { getDocumentId } from "../helpers/getDocumentId";
 import { getLocalStorage } from "../helpers/getLocalStorage";
+import { setLocalStorage } from "../helpers/setLocalStorage";
+import { IHeading } from "../models/heading";
+import { Settings } from "../models/settings";
+import Headings from "./Headings";
 import "./HeadingsWrapper.css";
+import SettingsPanel from "./SettingsPanel";
 
 interface HeadingsWrapperProps {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,12 +19,14 @@ interface HeadingsWrapperProps {
 
 const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     const [documentContent, setDocumentContent] = useState<IHeading[]>();
-    const [visibleHeadings, setVisibleHeadings] = useState(3); // default value of which headings are collapsed
-    const [userZoom, setUserZoom] = useState(11);
+    // const [visibleHeadings, setVisibleHeadings] = useState(3); // default value of which headings are collapsed
+    // const [userZoom, setUserZoom] = useState(11);
     const isFirstRender = useRef(true);
 
-    console.log("visibleHeadings", visibleHeadings);
+    // console.log("visibleHeadings", visibleHeadings);
     const documentCtx = useContext(DocumentContext);
+    const settingsCtx = useContext(SettingsContext);
+    const { userSettings, updateUserSettings } = settingsCtx;
 
     // console.log("init documentContent", documentContent, !!documentContent);
 
@@ -30,7 +35,6 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
         const onLoad = async () => {
             console.log("1)");
             const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
-            // const documentId = "bean";
             console.log("3)");
             const fileContents = await fetchFileContents(documentId, documentCtx);
 
@@ -52,14 +56,16 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     useEffect(() => {
         getLocalStorage("userZoom")
             .then(response => {
-                setUserZoom(response.data["userZoom"]);
+                // setUserZoom(response.data["userZoom"]);
+                updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
             })
             .catch(error => {
                 console.error(error);
             });
         getLocalStorage("userHeadingLvl")
             .then(response => {
-                setVisibleHeadings(response.data["userHeadingLvl"]);
+                // setVisibleHeadings(response.data["userHeadingLvl"]);
+                updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
             })
             .catch(error => {
                 console.error(error);
@@ -74,20 +80,14 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
             return;
         }
 
-        updateCssUserZoom(userZoom);
+        updateCssUserZoom(userSettings.userZoom);
         // save current user zoom into LocalStorage:
-        setLocalStorage("userZoom", { userZoom: userZoom });
-    }, [userZoom]);
+        setLocalStorage("userZoom", { userZoom: userSettings.userZoom });
+    }, [userSettings.userZoom]);
 
     const updateCssUserZoom = (userZoom: number) => {
         console.log("cole new user zoom", `${userZoom}px`);
         document.documentElement.style.setProperty("--user-zoom", `${userZoom}px`);
-    };
-
-    const handleVisibleHeadings = (headingLvl: number) => {
-        setVisibleHeadings(headingLvl);
-        // save current user hierarchy into LocalStorage:
-        setLocalStorage("userHeadingLvl", { userHeadingLvl: headingLvl });
     };
 
     return (
@@ -95,24 +95,13 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
             {documentContent && (
                 <div className="headings">
                     <ul>
-                        <Headings headings={documentContent} visibleHeadings={visibleHeadings} />
+                        {/* <Headings headings={documentContent} visibleHeadings={userSettings.userHeadingLvl} /> */}
+                        <Headings headings={documentContent} />
                     </ul>
                 </div>
             )}
 
-            <div className="headings-grid-container">
-                <button onClick={() => handleVisibleHeadings(1)}>H1</button>
-                <button onClick={() => handleVisibleHeadings(2)}>H2</button>
-                <button onClick={() => handleVisibleHeadings(3)}>H3</button>
-                <button onClick={() => handleVisibleHeadings(4)}>H4</button>
-                <button onClick={() => handleVisibleHeadings(5)}>H5</button>
-                <button onClick={() => handleVisibleHeadings(6)}>H6</button>
-            </div>
-            <br />
-            <div className="zoom-controls-container">
-                <button onClick={() => setUserZoom(s => ++s)}>+</button>
-                <button onClick={() => setUserZoom(s => --s)}>-</button>
-            </div>
+            <SettingsPanel />
         </>
     );
 };

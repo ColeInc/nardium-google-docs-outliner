@@ -1,6 +1,13 @@
 import React from "react";
 import { DocumentInfo, IDocumentContext } from "../models";
-import { defaultDocumentState } from "./DocumentProvider";
+
+export const defaultDocumentState: DocumentInfo = {
+    isLoggedIn: false,
+    token: "",
+    email: "",
+    documentId: "",
+    documentContent: {},
+};
 
 const DocumentContext = React.createContext<IDocumentContext>({
     documentDetails: defaultDocumentState,
