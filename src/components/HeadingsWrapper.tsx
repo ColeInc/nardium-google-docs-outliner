@@ -19,11 +19,8 @@ interface HeadingsWrapperProps {
 
 const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     const [documentContent, setDocumentContent] = useState<IHeading[]>();
-    // const [visibleHeadings, setVisibleHeadings] = useState(3); // default value of which headings are collapsed
-    // const [userZoom, setUserZoom] = useState(11);
     const isFirstRender = useRef(true);
 
-    // console.log("visibleHeadings", visibleHeadings);
     const documentCtx = useContext(DocumentContext);
     const settingsCtx = useContext(SettingsContext);
     const { userSettings, updateUserSettings } = settingsCtx;
@@ -35,6 +32,7 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
         const onLoad = async () => {
             console.log("1)");
             const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
+            // const documentId = "beans";
             console.log("3)");
             const fileContents = await fetchFileContents(documentId, documentCtx);
 
@@ -56,7 +54,6 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     useEffect(() => {
         getLocalStorage("userZoom")
             .then(response => {
-                // setUserZoom(response.data["userZoom"]);
                 updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
             })
             .catch(error => {
@@ -64,7 +61,6 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
             });
         getLocalStorage("userHeadingLvl")
             .then(response => {
-                // setVisibleHeadings(response.data["userHeadingLvl"]);
                 updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
             })
             .catch(error => {
@@ -95,7 +91,6 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
             {documentContent && (
                 <div className="headings">
                     <ul>
-                        {/* <Headings headings={documentContent} visibleHeadings={userSettings.userHeadingLvl} /> */}
                         <Headings headings={documentContent} />
                     </ul>
                 </div>

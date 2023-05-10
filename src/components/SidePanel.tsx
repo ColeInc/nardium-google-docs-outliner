@@ -9,7 +9,18 @@ const SidePanel = () => {
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     useEffect(() => {
         console.log("cookies enabled?", navigator.cookieEnabled);
@@ -30,8 +41,11 @@ const SidePanel = () => {
         );
     }
 
+    // dynamically calculate sidepanel total width depending on page width:
+    const sidePanelWidth = windowWidth > 1460 ? 285 + 0.5 * (windowWidth - 1600) : 285;
+
     return (
-        <div className="side-panel-container">
+        <div className="side-panel-container" style={{ width: sidePanelWidth }}>
             <div className="side-panel">
                 <h1>Nardium</h1>
 
