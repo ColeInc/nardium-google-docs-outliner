@@ -25,15 +25,35 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     const settingsCtx = useContext(SettingsContext);
     const { userSettings, updateUserSettings } = settingsCtx;
 
-    // console.log("init documentContent", documentContent, !!documentContent);
+    // // // // Main onLoad steps:
+    // // // useEffect(() => {
+    // // //     const onLoad = async () => {
+    // // //         console.log("1)");
+    // // //         const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
+    // // //         // const documentId = "beans";
+    // // //         console.log("3)");
+    // // //         const fileContents = await fetchFileContents(documentId, documentCtx);
+
+    // // //         // TODO: instead of if statement here i think just do a try catch and if error occurs at any point render an error component instead of <Headings>
+    // // //         if (!fileContents) {
+    // // //             console.log("Document content was not able to be fetched.");
+    // // //             // return;
+    // // //         } else {
+    // // //             const filteredHeadings = filterDocumentContent(fileContents);
+    // // //             const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings, documentCtx);
+    // // //             setDocumentContent(headingsHierarchy);
+    // // //         }
+    // // //         setIsLoading(false);
+    // // //     };
+    // // //     onLoad();
 
     // Main onLoad steps:
     useEffect(() => {
         const onLoad = async () => {
-            console.log("1)");
+            console.log("1) fetch document ID");
             const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
             // const documentId = "beans";
-            console.log("3)");
+            console.log("3) fetch document content");
             const fileContents = await fetchFileContents(documentId, documentCtx);
 
             // TODO: instead of if statement here i think just do a try catch and if error occurs at any point render an error component instead of <Headings>
@@ -46,8 +66,21 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
                 setDocumentContent(headingsHierarchy);
             }
             setIsLoading(false);
+            onLoad();
+
+            // Call the fetchData function periodically
+            const interval = setInterval(async () => {
+                // fetch file contents
+                const fileContents = await fetchFileContents(documentId, documentCtx);
+
+                // send to function to CHECK DIFFERENCE, if no difference then don't continue
+
+                // if difference found, filterDocumentContent
+
+                // generateHeadingsHierarchy & render it
+            }, 10000); // fetch data every 10 seconds
+            return () => clearInterval(interval);
         };
-        onLoad();
     }, []);
 
     // On initial page load check localStorage for existing zoom preferences AND Visible Headings Lvl and set them if found:
@@ -82,7 +115,7 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     }, [userSettings.userZoom]);
 
     const updateCssUserZoom = (userZoom: number) => {
-        console.log("cole new user zoom", `${userZoom}px`);
+        // console.log("new user zoom", `${userZoom}px`);
         document.documentElement.style.setProperty("--user-zoom", `${userZoom}px`);
     };
 
