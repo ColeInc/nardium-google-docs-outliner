@@ -19,7 +19,6 @@ export const getDocumentId = async (setDocumentId: (details: DocumentInfo) => vo
             });
         });
 
-        console.log("pre 2) doc id", documentId);
         setDocumentId({ documentId: documentId } as DocumentInfo);
         console.log("2)");
         return documentId;

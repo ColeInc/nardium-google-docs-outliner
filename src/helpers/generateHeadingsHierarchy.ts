@@ -18,14 +18,14 @@ export const generateHeadingsHierarchy = (
 
     const appendToParentPath = (segment: string) => {
         currentParentPath.push(segment);
-        console.log("latest official path stored:", currentParentPath);
+        // console.log("latest official path stored:", currentParentPath);
     };
 
     const popParentPath = (numTimes = 1) => {
-        console.log("popParentPath NUM TIMES", numTimes);
-        console.log("popParentPath BEFORE", currentParentPath);
+        // console.log("popParentPath NUM TIMES", numTimes);
+        // console.log("popParentPath BEFORE", currentParentPath);
         currentParentPath = currentParentPath.slice(0, -numTimes);
-        console.log("popParentPath AFTER", currentParentPath);
+        // console.log("popParentPath AFTER", currentParentPath);
     };
 
     // TODO: remove. was for testing only.
@@ -108,19 +108,19 @@ export const generateHeadingsHierarchy = (
                 }
             }
         });
-        console.log("final parent Heading found:", currentParentHeading);
+        // console.log("final parent Heading found:", currentParentHeading);
 
         // if we find a valid final parent heading, append the new child to it:
         if (currentParentHeading) {
             // first calculate how many children down we need to nest this child
             let diff = calcHeadingDiff(currentParentHeading, child);
-            console.log("diff between headings", diff);
+            // console.log("diff between headings", diff);
 
             // iterate and nest children till we hit the correct level heading should be at:
             for (let i = 0; i <= diff; i++) {
                 // if we are on last iteration insert the real child heading itself, else insert PLACEHOLDER
                 const heading = i === diff ? child : placeholderChild();
-                console.log("child getting appended", heading);
+                // console.log("child getting appended", heading);
 
                 if (currentParentHeading?.children) {
                     currentParentHeading?.children.push(heading);
@@ -140,7 +140,7 @@ export const generateHeadingsHierarchy = (
             console.error("No heading found.");
         }
 
-        console.log("final headingsHierarchy", JSON.stringify(headingsHierarchy));
+        // console.log("final headingsHierarchy", JSON.stringify(headingsHierarchy));
     };
 
     // TODO: remove any here
@@ -148,7 +148,7 @@ export const generateHeadingsHierarchy = (
         const para = heading.paragraph;
 
         if (!para || !para.paragraphStyle?.namedStyleType || !para.paragraphStyle?.headingId) {
-            console.log("Empty paragraph found. Not processing.");
+            // Empty paragraph found. Not processing.
             return null;
         }
 
@@ -167,28 +167,28 @@ export const generateHeadingsHierarchy = (
             endIndex,
         };
 
-        console.log("current heading", currHeadingDigit, currentParentPath);
+        // console.log("current heading", currHeadingDigit, currentParentPath);
 
         // 0) base case - if our heading is a top lvl H1 OR if there is nothing currently stored in currentParentPath, then create a new item in our final array of arrays:
         if (currHeadingDigit === 1 || !currentParentPath) {
-            console.log("0) base", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+            // console.log("0) base", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
 
             const headingDiff = prevHeadingDigit - currHeadingDigit;
-            console.log("basecase headingDiff", headingDiff);
+            // console.log("basecase headingDiff", headingDiff);
             // pop n from parent path where n is the diff between prev and curr heading digit
             popParentPath(headingDiff + 1);
-            console.log("basecase new parent path:", currentParentPath);
+            // console.log("basecase new parent path:", currentParentPath);
 
             headingsHierarchy.push(newChild);
             // currentParentPath = headingsHierachy[heading];
             appendToParentPath(headingId);
 
-            console.log("final headingsHierarchy", JSON.stringify(headingsHierarchy));
+            // console.log("final headingsHierarchy", JSON.stringify(headingsHierarchy));
         }
 
         //  1) if the current heading IS going to be a child of parent (E.g. we go from Heading2 to Heading3):
         else if (currHeadingDigit > prevHeadingDigit) {
-            console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+            // console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
             // console.log("original headingsHierarchy", headingsHierarchy);
 
             // add new child to current parent:
@@ -197,7 +197,7 @@ export const generateHeadingsHierarchy = (
 
         // 2) else if previous heading & this heading should be on same level
         else if (currHeadingDigit === prevHeadingDigit) {
-            console.log("2)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+            // console.log("2)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
 
             // pop one from parent path
             popParentPath();
@@ -207,7 +207,7 @@ export const generateHeadingsHierarchy = (
 
         // 3) else if current heading is bigger than previous heading (E.g. we go from Heading2 to Heading1)
         else if (currHeadingDigit < prevHeadingDigit) {
-            console.log("3)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
+            // console.log("3)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
             const headingDiff = prevHeadingDigit - currHeadingDigit;
 
             // pop n from parent path where n is the diff between prev and curr heading digit
@@ -219,7 +219,7 @@ export const generateHeadingsHierarchy = (
         prevHeadingDigit = currHeadingDigit;
     });
 
-    console.log("final filteredContent", JSON.stringify(headingsHierarchy));
+    // console.log("final filteredContent", JSON.stringify(headingsHierarchy));
     documentCtx.updateDocumentDetails({ documentContent: headingsHierarchy } as DocumentInfo);
     return headingsHierarchy;
 };

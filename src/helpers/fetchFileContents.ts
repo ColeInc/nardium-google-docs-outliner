@@ -503,11 +503,11 @@ export const fetchFileContents = async (
     try {
         const { token } = documentCtx.documentDetails;
 
-        console.log("trying with these token/documentId,", !!token, !!documentId);
+        // console.log("trying with these token/documentId,", !!token, !!documentId);
 
         if (token && documentId) {
-            console.log("going wid deeze", token, "\n/////\n", documentId);
-            console.log("4)");
+            // console.log("going with these:", token, "\n/////\n", documentId);
+            // console.log("4)");
 
             return fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
                 method: "GET",
@@ -518,7 +518,7 @@ export const fetchFileContents = async (
                     return response;
                 })
                 .then(contents => {
-                    console.log("docs API call response (content)", JSON.stringify(contents));
+                    // console.log("docs API call response (content)", JSON.stringify(contents));
                     documentCtx.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
                     return contents as UnfilteredBody;
                 });

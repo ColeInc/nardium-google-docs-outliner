@@ -12,6 +12,7 @@ import { Settings } from "../models/settings";
 import Headings from "./Headings";
 import "./HeadingsWrapper.css";
 import SettingsPanel from "./SettingsPanel";
+import { useHeadingsDifference } from "../hooks/useHeadingsDifference";
 
 interface HeadingsWrapperProps {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,6 +25,8 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     const documentCtx = useContext(DocumentContext);
     const settingsCtx = useContext(SettingsContext);
     const { userSettings, updateUserSettings } = settingsCtx;
+
+    const { checkHeadingsDifference } = useHeadingsDifference();
 
     // // // // Main onLoad steps:
     // // // useEffect(() => {
@@ -47,40 +50,55 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     // // //     };
     // // //     onLoad();
 
+    const refetch = async (documentId: string | null) => {
+        const fileContents = await fetchFileContents(documentId, documentCtx);
+
+        if (!fileContents) {
+            new Error("Document content was not able to be fetched.");
+            return;
+        }
+
+        // send to function to CHECK DIFFERENCE, if no difference then don't continue
+        const hasChanges = checkHeadingsDifference(fileContents);
+
+        // if no changes found then don't run entire calculation to render headings:
+        if (!hasChanges) {
+            setIsLoading(false);
+            return;
+        }
+        // if difference found, filterDocumentContent
+        const filteredHeadings = filterDocumentContent(fileContents);
+
+        // generateHeadingsHierarchy & render it out
+        const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings, documentCtx);
+        setDocumentContent(headingsHierarchy);
+        setIsLoading(false);
+    };
+
     // Main onLoad steps:
     useEffect(() => {
         const onLoad = async () => {
-            console.log("1) fetch document ID");
-            const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
-            // const documentId = "beans";
-            console.log("3) fetch document content");
-            const fileContents = await fetchFileContents(documentId, documentCtx);
+            try {
+                console.log("1) fetch document ID");
+                const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
+                // const documentId = "testing";
 
-            // TODO: instead of if statement here i think just do a try catch and if error occurs at any point render an error component instead of <Headings>
-            if (!fileContents) {
-                console.log("Document content was not able to be fetched.");
-                // return;
-            } else {
-                const filteredHeadings = filterDocumentContent(fileContents);
-                const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings, documentCtx);
-                setDocumentContent(headingsHierarchy);
+                refetch(documentId);
+
+                // Every 10 secs check headings data for new changes:
+                const interval = setInterval(async () => {
+                    console.log("interval bing");
+                    refetch(documentId);
+                    // }, 10000); // fetch data every 10 seconds
+                }, 5000); // fetch data every 10 seconds
+
+                return () => clearInterval(interval);
+            } catch (error) {
+                setIsLoading(false);
+                console.log(error);
             }
-            setIsLoading(false);
-            onLoad();
-
-            // Call the fetchData function periodically
-            const interval = setInterval(async () => {
-                // fetch file contents
-                const fileContents = await fetchFileContents(documentId, documentCtx);
-
-                // send to function to CHECK DIFFERENCE, if no difference then don't continue
-
-                // if difference found, filterDocumentContent
-
-                // generateHeadingsHierarchy & render it
-            }, 10000); // fetch data every 10 seconds
-            return () => clearInterval(interval);
         };
+        onLoad();
     }, []);
 
     // On initial page load check localStorage for existing zoom preferences AND Visible Headings Lvl and set them if found:
