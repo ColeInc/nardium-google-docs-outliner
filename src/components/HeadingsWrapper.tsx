@@ -146,7 +146,7 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
                 </div>
             )}
 
-            <SettingsPanel />
+            {/* <SettingsPanel /> */}
         </>
     );
 };

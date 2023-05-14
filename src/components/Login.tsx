@@ -12,7 +12,7 @@ const Login: FC<LoginProps> = ({ setIsLoading }) => {
 
     // attempt to log user in on page load:
     useEffect(() => {
-        // console.log("triggers handleLogin");
+        console.log("triggers handleLogin");
         handleLogin();
     }, []);
 

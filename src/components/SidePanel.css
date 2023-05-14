@@ -8,7 +8,12 @@
     bottom: 0;
     min-width: 285px;
     z-index: 9999999;
-    padding: 16px 0 10px 16px;
+    /* padding: 16px 0 10px 16px; */
+    padding: 16px 0 16px 16px;
+    /* transition: width 0.5s ease-in-out; */
+    /* transition: transform 2s ease-in-out; */
+    transition: transform 0.5s ease;
+    /* transform: translateX(0px); */
 }
 
 .side-panel {
@@ -32,6 +37,28 @@
     width: 100%;
     justify-content: center;
     align-items: center;
+}
+
+.side-panel-container.side-panel-collapsed {
+    transform: translateX(-400px);
+    /* transition: transform 0.5s ease-in-out; */
+    /* transform: translateX(-400px); */
+    /* width: 0px; */
+    /* overflow: hidden !important; */
+}
+
+.side-panel .collapse-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.side-panel-collapsed .collapse-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    left: 0;
+    bottom: 0;
+    position: fixed;
 }
 
 @media screen and (min-width: 1460px) {
