@@ -66,7 +66,7 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
             setIsLoading(false);
             return;
         }
-        // if difference found, filterDocumentContent
+        // if difference found, run entire filterDocumentContent
         const filteredHeadings = filterDocumentContent(fileContents);
 
         // generateHeadingsHierarchy & render it out
@@ -85,12 +85,11 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
 
                 refetch(documentId);
 
-                // Every 10 secs check headings data for new changes:
+                // Every 5 secs check headings data for new changes:
                 const interval = setInterval(async () => {
                     console.log("interval bing");
                     refetch(documentId);
-                    // }, 10000); // fetch data every 10 seconds
-                }, 5000); // fetch data every 10 seconds
+                }, 5000); // fetch data every 5 seconds
 
                 return () => clearInterval(interval);
             } catch (error) {

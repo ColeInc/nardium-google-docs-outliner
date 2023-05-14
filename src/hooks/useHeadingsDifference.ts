@@ -1,38 +1,33 @@
-import { useContext, useState } from "react";
+import { useRef } from "react";
 import { UnfilteredBody } from "../models/body";
-import DocumentContext from "../context/document-context";
 
 export const useHeadingsDifference = () => {
-    const [prevFileContents, setPrevFileContents] = useState<UnfilteredBody | undefined>();
-
-    // const documentCtx = useContext(DocumentContext);
-    // documentCtx.documentDetails.documentContent
+    const prevFileContentsRef = useRef<UnfilteredBody | undefined>();
 
     const checkHeadingsDifference = (fileContents: UnfilteredBody) => {
+        console.log("old prevstate b4 we start:", prevFileContentsRef.current);
+        console.log("what we receive:", fileContents);
+
+        const prevFileContents = prevFileContentsRef.current;
+
         let isDifferent = true;
-        // if there's nothing stored in prevFileContents then it must be the first run, therefore we definitely identify a difference between prev/curr headings:
 
-        console.log("prev fileContents.length", fileContents.body.content.length, JSON.stringify(fileContents));
-
-        console.log("prevContents b4 going in:", prevFileContents);
         if (!prevFileContents) {
             console.log("!prevFileContents");
             isDifferent = true;
         } else {
-            console.log("prev fileContents.length", prevFileContents.body.content.length, JSON.stringify(fileContents));
-            console.log("prev fileContents.length", fileContents.body.content.length, JSON.stringify(fileContents));
-            if (prevFileContents.body.content.length !== fileContents.body.content.length) {
-                // if the size of the content array is different:
-                // return true;
-                isDifferent = true;
-            } else {
+            console.log("prev fileContents.length", prevFileContents.body.content.length);
+            console.log("prev fileContents.length", fileContents.body.content.length);
+            // if the size of the content array is different:
+            // if (prevFileContents.body.content.length !== fileContents.body.content.length) {
+            if (JSON.stringify(prevFileContents.body.content) === JSON.stringify(fileContents.body.content)) {
                 isDifferent = false;
+            } else {
+                isDifferent = true;
             }
         }
 
-        // set the newly passed in fileContent to be the new prevFileContents for next time this is called:
-        setPrevFileContents(fileContents);
-        console.log("sets it", prevFileContents);
+        prevFileContentsRef.current = fileContents;
         console.log("DIFFERENT?", isDifferent);
         return isDifferent;
     };

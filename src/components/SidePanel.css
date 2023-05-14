@@ -13,7 +13,8 @@
 
 .side-panel {
     background-color: #070707;
-    border-radius: 15px;
+    /* border-radius: 15px; */
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     height: 100%;
