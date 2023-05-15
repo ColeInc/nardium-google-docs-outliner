@@ -12,8 +12,9 @@
     padding: 16px 0 16px 16px;
     /* transition: width 0.5s ease-in-out; */
     /* transition: transform 2s ease-in-out; */
-    transition: transform 0.5s ease;
+    transition: transform 0.4s ease;
     /* transform: translateX(0px); */
+    /* position: relative; */
 }
 
 .side-panel {
@@ -22,14 +23,17 @@
     border-radius: 12px;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     height: 100%;
     width: 100%;
     padding: 10px;
     /* overflow: auto; */
+    position: relative !important;
 }
 
 .side-panel h1 {
     color: #fff;
+    line-height: 80%;
 }
 
 .loading-spinner-container {
@@ -41,6 +45,7 @@
 
 .side-panel-container.side-panel-collapsed {
     transform: translateX(-400px);
+    /* left: -400px; */
     /* transition: transform 0.5s ease-in-out; */
     /* transform: translateX(-400px); */
     /* width: 0px; */
@@ -48,17 +53,75 @@
 }
 
 .side-panel .collapse-button {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    border-width: 0;
 }
 
+.collapse-button svg {
+    width: 16px;
+    height: 16px;
+}
+/* transition: transform .5s ease; */
+
 .side-panel-collapsed .collapse-button {
+    /* border-top-left-radius: 0;
+    border-bottom-left-radius: 0; */
+    /* right: 0; */
+    /* position: absolute; */
+    /* left: 0; */
+    /* bottom: 0; */
+    /* position: fixed; */
+
+    /* transform: translateX(400px); */
+}
+
+.expand-button {
+    width: 45px;
+    height: 38px;
+    border-radius: 7px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    left: 0;
+    border-width: 0;
+    left: -80px;
+    /* right: 0; */
     bottom: 0;
-    position: fixed;
+    /* position: absolute; */
+    position: fixed !important;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 8px;
+    cursor: pointer;
+    transition: width 0.1s ease;
+}
+
+.side-panel-collapsed.expand-button {
+    left: 0;
+    /* right: 0; */
+    bottom: 26px;
+    /* position: absolute; */
+    /* position: fixed; */
+    /* transition: transform .5s ease; */
+    /* transform: translateX(0px); */
+}
+
+.expand-button svg {
+    width: 16px;
+    height: 16px;
+    transform: rotate(180deg);
+}
+
+.expand-button:hover {
+    filter: brightness(70%);
+    width: 50px;
+}
+
+.side-panel-bottom-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
 }
 
 @media screen and (min-width: 1460px) {

@@ -80,8 +80,8 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
         const onLoad = async () => {
             try {
                 console.log("1) fetch document ID");
-                const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
-                // const documentId = "testing";
+                // const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
+                const documentId = "testing";
 
                 refetch(documentId);
 
@@ -102,20 +102,20 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
 
     // On initial page load check localStorage for existing zoom preferences AND Visible Headings Lvl and set them if found:
     useEffect(() => {
-        getLocalStorage("userZoom")
-            .then(response => {
-                updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        getLocalStorage("userHeadingLvl")
-            .then(response => {
-                updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        // // // getLocalStorage("userZoom")
+        // // //     .then(response => {
+        // // //         updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
+        // // //     })
+        // // //     .catch(error => {
+        // // //         console.error(error);
+        // // //     });
+        // // // getLocalStorage("userHeadingLvl")
+        // // //     .then(response => {
+        // // //         updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
+        // // //     })
+        // // //     .catch(error => {
+        // // //         console.error(error);
+        // // //     });
     }, []);
 
     // any time user clicks +/- zoom buttons, update corresponding --user-zoom CSS variable
@@ -128,7 +128,7 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
 
         updateCssUserZoom(userSettings.userZoom);
         // save current user zoom into LocalStorage:
-        setLocalStorage("userZoom", { userZoom: userSettings.userZoom });
+        // // // setLocalStorage("userZoom", { userZoom: userSettings.userZoom });
     }, [userSettings.userZoom]);
 
     const updateCssUserZoom = (userZoom: number) => {

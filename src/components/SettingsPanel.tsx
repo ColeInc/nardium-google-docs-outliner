@@ -16,7 +16,14 @@ export const SettingsPanel = () => {
     };
 
     return (
-        <div>
+        <div className="settings-container">
+            <div className="zoom-controls-container">
+                {/* <button onClick={() => setUserZoom(s => ++s)}>+</button>
+                <button onClick={() => setUserZoom(s => --s)}>-</button> */}
+                <button onClick={() => incrementUserZoom()}>+</button>
+                <button onClick={() => decrementUserZoom()}>-</button>
+            </div>
+
             <div className="headings-grid-container">
                 <button onClick={() => handleVisibleHeadings(1)}>H1</button>
                 <button onClick={() => handleVisibleHeadings(2)}>H2</button>
@@ -26,12 +33,6 @@ export const SettingsPanel = () => {
                 <button onClick={() => handleVisibleHeadings(6)}>H6</button>
             </div>
             <br />
-            <div className="zoom-controls-container">
-                {/* <button onClick={() => setUserZoom(s => ++s)}>+</button>
-                <button onClick={() => setUserZoom(s => --s)}>-</button> */}
-                <button onClick={() => incrementUserZoom()}>+</button>
-                <button onClick={() => decrementUserZoom()}>-</button>
-            </div>
         </div>
     );
 };

@@ -52,30 +52,47 @@ const SidePanel = () => {
     const sidePanelWidth = windowWidth > 1460 ? 285 + 0.5 * (windowWidth - 1600) : 285;
 
     return (
-        <div
-            className={`${isCollapsed ? "side-panel-collapsed" : ""} side-panel-container`}
-            style={{ width: sidePanelWidth }}
-        >
-            <div className="side-panel">
-                <h1>Nardium</h1>
+        <>
+            <div
+                className={`${isCollapsed ? "side-panel-collapsed" : ""} side-panel-container`}
+                style={{ width: sidePanelWidth }}
+            >
+                <div className="side-panel">
+                    {isLoading && (
+                        <div className="loading-spinner-container">
+                            <LoadingSpinner />
+                        </div>
+                    )}
 
-                {isLoading && (
-                    <div className="loading-spinner-container">
-                        <LoadingSpinner />
+                    {/* TODO: perhaps global loading provider LoadingProvider */}
+                    {!isLoggedIn ? (
+                        <Login setIsLoading={setIsLoading} />
+                    ) : (
+                        <HeadingsWrapper setIsLoading={setIsLoading} />
+                    )}
+
+                    <div className="side-panel-config-container">
+                        <SettingsPanel />
+                        <div className="side-panel-bottom-banner">
+                            <h1>Nardium</h1>
+                            <button className="collapse-button" onClick={togglePanelCollapsed}>
+                                <Chevron />
+                            </button>
+                        </div>
                     </div>
-                )}
-
-                {/* TODO: perhaps global loading provider LoadingProvider */}
-                {!isLoggedIn ? <Login setIsLoading={setIsLoading} /> : <HeadingsWrapper setIsLoading={setIsLoading} />}
-
-                <SettingsPanel />
-                <div style={{ position: "relative" }}>
-                    <button className="collapse-button" onClick={togglePanelCollapsed}>
-                        <Chevron />
-                    </button>
                 </div>
             </div>
-        </div>
+
+            {/* <div style={{ position: "relative" }}> */}
+            <button
+                className={`${isCollapsed ? "side-panel-collapsed" : ""} expand-button`}
+                onClick={togglePanelCollapsed}
+                title="Show Document Outline"
+            >
+                <Chevron />
+            </button>
+            {/* </div> */}
+        </>
     );
 };
 
