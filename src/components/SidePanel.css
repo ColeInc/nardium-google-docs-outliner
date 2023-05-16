@@ -18,7 +18,7 @@
 }
 
 .side-panel {
-    background-color: #070707;
+    background-color: var(--color1);
     /* border-radius: 15px; */
     border-radius: 12px;
     display: flex;
@@ -32,8 +32,7 @@
 }
 
 .side-panel h1 {
-    color: #fff;
-    line-height: 80%;
+    color: var(--font-color);
 }
 
 .loading-spinner-container {
@@ -57,6 +56,8 @@
     height: 34px;
     border-radius: 7px;
     border-width: 0;
+    cursor: pointer;
+    background-color: var(--color2);
 }
 
 .collapse-button svg {
@@ -85,22 +86,21 @@
     border-bottom-left-radius: 0;
     border-width: 0;
     left: -80px;
-    /* right: 0; */
     bottom: 0;
-    /* position: absolute; */
-    position: fixed !important;
     display: flex;
+    position: fixed !important;
     justify-content: flex-end;
     align-items: center;
     padding-right: 8px;
     cursor: pointer;
     transition: width 0.1s ease;
+    background-color: var(--color2);
 }
 
 .side-panel-collapsed.expand-button {
     left: 0;
-    /* right: 0; */
     bottom: 26px;
+    /* right: 0; */
     /* position: absolute; */
     /* position: fixed; */
     /* transition: transform .5s ease; */
@@ -122,6 +122,33 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+}
+
+.side-panel-bottom-banner h1 {
+    font-size: 20pt;
+    line-height: 78%;
+    --bg-size: 400%;
+    --color-one: #da49df;
+    --color-two: #1fbbf9;
+    background: linear-gradient(60deg, var(--color-one), var(--color-two), var(--color-one)) 0 0 / var(--bg-size) 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: move-bg 16s infinite linear;
+}
+
+@keyframes move-bg {
+    to {
+        background-position: var(--bg-size) 0;
+    }
+}
+
+.side-panel-bottom-banner p {
+    margin: 0 auto 0 0;
+    padding: 0 0 0 5px;
+    font-size: 5pt;
+    color: var(--font-color);
+    filter: brightness(50%);
 }
 
 @media screen and (min-width: 1460px) {

@@ -21,7 +21,7 @@
 
 .headings h1 {
     /* color: #fff; */
-    color: green;
+    /* color: green; */
     /* font-size: 8pt; */
     font-size: var(--user-zoom);
     font-weight: 400;

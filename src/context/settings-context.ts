@@ -12,6 +12,7 @@ const SettingsContext = React.createContext({
     updateUserSettings: (settings: Settings) => {},
     incrementUserZoom: () => {},
     decrementUserZoom: () => {},
+    toggleDarkMode: () => {},
 });
 
 export default SettingsContext;

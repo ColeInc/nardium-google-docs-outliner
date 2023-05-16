@@ -14,6 +14,7 @@ const SidePanel = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isLoading, setIsLoading] = useState(true);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const version = "v0.1.0";
 
     useEffect(() => {
         const handleResize = () => {
@@ -75,6 +76,7 @@ const SidePanel = () => {
                         <SettingsPanel />
                         <div className="side-panel-bottom-banner">
                             <h1>Nardium</h1>
+                            <p>{version}</p>
                             <button className="collapse-button" onClick={togglePanelCollapsed}>
                                 <Chevron />
                             </button>
