@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Chevron from "../../public/assets/chevron.svg";
+import SettingsGear from "../../public/assets/settings-gear.svg";
 import DocumentContext from "../context/document-context";
 import HeadingsWrapper from "./HeadingsWrapper";
 import LoadingSpinner from "./LoadingSpinner";
@@ -8,12 +9,15 @@ import Login from "./Login";
 import "./SidePanel.css";
 
 const SidePanel = () => {
-    const documentCtx = useContext(DocumentContext);
-    const { isLoggedIn } = documentCtx.documentDetails;
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isLoading, setIsLoading] = useState(true);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [panelCollapsed, setPanelCollapsed] = useState(false);
+    const [settingsVisible, setSettingsVisible] = useState(false);
+
+    const documentCtx = useContext(DocumentContext);
+    const { isLoggedIn } = documentCtx.documentDetails;
+
     const version = "v0.1.0";
 
     useEffect(() => {
@@ -46,7 +50,11 @@ const SidePanel = () => {
     }
 
     const togglePanelCollapsed = () => {
-        setIsCollapsed(s => !s);
+        setPanelCollapsed(s => !s);
+    };
+
+    const toggleSettingsPanel = () => {
+        setSettingsVisible(s => !s);
     };
 
     // dynamically calculate sidepanel total width depending on page width:
@@ -55,7 +63,7 @@ const SidePanel = () => {
     return (
         <>
             <div
-                className={`${isCollapsed ? "side-panel-collapsed" : ""} side-panel-container`}
+                className={`${panelCollapsed ? "side-panel-collapsed" : ""} side-panel-container`}
                 style={{ width: sidePanelWidth }}
             >
                 <div className="side-panel">
@@ -73,10 +81,14 @@ const SidePanel = () => {
                     )}
 
                     <div className="side-panel-config-container">
-                        <SettingsPanel />
+                        <SettingsPanel isVisible={settingsVisible} />
                         <div className="side-panel-bottom-banner">
                             <h1>Nardium</h1>
                             <p>{version}</p>
+
+                            <button className="toggle-settings-button" onClick={toggleSettingsPanel}>
+                                <SettingsGear />
+                            </button>
                             <button className="collapse-button" onClick={togglePanelCollapsed}>
                                 <Chevron />
                             </button>
@@ -85,15 +97,13 @@ const SidePanel = () => {
                 </div>
             </div>
 
-            {/* <div style={{ position: "relative" }}> */}
             <button
-                className={`${isCollapsed ? "side-panel-collapsed" : ""} expand-button`}
+                className={`${panelCollapsed ? "side-panel-collapsed" : ""} expand-button`}
                 onClick={togglePanelCollapsed}
                 title="Show Document Outline"
             >
                 <Chevron />
             </button>
-            {/* </div> */}
         </>
     );
 };

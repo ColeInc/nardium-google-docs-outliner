@@ -6,59 +6,42 @@
     display: none;
 }
 
+.headings h1 {
+    font-size: var(--user-zoom);
+    font-weight: 400;
+    margin-left: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.headings a {
+    text-decoration: none !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .headings .heading-arrow-container {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     /* height: calc(2 * var(--user-zoom)); */
     height: calc(1.8 * var(--user-zoom));
-    /* background-color: green; */
+    /* height: calc(1.75 * var(--user-zoom)); */
+    border-radius: 3px;
 }
 
-.headings .heading-arrow-container:hover .heading-chevron-button svg {
-    fill: grey;
+.headings .heading-arrow-container:hover {
+    background-color: var(--color2);
+    cursor: pointer;
 }
 
-.headings h1 {
-    /* color: #fff; */
-    /* color: green; */
-    /* font-size: 8pt; */
-    font-size: var(--user-zoom);
-    font-weight: 400;
-    margin-left: 4px;
-    white-space: nowrap; /* Prevents the text from wrapping */
-    overflow: hidden; /* Hides the overflow text */
-    text-overflow: ellipsis; /* Shows ellipsis when the text is truncated */
-    /* width: 80px; */
-    /* color: white; */
+.heading-arrow-container.heading1 {
+    padding-left: 4px !important;
 }
 
-/* .headings .heading1 {
-    padding-left: 0;
-}
-.headings .heading2 {
-    padding-left: 32px;
-}
-.headings .heading3 {
-    padding-left: 64px;
-}
-.headings .heading4 {
-    padding-left: 96px;
-}
-.headings .heading5 {
-    padding-left: 128px;
-}
-.headings .heading6 {
-    padding-left: 160px;
-}
-.headings .heading7 {
-    padding-left: 192px;
-} */
-
-.headings a {
-    text-decoration: none !important;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.headings .heading-arrow-container:hover h1 {
+    color: var(--font-highlighted-color);
 }
 
 .heading-chevron-button {
@@ -74,11 +57,14 @@
 .heading-chevron-button svg {
     transform: rotate(270deg);
     /* fill: transparent; */
-    fill: #414141;
+    fill: var(--chevron-color);
+    /* fill: #414141; */
+    transition: fill 0.05s linear;
 }
 
-.heading-chevron-button:hover svg {
-    fill: #fff !important;
+.headings .heading-arrow-container:hover .heading-chevron-button svg {
+    /* fill: #fff !important; */
+    fill: var(--chevron-highlighted-color) !important;
 }
 
 .clicked svg {

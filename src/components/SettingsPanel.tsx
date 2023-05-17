@@ -1,10 +1,10 @@
-import React, { useContext, useState } from "react";
-import "./SettingsPanel.css";
+import React, { FC, useContext } from "react";
 import SettingsContext from "../context/settings-context";
 import { setLocalStorage } from "../helpers/setLocalStorage";
 import { Settings } from "../models/settings";
+import "./SettingsPanel.css";
 
-export const SettingsPanel = () => {
+export const SettingsPanel = ({ isVisible }: { isVisible: boolean }) => {
     const settingsCtx = useContext(SettingsContext);
     const { userSettings, updateUserSettings, incrementUserZoom, decrementUserZoom, toggleDarkMode } = settingsCtx;
 
@@ -15,7 +15,7 @@ export const SettingsPanel = () => {
     };
 
     return (
-        <div className="settings-container">
+        <div className={`${!isVisible ? "settings-hidden" : ""} settings-container`}>
             <div className="settings-controls-row">
                 <div className="zoom-controls-container">
                     <button onClick={() => incrementUserZoom()}>+</button>

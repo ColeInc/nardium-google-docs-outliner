@@ -233,6 +233,636 @@ export const fetchFileContents = async (
                     },
                 },
                 {
+                    startIndex: 1,
+                    endIndex: 8,
+                    paragraph: {
+                        elements: [
+                            {
+                                startIndex: 1,
+                                endIndex: 8,
+                                textRun: {
+                                    content:
+                                        "H1 - 1How could I make a google docs plugin that outlines the headings of the document and allows me to collapse individual headings and subheadings?\n",
+                                    textStyle: {},
+                                },
+                            },
+                        ],
+                        paragraphStyle: {
+                            headingId: "h.opb284gdria0",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 8,
+                    endIndex: 15,
+                    paragraph: {
+                        elements: [
+                            {
+                                startIndex: 8,
+                                endIndex: 15,
+                                textRun: {
+                                    content:
+                                        "H2 - 2Do you have any advice how I could implement that ability to collapse and expand individual headings?\n",
+                                    textStyle: {},
+                                },
+                            },
+                        ],
+                        paragraphStyle: {
+                            headingId: "h.6z3v76uflp1r",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 15,
+                    endIndex: 22,
+                    paragraph: {
+                        elements: [
+                            {
+                                startIndex: 15,
+                                endIndex: 22,
+                                textRun: {
+                                    content:
+                                        "H3 - 3WHY IS THE EARTH FLAT AND HOW DO PIGEONS SECRETLY RUN THE LARGEST MAFIA RING IN THE UNITED STATES?\n",
+                                    textStyle: {},
+                                },
+                            },
+                        ],
+                        paragraphStyle: {
+                            headingId: "h.i8wwhibh4v7v",
+                            namedStyleType: "HEADING_3",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 22,
+                    endIndex: 29,
+                    paragraph: {
+                        elements: [{ startIndex: 22, endIndex: 29, textRun: { content: "H4 - 4\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.jg2jpfu79bzz",
+                            namedStyleType: "HEADING_4",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 29,
+                    endIndex: 36,
+                    paragraph: {
+                        elements: [{ startIndex: 29, endIndex: 36, textRun: { content: "H1 - 5\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.ux7bmvz95wyy",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 36,
+                    endIndex: 43,
+                    paragraph: {
+                        elements: [{ startIndex: 36, endIndex: 43, textRun: { content: "H2 - 6\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.i6zu16fw3tuj",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 43,
+                    endIndex: 50,
+                    paragraph: {
+                        elements: [{ startIndex: 43, endIndex: 50, textRun: { content: "H3 - 7\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.vbp8nl9eg1s",
+                            namedStyleType: "HEADING_3",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 50,
+                    endIndex: 57,
+                    paragraph: {
+                        elements: [{ startIndex: 50, endIndex: 57, textRun: { content: "H4 - 8\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.2x3fvugxehv6",
+                            namedStyleType: "HEADING_4",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 57,
+                    endIndex: 64,
+                    paragraph: {
+                        elements: [{ startIndex: 57, endIndex: 64, textRun: { content: "H5 - 9\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.dyh4t2z0z770",
+                            namedStyleType: "HEADING_5",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 64,
+                    endIndex: 72,
+                    paragraph: {
+                        elements: [{ startIndex: 64, endIndex: 72, textRun: { content: "H2 - 10\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.2jd7ibwmaahh",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 72,
+                    endIndex: 80,
+                    paragraph: {
+                        elements: [{ startIndex: 72, endIndex: 80, textRun: { content: "H1 - 11\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.gd6zllnwyt32",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 80,
+                    endIndex: 88,
+                    paragraph: {
+                        elements: [{ startIndex: 80, endIndex: 88, textRun: { content: "H2 - 12\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.2pt74a6zl0ii",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 88,
+                    endIndex: 96,
+                    paragraph: {
+                        elements: [{ startIndex: 88, endIndex: 96, textRun: { content: "H1 - 13\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.b70vuc8fttbq",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 96,
+                    endIndex: 97,
+                    paragraph: {
+                        elements: [{ startIndex: 96, endIndex: 97, textRun: { content: "\n", textStyle: {} } }],
+                        paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+                    },
+                },
+                {
+                    startIndex: 97,
+                    endIndex: 98,
+                    paragraph: {
+                        elements: [{ startIndex: 97, endIndex: 98, textRun: { content: "\n", textStyle: {} } }],
+                        paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+                    },
+                },
+                {
+                    startIndex: 98,
+                    endIndex: 99,
+                    paragraph: {
+                        elements: [{ startIndex: 98, endIndex: 99, textRun: { content: "\n", textStyle: {} } }],
+                        paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+                    },
+                },
+                {
+                    startIndex: 1,
+                    endIndex: 8,
+                    paragraph: {
+                        elements: [
+                            {
+                                startIndex: 1,
+                                endIndex: 8,
+                                textRun: {
+                                    content:
+                                        "H1 - 1How could I make a google docs plugin that outlines the headings of the document and allows me to collapse individual headings and subheadings?\n",
+                                    textStyle: {},
+                                },
+                            },
+                        ],
+                        paragraphStyle: {
+                            headingId: "h.opb284gdria0",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 8,
+                    endIndex: 15,
+                    paragraph: {
+                        elements: [
+                            {
+                                startIndex: 8,
+                                endIndex: 15,
+                                textRun: {
+                                    content:
+                                        "H2 - 2Do you have any advice how I could implement that ability to collapse and expand individual headings?\n",
+                                    textStyle: {},
+                                },
+                            },
+                        ],
+                        paragraphStyle: {
+                            headingId: "h.6z3v76uflp1r",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 15,
+                    endIndex: 22,
+                    paragraph: {
+                        elements: [
+                            {
+                                startIndex: 15,
+                                endIndex: 22,
+                                textRun: {
+                                    content:
+                                        "H3 - 3WHY IS THE EARTH FLAT AND HOW DO PIGEONS SECRETLY RUN THE LARGEST MAFIA RING IN THE UNITED STATES?\n",
+                                    textStyle: {},
+                                },
+                            },
+                        ],
+                        paragraphStyle: {
+                            headingId: "h.i8wwhibh4v7v",
+                            namedStyleType: "HEADING_3",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 22,
+                    endIndex: 29,
+                    paragraph: {
+                        elements: [{ startIndex: 22, endIndex: 29, textRun: { content: "H4 - 4\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.jg2jpfu79bzz",
+                            namedStyleType: "HEADING_4",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 29,
+                    endIndex: 36,
+                    paragraph: {
+                        elements: [{ startIndex: 29, endIndex: 36, textRun: { content: "H1 - 5\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.ux7bmvz95wyy",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 36,
+                    endIndex: 43,
+                    paragraph: {
+                        elements: [{ startIndex: 36, endIndex: 43, textRun: { content: "H2 - 6\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.i6zu16fw3tuj",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 43,
+                    endIndex: 50,
+                    paragraph: {
+                        elements: [{ startIndex: 43, endIndex: 50, textRun: { content: "H3 - 7\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.vbp8nl9eg1s",
+                            namedStyleType: "HEADING_3",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 50,
+                    endIndex: 57,
+                    paragraph: {
+                        elements: [{ startIndex: 50, endIndex: 57, textRun: { content: "H4 - 8\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.2x3fvugxehv6",
+                            namedStyleType: "HEADING_4",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 57,
+                    endIndex: 64,
+                    paragraph: {
+                        elements: [{ startIndex: 57, endIndex: 64, textRun: { content: "H5 - 9\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.dyh4t2z0z770",
+                            namedStyleType: "HEADING_5",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 64,
+                    endIndex: 72,
+                    paragraph: {
+                        elements: [{ startIndex: 64, endIndex: 72, textRun: { content: "H2 - 10\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.2jd7ibwmaahh",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 72,
+                    endIndex: 80,
+                    paragraph: {
+                        elements: [{ startIndex: 72, endIndex: 80, textRun: { content: "H1 - 11\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.gd6zllnwyt32",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 80,
+                    endIndex: 88,
+                    paragraph: {
+                        elements: [{ startIndex: 80, endIndex: 88, textRun: { content: "H2 - 12\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.2pt74a6zl0ii",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 88,
+                    endIndex: 96,
+                    paragraph: {
+                        elements: [{ startIndex: 88, endIndex: 96, textRun: { content: "H1 - 13\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.b70vuc8fttbq",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 96,
+                    endIndex: 97,
+                    paragraph: {
+                        elements: [{ startIndex: 96, endIndex: 97, textRun: { content: "\n", textStyle: {} } }],
+                        paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+                    },
+                },
+                {
+                    startIndex: 97,
+                    endIndex: 98,
+                    paragraph: {
+                        elements: [{ startIndex: 97, endIndex: 98, textRun: { content: "\n", textStyle: {} } }],
+                        paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+                    },
+                },
+                {
+                    startIndex: 98,
+                    endIndex: 99,
+                    paragraph: {
+                        elements: [{ startIndex: 98, endIndex: 99, textRun: { content: "\n", textStyle: {} } }],
+                        paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+                    },
+                },
+                {
+                    startIndex: 1,
+                    endIndex: 8,
+                    paragraph: {
+                        elements: [
+                            {
+                                startIndex: 1,
+                                endIndex: 8,
+                                textRun: {
+                                    content:
+                                        "H1 - 1How could I make a google docs plugin that outlines the headings of the document and allows me to collapse individual headings and subheadings?\n",
+                                    textStyle: {},
+                                },
+                            },
+                        ],
+                        paragraphStyle: {
+                            headingId: "h.opb284gdria0",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 8,
+                    endIndex: 15,
+                    paragraph: {
+                        elements: [
+                            {
+                                startIndex: 8,
+                                endIndex: 15,
+                                textRun: {
+                                    content:
+                                        "H2 - 2Do you have any advice how I could implement that ability to collapse and expand individual headings?\n",
+                                    textStyle: {},
+                                },
+                            },
+                        ],
+                        paragraphStyle: {
+                            headingId: "h.6z3v76uflp1r",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 15,
+                    endIndex: 22,
+                    paragraph: {
+                        elements: [
+                            {
+                                startIndex: 15,
+                                endIndex: 22,
+                                textRun: {
+                                    content:
+                                        "H3 - 3WHY IS THE EARTH FLAT AND HOW DO PIGEONS SECRETLY RUN THE LARGEST MAFIA RING IN THE UNITED STATES?\n",
+                                    textStyle: {},
+                                },
+                            },
+                        ],
+                        paragraphStyle: {
+                            headingId: "h.i8wwhibh4v7v",
+                            namedStyleType: "HEADING_3",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 22,
+                    endIndex: 29,
+                    paragraph: {
+                        elements: [{ startIndex: 22, endIndex: 29, textRun: { content: "H4 - 4\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.jg2jpfu79bzz",
+                            namedStyleType: "HEADING_4",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 29,
+                    endIndex: 36,
+                    paragraph: {
+                        elements: [{ startIndex: 29, endIndex: 36, textRun: { content: "H1 - 5\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.ux7bmvz95wyy",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 36,
+                    endIndex: 43,
+                    paragraph: {
+                        elements: [{ startIndex: 36, endIndex: 43, textRun: { content: "H2 - 6\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.i6zu16fw3tuj",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 43,
+                    endIndex: 50,
+                    paragraph: {
+                        elements: [{ startIndex: 43, endIndex: 50, textRun: { content: "H3 - 7\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.vbp8nl9eg1s",
+                            namedStyleType: "HEADING_3",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 50,
+                    endIndex: 57,
+                    paragraph: {
+                        elements: [{ startIndex: 50, endIndex: 57, textRun: { content: "H4 - 8\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.2x3fvugxehv6",
+                            namedStyleType: "HEADING_4",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 57,
+                    endIndex: 64,
+                    paragraph: {
+                        elements: [{ startIndex: 57, endIndex: 64, textRun: { content: "H5 - 9\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.dyh4t2z0z770",
+                            namedStyleType: "HEADING_5",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 64,
+                    endIndex: 72,
+                    paragraph: {
+                        elements: [{ startIndex: 64, endIndex: 72, textRun: { content: "H2 - 10\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.2jd7ibwmaahh",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 72,
+                    endIndex: 80,
+                    paragraph: {
+                        elements: [{ startIndex: 72, endIndex: 80, textRun: { content: "H1 - 11\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.gd6zllnwyt32",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 80,
+                    endIndex: 88,
+                    paragraph: {
+                        elements: [{ startIndex: 80, endIndex: 88, textRun: { content: "H2 - 12\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.2pt74a6zl0ii",
+                            namedStyleType: "HEADING_2",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 88,
+                    endIndex: 96,
+                    paragraph: {
+                        elements: [{ startIndex: 88, endIndex: 96, textRun: { content: "H1 - 13\n", textStyle: {} } }],
+                        paragraphStyle: {
+                            headingId: "h.b70vuc8fttbq",
+                            namedStyleType: "HEADING_1",
+                            direction: "LEFT_TO_RIGHT",
+                        },
+                    },
+                },
+                {
+                    startIndex: 96,
+                    endIndex: 97,
+                    paragraph: {
+                        elements: [{ startIndex: 96, endIndex: 97, textRun: { content: "\n", textStyle: {} } }],
+                        paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+                    },
+                },
+                {
+                    startIndex: 97,
+                    endIndex: 98,
+                    paragraph: {
+                        elements: [{ startIndex: 97, endIndex: 98, textRun: { content: "\n", textStyle: {} } }],
+                        paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+                    },
+                },
+                {
+                    startIndex: 98,
+                    endIndex: 99,
+                    paragraph: {
+                        elements: [{ startIndex: 98, endIndex: 99, textRun: { content: "\n", textStyle: {} } }],
+                        paragraphStyle: { namedStyleType: "NORMAL_TEXT", direction: "LEFT_TO_RIGHT" },
+                    },
+                },
+                {
                     startIndex: 99,
                     endIndex: 100,
                     paragraph: {

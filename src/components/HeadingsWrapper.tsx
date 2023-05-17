@@ -87,7 +87,6 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
 
                 // Every 5 secs check headings data for new changes:
                 const interval = setInterval(async () => {
-                    console.log("interval bing");
                     refetch(documentId);
                 }, 5000); // fetch data every 5 seconds
 
