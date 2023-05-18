@@ -3,6 +3,8 @@ import SettingsContext from "../context/settings-context";
 import { setLocalStorage } from "../helpers/setLocalStorage";
 import { Settings } from "../models/settings";
 import "./SettingsPanel.css";
+import PlusIcon from "../../public/assets/plus-icon.svg";
+import MinusIcon from "../../public/assets/minus-icon.svg";
 
 export const SettingsPanel = ({ isVisible }: { isVisible: boolean }) => {
     const settingsCtx = useContext(SettingsContext);
@@ -18,8 +20,12 @@ export const SettingsPanel = ({ isVisible }: { isVisible: boolean }) => {
         <div className={`${!isVisible ? "settings-hidden" : ""} settings-container`}>
             <div className="settings-controls-row">
                 <div className="zoom-controls-container">
-                    <button onClick={() => incrementUserZoom()}>+</button>
-                    <button onClick={() => decrementUserZoom()}>-</button>
+                    <button onClick={() => incrementUserZoom()}>
+                        <PlusIcon />
+                    </button>
+                    <button onClick={() => decrementUserZoom()}>
+                        <MinusIcon />
+                    </button>
                 </div>
 
                 <div className="headings-grid-container">

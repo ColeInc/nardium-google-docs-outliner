@@ -57,6 +57,9 @@
 }
 
 .zoom-controls-container button {
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
     /* height: 32px;
     width: 32px; */
 }
@@ -64,6 +67,12 @@
     /* height: 22px;
     width: 22px;
     border-radius: 6px; */
+}
+.zoom-controls-container button svg {
+    width: 15px;
+    height: 15px;
+    fill: var(--font-color);
+    /* background-color: red; */
 }
 
 .settings-container button:hover {
