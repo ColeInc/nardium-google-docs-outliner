@@ -3,7 +3,7 @@ import { IHeading } from "../models/heading";
 import Headings from "./Headings";
 import Chevron from "../../public/assets/chevron.svg";
 import SettingsContext from "../context/settings-context";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 interface HeadingProps {
     heading: IHeading;
@@ -19,19 +19,51 @@ const Heading: FC<HeadingProps> = ({ heading }) => {
 
     const location = useLocation();
 
-    useEffect(() => {
-        // if nothing found we want to keep whatever is current active still set to active:
-        // let found = false;
+    // // useEffect(() => {
+    // //     console.log("current location", JSON.stringify(location));
+    // //     // if nothing found we want to keep whatever is current active still set to active:
+    // //     // let found = false;
 
-        // console.log("trying to match:", location.hash, heading.headingId, location.hash.includes(heading.headingId));
-        // must check it includes "heading" here because we only want to recheck for active heading when the hash contains "heading" otherwise user might have cursor on paragraph, etc.
-        if (location.hash.includes("heading") && location.hash.includes(heading.headingId)) {
-            // found = true;
-            setIsActive(true);
-        } else {
-            // found && setIsActive(false);
-            setIsActive(false);
-        }
+    // //     console.log("trying to match:", location.hash, heading.headingId, location.hash.includes(heading.headingId));
+    // //     // must check it includes "heading" here because we only want to recheck for active heading when the hash contains "heading" otherwise user might have cursor on paragraph, etc.
+    // //     if (location.hash.includes("heading") && location.hash.includes(heading.headingId)) {
+    // //         // found = true;
+    // //         setIsActive(true);
+    // //     } else {
+    // //         // found && setIsActive(false);
+    // //         setIsActive(false);
+    // //     }
+    // // }, [location.hash]);
+
+    useEffect(() => {
+        const handleLocationChange = () => {
+            console.log("current location", JSON.stringify(location));
+            // if nothing found we want to keep whatever is current active still set to active:
+            // let found = false;
+
+            console.log(
+                "trying to match:",
+                location.hash,
+                heading.headingId,
+                location.hash.includes(heading.headingId)
+            );
+            // must check it includes "heading" here because we only want to recheck for active heading when the hash contains "heading" otherwise user might have cursor on paragraph, etc.
+            if (location.hash.includes("heading") && location.hash.includes(heading.headingId)) {
+                // found = true;
+                setIsActive(true);
+            } else {
+                // found && setIsActive(false);
+                setIsActive(false);
+            }
+        };
+
+        // Listen for hashchange event
+        window.addEventListener("hashchange", handleLocationChange);
+
+        // Clean up the event listener when the component unmounts
+        return () => {
+            window.removeEventListener("hashchange", handleLocationChange);
+        };
     }, [location.hash]);
 
     const digit = heading.headingDigit || 0;
@@ -58,11 +90,12 @@ const Heading: FC<HeadingProps> = ({ heading }) => {
     return (
         <li key={heading.headingId}>
             {!isPlaceholder && (
-                <Link to={`#heading=${heading.headingId}`}>
+                <a href={`#heading=${heading.headingId}`}>
                     <div
                         className={`heading-arrow-container ${isActive ? "active-heading" : ""} heading${
                             heading.headingDigit
                         }`}
+                        title={heading.headingText}
                         style={headerStyle}
                     >
                         {heading.children && (
@@ -74,7 +107,7 @@ const Heading: FC<HeadingProps> = ({ heading }) => {
                         <h1>{heading.headingText}</h1>
                         {/* </Link> */}
                     </div>
-                </Link>
+                </a>
             )}
 
             {heading.children && (

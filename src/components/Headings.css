@@ -7,8 +7,9 @@
 }
 
 .headings h1 {
-    /* font-family: "Montserrat"; */
-    font-family: "Calibri body";
+    /* font-family: "Poppins"; */
+    /* font-family: "inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", */
+    /* "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif; */
     font-size: var(--user-zoom);
     font-weight: 400;
     /* margin-left: 4px; */

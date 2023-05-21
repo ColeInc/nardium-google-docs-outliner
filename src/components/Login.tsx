@@ -18,17 +18,17 @@ const Login: FC<LoginProps> = ({ setIsLoading }) => {
 
     const handleLogin = () => {
         // TODO: convert this response into valid type once we have final user object shape:
-        // // // chrome.runtime.sendMessage({ type: "getAuthToken" }, (response: any) => {
-        // // //     if (response) {
-        // // //         console.log("repsonse fetched back at content.js", response);
-        // // //         documentCtx.updateDocumentDetails({ isLoggedIn: true, token: response.token } as DocumentInfo);
-        // // //     } else {
-        // // //         console.log("Invalid response back from chrome Login background.js function");
-        // // //         documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
-        // // //     }
-        // // // });
-        documentCtx.updateDocumentDetails({ isLoggedIn: true } as DocumentInfo);
-        setIsLoading(false);
+        chrome.runtime.sendMessage({ type: "getAuthToken" }, (response: any) => {
+            if (response) {
+                console.log("repsonse fetched back at content.js", response);
+                documentCtx.updateDocumentDetails({ isLoggedIn: true, token: response.token } as DocumentInfo);
+            } else {
+                console.log("Invalid response back from chrome Login background.js function");
+                documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
+            }
+        });
+        // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } as DocumentInfo);
+        // // // setIsLoading(false);
     };
 
     return (

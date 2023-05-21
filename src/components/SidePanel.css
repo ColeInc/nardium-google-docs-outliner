@@ -7,7 +7,8 @@
     top: 102px;
     bottom: 0;
     min-width: 285px;
-    z-index: 9999999;
+    /* z-index: 9999999; */
+    z-index: 10;
     /* padding: 16px 0 10px 16px; */
     padding: 16px 0 16px 16px;
     /* transition: width 0.5s ease-in-out; */
@@ -125,6 +126,7 @@
 
 .side-panel-bottom-banner h1 {
     font-size: 20pt;
+    letter-spacing: -0.5px;
     line-height: 78%;
     --bg-size: 400%;
     --color-one: #da49df;

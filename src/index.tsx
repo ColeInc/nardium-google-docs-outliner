@@ -1,8 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
+import "@fontsource/inter";
+import "@fontsource/poppins";
 import App from "./App";
-import "@fontsource/montserrat";
+import "./index.css";
 
 // const rootElement = document.createElement("div");
 // rootElement.id = "nardium";

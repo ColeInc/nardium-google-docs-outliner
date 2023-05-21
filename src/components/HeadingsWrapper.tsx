@@ -54,8 +54,7 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
         const fileContents = await fetchFileContents(documentId, documentCtx);
 
         if (!fileContents) {
-            new Error("Document content was not able to be fetched.");
-            return;
+            return new Error("Document content was not able to be fetched.");
         }
 
         // send to function to CHECK DIFFERENCE, if no difference then don't continue
@@ -80,8 +79,8 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
         const onLoad = async () => {
             try {
                 console.log("1) fetch document ID");
-                // const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
-                const documentId = "testing";
+                const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
+                // const documentId = "testing";
 
                 refetch(documentId);
 
@@ -101,20 +100,20 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
 
     // On initial page load check localStorage for existing zoom preferences AND Visible Headings Lvl and set them if found:
     useEffect(() => {
-        // // // getLocalStorage("userZoom")
-        // // //     .then(response => {
-        // // //         updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
-        // // //     })
-        // // //     .catch(error => {
-        // // //         console.error(error);
-        // // //     });
-        // // // getLocalStorage("userHeadingLvl")
-        // // //     .then(response => {
-        // // //         updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
-        // // //     })
-        // // //     .catch(error => {
-        // // //         console.error(error);
-        // // //     });
+        getLocalStorage("userZoom")
+            .then(response => {
+                updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        getLocalStorage("userHeadingLvl")
+            .then(response => {
+                updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
+            })
+            .catch(error => {
+                console.error(error);
+            });
     }, []);
 
     // any time user clicks +/- zoom buttons, update corresponding --user-zoom CSS variable
