@@ -1,14 +1,27 @@
-import React, { FC, useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import SettingsContext from "../context/settings-context";
 import { setLocalStorage } from "../helpers/setLocalStorage";
 import { Settings } from "../models/settings";
 import "./SettingsPanel.css";
 import PlusIcon from "../../public/assets/plus-icon.svg";
 import MinusIcon from "../../public/assets/minus-icon.svg";
+import { getLocalStorage } from "../helpers/getLocalStorage";
 
 export const SettingsPanel = ({ isVisible }: { isVisible: boolean }) => {
     const settingsCtx = useContext(SettingsContext);
     const { userSettings, updateUserSettings, incrementUserZoom, decrementUserZoom, toggleDarkMode } = settingsCtx;
+
+    // // // On initial page load check localStorage for existing darkTheme settings:
+    // // useEffect(() => {
+    // //     getLocalStorage("darkTheme")
+    // //         .then(response => {
+    // //             response.data["darkTheme"] ? toggleDarkMode() : null;
+    // //             // updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
+    // //         })
+    // //         .catch(error => {
+    // //             console.error(error);
+    // //         });
+    // // }, []);
 
     const handleVisibleHeadings = (headingLvl: number) => {
         updateUserSettings({ userHeadingLvl: headingLvl } as Settings);

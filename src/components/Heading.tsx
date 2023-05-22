@@ -19,51 +19,14 @@ const Heading: FC<HeadingProps> = ({ heading }) => {
 
     const location = useLocation();
 
-    // // useEffect(() => {
-    // //     console.log("current location", JSON.stringify(location));
-    // //     // if nothing found we want to keep whatever is current active still set to active:
-    // //     // let found = false;
-
-    // //     console.log("trying to match:", location.hash, heading.headingId, location.hash.includes(heading.headingId));
-    // //     // must check it includes "heading" here because we only want to recheck for active heading when the hash contains "heading" otherwise user might have cursor on paragraph, etc.
-    // //     if (location.hash.includes("heading") && location.hash.includes(heading.headingId)) {
-    // //         // found = true;
-    // //         setIsActive(true);
-    // //     } else {
-    // //         // found && setIsActive(false);
-    // //         setIsActive(false);
-    // //     }
-    // // }, [location.hash]);
-
     useEffect(() => {
-        const handleLocationChange = () => {
-            console.log("current location", JSON.stringify(location));
-            // if nothing found we want to keep whatever is current active still set to active:
-            // let found = false;
-
-            console.log(
-                "trying to match:",
-                location.hash,
-                heading.headingId,
-                location.hash.includes(heading.headingId)
-            );
-            // must check it includes "heading" here because we only want to recheck for active heading when the hash contains "heading" otherwise user might have cursor on paragraph, etc.
-            if (location.hash.includes("heading") && location.hash.includes(heading.headingId)) {
-                // found = true;
-                setIsActive(true);
-            } else {
-                // found && setIsActive(false);
-                setIsActive(false);
-            }
-        };
-
-        // Listen for hashchange event
-        window.addEventListener("hashchange", handleLocationChange);
-
-        // Clean up the event listener when the component unmounts
-        return () => {
-            window.removeEventListener("hashchange", handleLocationChange);
-        };
+        // console.log("trying to match:", location.hash, heading.headingId, location.hash.includes(heading.headingId));
+        // must check it includes "heading" here because we only want to recheck for active heading when the hash contains "heading" otherwise user might have cursor on paragraph, etc.
+        if (location.hash.includes("heading") && location.hash.includes(heading.headingId)) {
+            setIsActive(true);
+        } else {
+            setIsActive(false);
+        }
     }, [location.hash]);
 
     const digit = heading.headingDigit || 0;
@@ -77,7 +40,8 @@ const Heading: FC<HeadingProps> = ({ heading }) => {
         }
     }, [userHeadingLvl]);
 
-    const toggleHidden = () => {
+    const toggleHidden = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
         setIsHidden(s => !s);
     };
 

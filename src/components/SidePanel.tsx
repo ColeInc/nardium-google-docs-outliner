@@ -7,16 +7,21 @@ import LoadingSpinner from "./LoadingSpinner";
 import SettingsPanel from "./SettingsPanel";
 import Login from "./Login";
 import "./SidePanel.css";
+import SettingsContext from "../context/settings-context";
+import { getLocalStorage } from "../helpers/getLocalStorage";
 
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isLoading, setIsLoading] = useState(true);
-    const [panelCollapsed, setPanelCollapsed] = useState(false);
+    // const [panelCollapsed, setPanelCollapsed] = useState(false);
     const [settingsVisible, setSettingsVisible] = useState(false);
 
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;
+    const settingsCtx = useContext(SettingsContext);
+    const { userSettings } = settingsCtx;
+    const { settingsPanelCollapsed } = userSettings;
 
     const version = "v0.1.0";
 
@@ -41,6 +46,18 @@ const SidePanel = () => {
         }
     }, []);
 
+    // On initial page load check localStorage for sidePanelCollapsed true/false:
+    useEffect(() => {
+        getLocalStorage("sidePanelCollapsed")
+            .then(response => {
+                response.data["sidePanelCollapsed"] ? togglePanelCollapsed() : null;
+                // updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }, []);
+
     if (thirdPartyCookiesEnabled) {
         return (
             <div className="message">
@@ -50,7 +67,8 @@ const SidePanel = () => {
     }
 
     const togglePanelCollapsed = () => {
-        setPanelCollapsed(s => !s);
+        togglePanelCollapsed();
+        // setPanelCollapsed(s => !s);
     };
 
     const toggleSettingsPanel = () => {
@@ -63,7 +81,7 @@ const SidePanel = () => {
     return (
         <>
             <div
-                className={`${panelCollapsed ? "side-panel-collapsed" : ""} side-panel-container`}
+                className={`${settingsPanelCollapsed ? "side-panel-collapsed" : ""} side-panel-container`}
                 style={{ width: sidePanelWidth }}
             >
                 <div className="side-panel">
@@ -86,10 +104,14 @@ const SidePanel = () => {
                             <h1>Nardium</h1>
                             <p>{version}</p>
 
-                            <button className="toggle-settings-button" onClick={toggleSettingsPanel}>
+                            <button className="toggle-settings-button" onClick={toggleSettingsPanel} title="Settings">
                                 <SettingsGear />
                             </button>
-                            <button className="collapse-button" onClick={togglePanelCollapsed}>
+                            <button
+                                className="collapse-button"
+                                onClick={togglePanelCollapsed}
+                                title="Hide Document Outline Panel"
+                            >
                                 <Chevron />
                             </button>
                         </div>
@@ -98,7 +120,7 @@ const SidePanel = () => {
             </div>
 
             <button
-                className={`${panelCollapsed ? "side-panel-collapsed" : ""} expand-button`}
+                className={`${settingsPanelCollapsed ? "side-panel-collapsed" : ""} expand-button`}
                 onClick={togglePanelCollapsed}
                 title="Show Document Outline"
             >

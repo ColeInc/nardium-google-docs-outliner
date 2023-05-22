@@ -1,10 +1,52 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import SettingsContext, { defaultSettings } from "./settings-context";
 import { Settings } from "../models/settings";
+import { setLocalStorage } from "../helpers/setLocalStorage";
+import { getLocalStorage } from "../helpers/getLocalStorage";
 
 const SettingsProvider = (props: { children: ReactNode }) => {
     const [userSettings, setUserSettings] = useState<Settings>(defaultSettings);
     const { darkTheme } = userSettings;
+
+    // On initial page load check localStorage for all settings, and if anything is found then overwrite default settings:
+    useEffect(() => {
+        getLocalStorage("userZoom")
+            .then(response => {
+                updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        getLocalStorage("userHeadingLvl")
+            .then(response => {
+                updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        getLocalStorage("darkTheme")
+            .then(response => {
+                // response.data["darkTheme"] ? toggleDarkMode() : null;
+                updateUserSettings({ darkTheme: response.data["darkTheme"] } as Settings);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        getLocalStorage("mainPanelCollapsed")
+            .then(response => {
+                updateUserSettings({ mainPanelCollapsed: response.data["mainPanelCollapsed"] } as Settings);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        getLocalStorage("sidePanelCollapsed")
+            .then(response => {
+                updateUserSettings({ settingsPanelCollapsed: response.data["sidePanelCollapsed"] } as Settings);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }, []);
 
     // TODO: extract each individual color out into json object so we can refer to them by like darktheme.fontcolor
     useEffect(() => {
@@ -47,12 +89,38 @@ const SettingsProvider = (props: { children: ReactNode }) => {
 
     const toggleDarkMode = () => {
         setUserSettings(prevState => {
-            return { ...prevState, darkTheme: !prevState.darkTheme };
+            const darkTheme = !prevState.darkTheme;
+            setLocalStorage("darkTheme", { darkTheme }); // persist settings to localStorage
+            return { ...prevState, darkTheme };
+        });
+    };
+
+    const toggleMainPanel = () => {
+        setUserSettings(prevState => {
+            const mainPanelCollapsed = !prevState.mainPanelCollapsed;
+            setLocalStorage("mainPanelCollapsed", { mainPanelCollapsed }); // persist settings to localStorage
+            return { ...prevState, mainPanelCollapsed };
+        });
+    };
+
+    const toggleSettingsPanel = () => {
+        setUserSettings(prevState => {
+            const settingsPanelCollapsed = !prevState.settingsPanelCollapsed;
+            setLocalStorage("settingsPanelCollapsed", { settingsPanelCollapsed }); // persist settings to localStorage
+            return { ...prevState, settingsPanelCollapsed };
         });
     };
 
     const settingsContext = useMemo(
-        () => ({ userSettings, updateUserSettings, incrementUserZoom, decrementUserZoom, toggleDarkMode }),
+        () => ({
+            userSettings,
+            updateUserSettings,
+            incrementUserZoom,
+            decrementUserZoom,
+            toggleDarkMode,
+            toggleMainPanel,
+            toggleSettingsPanel,
+        }),
         [userSettings, updateUserSettings]
     );
 

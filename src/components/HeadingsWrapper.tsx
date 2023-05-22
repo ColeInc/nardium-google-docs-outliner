@@ -98,23 +98,23 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
         onLoad();
     }, []);
 
-    // On initial page load check localStorage for existing zoom preferences AND Visible Headings Lvl and set them if found:
-    useEffect(() => {
-        getLocalStorage("userZoom")
-            .then(response => {
-                updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        getLocalStorage("userHeadingLvl")
-            .then(response => {
-                updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }, []);
+    // // // On initial page load check localStorage for existing zoom preferences AND Visible Headings Lvl and set them if found:
+    // // useEffect(() => {
+    // //     getLocalStorage("userZoom")
+    // //         .then(response => {
+    // //             updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
+    // //         })
+    // //         .catch(error => {
+    // //             console.error(error);
+    // //         });
+    // //     getLocalStorage("userHeadingLvl")
+    // //         .then(response => {
+    // //             updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
+    // //         })
+    // //         .catch(error => {
+    // //             console.error(error);
+    // //         });
+    // // }, []);
 
     // any time user clicks +/- zoom buttons, update corresponding --user-zoom CSS variable
     useEffect(() => {

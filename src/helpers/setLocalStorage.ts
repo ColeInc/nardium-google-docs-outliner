@@ -1,4 +1,4 @@
-export const setLocalStorage = (key: string, payload: { [key: string]: number }) => {
+export const setLocalStorage = (key: string, payload: { [key: string]: number | boolean }) => {
     chrome.runtime.sendMessage(
         {
             type: "setLocalStorage",

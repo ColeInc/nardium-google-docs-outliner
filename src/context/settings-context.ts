@@ -5,6 +5,8 @@ export const defaultSettings: Settings = {
     userZoom: 11,
     userHeadingLvl: 3,
     darkTheme: false,
+    mainPanelCollapsed: false,
+    settingsPanelCollapsed: false,
 };
 
 const SettingsContext = React.createContext({
@@ -13,6 +15,8 @@ const SettingsContext = React.createContext({
     incrementUserZoom: () => {},
     decrementUserZoom: () => {},
     toggleDarkMode: () => {},
+    toggleMainPanel: () => {},
+    toggleSettingsPanel: () => {},
 });
 
 export default SettingsContext;
