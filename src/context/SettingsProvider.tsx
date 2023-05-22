@@ -8,41 +8,84 @@ const SettingsProvider = (props: { children: ReactNode }) => {
     const [userSettings, setUserSettings] = useState<Settings>(defaultSettings);
     const { darkTheme } = userSettings;
 
+    // // // On initial page load check localStorage for all settings, and if anything is found then overwrite default settings:
+    // // useEffect(() => {
+    // //     getLocalStorage("userZoom")
+    // //         .then(response => {
+    // //             updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
+    // //         })
+    // //         .catch(error => {
+    // //             console.error(error);
+    // //         });
+    // //     getLocalStorage("userHeadingLvl")
+    // //         .then(response => {
+    // //             updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
+    // //         })
+    // //         .catch(error => {
+    // //             console.error(error);
+    // //         });
+    // //     getLocalStorage("darkTheme")
+    // //         .then(response => {
+    // //             // response.data["darkTheme"] ? toggleDarkMode() : null;
+    // //             updateUserSettings({ darkTheme: response.data["darkTheme"] } as Settings);
+    // //         })
+    // //         .catch(error => {
+    // //             console.error(error);
+    // //         });
+    // //     getLocalStorage("mainPanelCollapsed")
+    // //         .then(response => {
+    // //             updateUserSettings({ mainPanelCollapsed: response.data["mainPanelCollapsed"] } as Settings);
+    // //         })
+    // //         .catch(error => {
+    // //             console.error(error);
+    // //         });
+    // //     getLocalStorage("sidePanelCollapsed")
+    // //         .then(response => {
+    // //             updateUserSettings({ settingsPanelCollapsed: response.data["sidePanelCollapsed"] } as Settings);
+    // //         })
+    // //         .catch(error => {
+    // //             console.error(error);
+    // //         });
+    // // }, []);
+
     // On initial page load check localStorage for all settings, and if anything is found then overwrite default settings:
     useEffect(() => {
-        getLocalStorage("userZoom")
-            .then(response => {
-                updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        getLocalStorage("userHeadingLvl")
-            .then(response => {
-                updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        getLocalStorage("darkTheme")
-            .then(response => {
-                // response.data["darkTheme"] ? toggleDarkMode() : null;
-                updateUserSettings({ darkTheme: response.data["darkTheme"] } as Settings);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        getLocalStorage("mainPanelCollapsed")
-            .then(response => {
-                updateUserSettings({ mainPanelCollapsed: response.data["mainPanelCollapsed"] } as Settings);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        getLocalStorage("sidePanelCollapsed")
-            .then(response => {
-                updateUserSettings({ settingsPanelCollapsed: response.data["sidePanelCollapsed"] } as Settings);
-            })
+        Promise.all([
+            getLocalStorage("userZoom"),
+            getLocalStorage("userHeadingLvl"),
+            getLocalStorage("darkTheme"),
+            getLocalStorage("mainPanelCollapsed"),
+            getLocalStorage("sidePanelCollapsed"),
+        ])
+            .then(
+                ([
+                    userZoomResponse,
+                    userHeadingLvlResponse,
+                    darkThemeResponse,
+                    mainPanelResponse,
+                    sidePanelResponse,
+                ]) => {
+                    const settings = defaultSettings;
+
+                    if (userZoomResponse.data.hasOwnProperty("userZoom")) {
+                        settings.userZoom = userZoomResponse.data["userZoom"];
+                    }
+                    if (userHeadingLvlResponse.data.hasOwnProperty("userHeadingLvl")) {
+                        settings.userHeadingLvl = userHeadingLvlResponse.data["userHeadingLvl"];
+                    }
+                    if (darkThemeResponse.data.hasOwnProperty("darkTheme")) {
+                        settings.darkTheme = darkThemeResponse.data["darkTheme"];
+                    }
+                    if (mainPanelResponse.data.hasOwnProperty("mainPanelCollapsed")) {
+                        settings.mainPanelCollapsed = mainPanelResponse.data["mainPanelCollapsed"];
+                    }
+                    if (sidePanelResponse.data.hasOwnProperty("sidePanelCollapsed")) {
+                        settings.settingsPanelCollapsed = sidePanelResponse.data["sidePanelCollapsed"];
+                    }
+
+                    updateUserSettings(settings);
+                }
+            )
             .catch(error => {
                 console.error(error);
             });
