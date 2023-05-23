@@ -1,3 +1,5 @@
+import { setTimeout } from "timers";
+
 interface ChromeMessageRequest {
     type: string;
     token?: string;
@@ -39,14 +41,16 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     // Fetch documentId:
     else if (request.type === "getDocumentId") {
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
-            const url = tabs[0].url;
-            const match = /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(url);
-            const documentId = match && match[1];
-            if (!documentId) {
-                sendResponse({ error: "Failed to get document ID" });
-            } else {
-                sendResponse({ documentId });
-            }
+            setTimeout(() => {
+                const url = tabs[0].url;
+                const match = /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(url);
+                const documentId = match && match[1];
+                if (!documentId) {
+                    sendResponse({ error: "Failed to get document ID" });
+                } else {
+                    sendResponse({ documentId });
+                }
+            }, 300);
         });
         return true;
     }

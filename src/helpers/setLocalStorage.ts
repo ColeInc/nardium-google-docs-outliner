@@ -6,7 +6,7 @@ export const setLocalStorage = (key: string, payload: { [key: string]: number | 
             payload,
         },
         response => {
-            console.log("response from setLocalStorage", response);
+            // console.log("response from setLocalStorage", response);
         }
     );
 };

@@ -48,46 +48,101 @@ const SettingsProvider = (props: { children: ReactNode }) => {
     // //         });
     // // }, []);
 
+    // // // On initial page load check localStorage for all settings, and if anything is found then overwrite default settings:
+    // // useEffect(() => {
+    // //     Promise.all([
+    // //         getLocalStorage("userZoom"),
+    // //         getLocalStorage("userHeadingLvl"),
+    // //         getLocalStorage("darkTheme"),
+    // //         getLocalStorage("mainPanelCollapsed"),
+    // //         getLocalStorage("sidePanelCollapsed"),
+    // //     ])
+    // //         .then(
+    // //             ([
+    // //                 userZoomResponse,
+    // //                 userHeadingLvlResponse,
+    // //                 darkThemeResponse,
+    // //                 mainPanelResponse,
+    // //                 sidePanelResponse,
+    // //             ]) => {
+    // //                 const settings = defaultSettings;
+
+    // //                 console.log("userZoomResponse.data", userZoomResponse.data);
+    // //                 console.log("userHeadingLvlResponse.data", userHeadingLvlResponse.data);
+    // //                 console.log("darkThemeResponse.data", darkThemeResponse.data);
+    // //                 console.log("mainPanelResponse.data", mainPanelResponse.data);
+    // //                 console.log("sidePanelResponse.data", sidePanelResponse.data);
+
+    // //                 if (userZoomResponse.data["userZoom"]) {
+    // //                     settings.userZoom = userZoomResponse.data["userZoom"];
+    // //                 }
+    // //                 if (userHeadingLvlResponse.data["userHeadingLvl"]) {
+    // //                     settings.userHeadingLvl = userHeadingLvlResponse.data["userHeadingLvl"];
+    // //                 }
+    // //                 if (darkThemeResponse.data["darkTheme"]) {
+    // //                     settings.darkTheme = darkThemeResponse.data["darkTheme"];
+    // //                 }
+    // //                 if (mainPanelResponse.data["mainPanelCollapsed"]) {
+    // //                     settings.mainPanelCollapsed = mainPanelResponse.data["mainPanelCollapsed"];
+    // //                 }
+    // //                 if (sidePanelResponse.data["sidePanelCollapsed"]) {
+    // //                     settings.settingsPanelCollapsed = sidePanelResponse.data["sidePanelCollapsed"];
+    // //                 }
+
+    // //                 console.log("final loaded settings", settings);
+    // //                 updateUserSettings(settings);
+    // //             }
+    // //         )
+    // //         .catch(error => {
+    // //             console.log("LocalStorage item not found. ", error);
+    // //         });
+    // // }, []);
+
     // On initial page load check localStorage for all settings, and if anything is found then overwrite default settings:
     useEffect(() => {
-        Promise.all([
+        Promise.allSettled([
             getLocalStorage("userZoom"),
             getLocalStorage("userHeadingLvl"),
             getLocalStorage("darkTheme"),
             getLocalStorage("mainPanelCollapsed"),
-            getLocalStorage("sidePanelCollapsed"),
+            getLocalStorage("settingsPanelCollapsed"),
         ])
-            .then(
-                ([
-                    userZoomResponse,
-                    userHeadingLvlResponse,
-                    darkThemeResponse,
-                    mainPanelResponse,
-                    sidePanelResponse,
-                ]) => {
-                    const settings = defaultSettings;
+            .then(results => {
+                const settings = defaultSettings;
 
-                    if (userZoomResponse.data.hasOwnProperty("userZoom")) {
-                        settings.userZoom = userZoomResponse.data["userZoom"];
-                    }
-                    if (userHeadingLvlResponse.data.hasOwnProperty("userHeadingLvl")) {
-                        settings.userHeadingLvl = userHeadingLvlResponse.data["userHeadingLvl"];
-                    }
-                    if (darkThemeResponse.data.hasOwnProperty("darkTheme")) {
-                        settings.darkTheme = darkThemeResponse.data["darkTheme"];
-                    }
-                    if (mainPanelResponse.data.hasOwnProperty("mainPanelCollapsed")) {
-                        settings.mainPanelCollapsed = mainPanelResponse.data["mainPanelCollapsed"];
-                    }
-                    if (sidePanelResponse.data.hasOwnProperty("sidePanelCollapsed")) {
-                        settings.settingsPanelCollapsed = sidePanelResponse.data["sidePanelCollapsed"];
-                    }
+                results.forEach(result => {
+                    if (result.status === "fulfilled") {
+                        console.log("cole item", result);
+                        const { data } = result.value;
+                        // console.log("cole key data", key, data);
+                        // console.log("cole key === 'userZoom'", key === "userZoom");
+                        // console.log("cole data['userZoom']", data["userZoom"]);
 
-                    updateUserSettings(settings);
-                }
-            )
+                        if (data["userZoom"]) {
+                            settings.userZoom = data["userZoom"];
+                        }
+                        if (data["userHeadingLvl"]) {
+                            settings.userHeadingLvl = data["userHeadingLvl"];
+                        }
+                        if (data["darkTheme"]) {
+                            settings.darkTheme = data["darkTheme"];
+                        }
+                        if (data["mainPanelCollapsed"]) {
+                            settings.mainPanelCollapsed = data["mainPanelCollapsed"];
+                        }
+                        if (data["settingsPanelCollapsed"]) {
+                            settings.settingsPanelCollapsed = data["settingsPanelCollapsed"];
+                        }
+                    } else if (result.status === "rejected") {
+                        console.error(result.reason); // Handle individual promise failure
+                    }
+                });
+
+                console.log("final loaded settings", settings);
+                updateUserSettings(settings);
+            })
             .catch(error => {
-                console.error(error);
+                console.error("An error occurred:", error);
             });
     }, []);
 
@@ -120,13 +175,17 @@ const SettingsProvider = (props: { children: ReactNode }) => {
 
     const incrementUserZoom = () => {
         setUserSettings(prevState => {
-            return { ...prevState, userZoom: prevState.userZoom + 0.25 };
+            const userZoom = prevState.userZoom + 0.25;
+            setLocalStorage("userZoom", { userZoom });
+            return { ...prevState, userZoom };
         });
     };
 
     const decrementUserZoom = () => {
         setUserSettings(prevState => {
-            return { ...prevState, userZoom: prevState.userZoom - 0.25 };
+            const userZoom = prevState.userZoom - 0.25;
+            setLocalStorage("userZoom", { userZoom });
+            return { ...prevState, userZoom };
         });
     };
 

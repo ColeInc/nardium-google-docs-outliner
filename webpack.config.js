@@ -58,6 +58,7 @@ module.exports = {
             child_process: false,
             http2: false,
             "crypto-browserify": require.resolve("crypto-browserify"),
+            timers: require.resolve("timers-browserify"),
         },
     },
     plugins: [

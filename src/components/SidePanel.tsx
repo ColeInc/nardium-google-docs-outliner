@@ -1,29 +1,29 @@
 import React, { useContext, useEffect, useState } from "react";
-import Chevron from "../../public/assets/chevron.svg";
+import SettingsContext from "../context/settings-context";
 import SettingsGear from "../../public/assets/settings-gear.svg";
 import DocumentContext from "../context/document-context";
 import HeadingsWrapper from "./HeadingsWrapper";
 import LoadingSpinner from "./LoadingSpinner";
 import SettingsPanel from "./SettingsPanel";
+import Chevron from "../../public/assets/chevron.svg";
 import Login from "./Login";
 import "./SidePanel.css";
-import SettingsContext from "../context/settings-context";
-import { getLocalStorage } from "../helpers/getLocalStorage";
 
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isLoading, setIsLoading] = useState(true);
     // const [panelCollapsed, setPanelCollapsed] = useState(false);
-    const [settingsVisible, setSettingsVisible] = useState(false);
+    // const [settingsVisible, setSettingsVisible] = useState(false);
 
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;
-    const settingsCtx = useContext(SettingsContext);
-    const { userSettings } = settingsCtx;
-    const { settingsPanelCollapsed } = userSettings;
 
-    const version = "v0.1.0";
+    const settingsCtx = useContext(SettingsContext);
+    const { userSettings, toggleMainPanel, toggleSettingsPanel } = settingsCtx;
+    const { mainPanelCollapsed, settingsPanelCollapsed } = userSettings;
+
+    const VERSION_NUMBER = "v0.1.0";
 
     useEffect(() => {
         const handleResize = () => {
@@ -46,18 +46,6 @@ const SidePanel = () => {
         }
     }, []);
 
-    // On initial page load check localStorage for sidePanelCollapsed true/false:
-    useEffect(() => {
-        getLocalStorage("sidePanelCollapsed")
-            .then(response => {
-                response.data["sidePanelCollapsed"] ? togglePanelCollapsed() : null;
-                // updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }, []);
-
     if (thirdPartyCookiesEnabled) {
         return (
             <div className="message">
@@ -66,14 +54,15 @@ const SidePanel = () => {
         );
     }
 
-    const togglePanelCollapsed = () => {
-        togglePanelCollapsed();
-        // setPanelCollapsed(s => !s);
-    };
+    // // const togglePanelCollapsed = () => {
+    // //     toggleMainPanel();
+    // //     // setPanelCollapsed(s => !s);
+    // // };
 
-    const toggleSettingsPanel = () => {
-        setSettingsVisible(s => !s);
-    };
+    // // const toggleSettings = () => {
+    // //     toggleSettingsPanel();
+    // //     // setSettingsVisible(s => !s);
+    // // };
 
     // dynamically calculate sidepanel total width depending on page width:
     const sidePanelWidth = windowWidth > 1460 ? 285 + 0.5 * (windowWidth - 1600) : 285;
@@ -81,7 +70,7 @@ const SidePanel = () => {
     return (
         <>
             <div
-                className={`${settingsPanelCollapsed ? "side-panel-collapsed" : ""} side-panel-container`}
+                className={`${mainPanelCollapsed ? "side-panel-collapsed" : ""} side-panel-container`}
                 style={{ width: sidePanelWidth }}
             >
                 <div className="side-panel">
@@ -99,17 +88,17 @@ const SidePanel = () => {
                     )}
 
                     <div className="side-panel-config-container">
-                        <SettingsPanel isVisible={settingsVisible} />
+                        <SettingsPanel isVisible={settingsPanelCollapsed} />
                         <div className="side-panel-bottom-banner">
                             <h1>Nardium</h1>
-                            <p>{version}</p>
+                            <p>{VERSION_NUMBER}</p>
 
                             <button className="toggle-settings-button" onClick={toggleSettingsPanel} title="Settings">
                                 <SettingsGear />
                             </button>
                             <button
                                 className="collapse-button"
-                                onClick={togglePanelCollapsed}
+                                onClick={toggleMainPanel}
                                 title="Hide Document Outline Panel"
                             >
                                 <Chevron />
@@ -120,8 +109,8 @@ const SidePanel = () => {
             </div>
 
             <button
-                className={`${settingsPanelCollapsed ? "side-panel-collapsed" : ""} expand-button`}
-                onClick={togglePanelCollapsed}
+                className={`${mainPanelCollapsed ? "side-panel-collapsed" : ""} expand-button`}
+                onClick={toggleMainPanel}
                 title="Show Document Outline"
             >
                 <Chevron />

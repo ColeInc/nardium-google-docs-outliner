@@ -78,7 +78,6 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     useEffect(() => {
         const onLoad = async () => {
             try {
-                console.log("1) fetch document ID");
                 const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
                 // const documentId = "testing";
 
