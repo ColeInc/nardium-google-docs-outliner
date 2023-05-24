@@ -5,7 +5,7 @@ export const defaultSettings: Settings = {
     userZoom: 11,
     userHeadingLvl: 3,
     darkTheme: false,
-    mainPanelCollapsed: false,
+    mainPanelCollapsed: true,
     settingsPanelCollapsed: false,
 };
 

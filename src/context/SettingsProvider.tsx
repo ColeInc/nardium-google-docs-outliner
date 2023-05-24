@@ -109,6 +109,7 @@ const SettingsProvider = (props: { children: ReactNode }) => {
         ])
             .then(results => {
                 const settings = defaultSettings;
+                settings.mainPanelCollapsed = false; // having this change here prevents the 1 second flash displaying panel before localStorage loads and shows user had it collapsed.
 
                 results.forEach(result => {
                     if (result.status === "fulfilled") {

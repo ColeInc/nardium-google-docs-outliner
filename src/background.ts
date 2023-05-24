@@ -33,9 +33,16 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     // Logout user:
     else if (request.type === "logoutUser") {
         if (chrome.identity && request.token) {
+            // // // // remove user's token from cache
+            // // // chrome.identity.removeCachedAuthToken({ token: request.token });
+
             // remove user's token from cache
             chrome.identity.removeCachedAuthToken({ token: request.token });
-            console.log("Successfully logged out user! v1");
+
+            // Clear all cached auth tokens.
+            chrome.identity.clearAllCachedAuthTokens();
+
+            console.log("Successfully logged out user!");
         }
     }
     // Fetch documentId:

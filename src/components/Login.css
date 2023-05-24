@@ -1,7 +1,17 @@
 .login-container {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
-    background-color: red;
+    height: 75%;
+    /* background-color: red; */
+}
+
+.login-button {
+    padding: 10px 58px;
+    border-radius: 9px;
+    background-color: var(--color3);
+    color: var(--font-color);
+    font-size: 12pt;
+    border: none;
 }

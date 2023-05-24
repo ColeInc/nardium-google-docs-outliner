@@ -1,18 +1,14 @@
-import React, { FC, useContext, useEffect, useRef, useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import DocumentContext from "../context/document-context";
 import SettingsContext from "../context/settings-context";
 import { fetchFileContents } from "../helpers/fetchFileContents";
 import { filterDocumentContent } from "../helpers/filterDocumentContent";
 import { generateHeadingsHierarchy } from "../helpers/generateHeadingsHierarchy";
+import { useHeadingsDifference } from "../hooks/useHeadingsDifference";
 import { getDocumentId } from "../helpers/getDocumentId";
-import { getLocalStorage } from "../helpers/getLocalStorage";
-import { setLocalStorage } from "../helpers/setLocalStorage";
 import { IHeading } from "../models/heading";
-import { Settings } from "../models/settings";
 import Headings from "./Headings";
 import "./HeadingsWrapper.css";
-import SettingsPanel from "./SettingsPanel";
-import { useHeadingsDifference } from "../hooks/useHeadingsDifference";
 
 interface HeadingsWrapperProps {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,11 +16,11 @@ interface HeadingsWrapperProps {
 
 const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     const [documentContent, setDocumentContent] = useState<IHeading[]>();
-    const isFirstRender = useRef(true);
 
     const documentCtx = useContext(DocumentContext);
     const settingsCtx = useContext(SettingsContext);
-    const { userSettings, updateUserSettings } = settingsCtx;
+    const { userSettings } = settingsCtx;
+    const { userZoom } = userSettings;
 
     const { checkHeadingsDifference } = useHeadingsDifference();
 
@@ -117,21 +113,8 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
 
     // any time user clicks +/- zoom buttons, update corresponding --user-zoom CSS variable
     useEffect(() => {
-        // if its the first render don't run this bc we will try load from localStorage instead:
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
-
-        updateCssUserZoom(userSettings.userZoom);
-        // save current user zoom into LocalStorage:
-        // // // setLocalStorage("userZoom", { userZoom: userSettings.userZoom });
-    }, [userSettings.userZoom]);
-
-    const updateCssUserZoom = (userZoom: number) => {
-        // console.log("new user zoom", `${userZoom}px`);
         document.documentElement.style.setProperty("--user-zoom", `${userZoom}px`);
-    };
+    }, [userZoom]);
 
     return (
         <>

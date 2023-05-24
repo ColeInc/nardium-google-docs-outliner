@@ -18,6 +18,7 @@ const Login: FC<LoginProps> = ({ setIsLoading }) => {
     const handleLogin = () => {
         // TODO: convert this response into valid type once we have final user object shape:
         chrome.runtime.sendMessage({ type: "getAuthToken" }, (response: any) => {
+            console.log("RESP TO CONVERT TO TYPESCRIPT", JSON.stringify(response));
             if (response) {
                 // console.log("repsonse fetched back at content.js", response);
                 documentCtx.updateDocumentDetails({ isLoggedIn: true, token: response.token } as DocumentInfo);
@@ -26,16 +27,16 @@ const Login: FC<LoginProps> = ({ setIsLoading }) => {
                 documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
             }
         });
+        // next line is for testing only:
         // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } as DocumentInfo);
-        // // // setIsLoading(false);
+        setIsLoading(false);
     };
 
     return (
         <div className="login-container">
-            <div className="login-button">
-                <button onClick={handleLogin}>Login</button>
-            </div>
-            <Logout />
+            <button className="login-button" onClick={handleLogin}>
+                LOGIN
+            </button>
         </div>
     );
 };

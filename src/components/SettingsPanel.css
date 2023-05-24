@@ -6,23 +6,16 @@
     border-radius: 10px;
     padding: 7px;
     margin-bottom: 5px;
-    /* transition: max-height 1.4s ease; */
-    /* transition: display 2s ease; */
-    /* transition: padding 0.4s ease; */
     transition: max-height 0.12s ease-in-out, padding 0.05s ease-in-out;
     max-height: 250px;
     overflow: hidden;
 }
 
 .settings-container.settings-hidden {
-    /* .settings-container:hover { */
-    /* display: none; */
     max-height: 0px;
     padding-top: 0;
     padding-bottom: 0;
     margin: 0;
-    /* transition: max-height 1.4s ease;
-    transition: padding 1.4s ease; */
 }
 
 .settings-controls-row {
@@ -30,6 +23,12 @@
     flex-direction: row;
     justify-content: space-between;
     margin-bottom: 8px;
+}
+
+.settings-darkmode-logout-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .zoom-controls-container,
@@ -48,7 +47,6 @@
     width: 26px;
     border-radius: 7px;
     background-color: var(--color3);
-    /* padding: 10px; */
     border: none;
     font-size: 7pt;
     color: var(--font-color);
@@ -56,23 +54,14 @@
     cursor: pointer;
 }
 
-.zoom-controls-container button {
-    /* display: flex;
-    justify-content: center;
-    align-items: center; */
-    /* height: 32px;
-    width: 32px; */
+.headings-grid-container button.settings-grid-active {
+    background-color: var(--color1);
 }
-.headings-grid-container button {
-    /* height: 22px;
-    width: 22px;
-    border-radius: 6px; */
-}
+
 .zoom-controls-container button svg {
     width: 15px;
     height: 15px;
     fill: var(--font-color);
-    /* background-color: red; */
 }
 
 .settings-container button:hover {

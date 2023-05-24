@@ -13,8 +13,6 @@ const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isLoading, setIsLoading] = useState(true);
-    // const [panelCollapsed, setPanelCollapsed] = useState(false);
-    // const [settingsVisible, setSettingsVisible] = useState(false);
 
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;
@@ -54,16 +52,6 @@ const SidePanel = () => {
         );
     }
 
-    // // const togglePanelCollapsed = () => {
-    // //     toggleMainPanel();
-    // //     // setPanelCollapsed(s => !s);
-    // // };
-
-    // // const toggleSettings = () => {
-    // //     toggleSettingsPanel();
-    // //     // setSettingsVisible(s => !s);
-    // // };
-
     // dynamically calculate sidepanel total width depending on page width:
     const sidePanelWidth = windowWidth > 1460 ? 285 + 0.5 * (windowWidth - 1600) : 285;
 
@@ -80,22 +68,24 @@ const SidePanel = () => {
                         </div>
                     )}
 
-                    {/* TODO: perhaps global loading provider LoadingProvider */}
-                    {!isLoggedIn ? (
-                        <Login setIsLoading={setIsLoading} />
-                    ) : (
-                        <HeadingsWrapper setIsLoading={setIsLoading} />
-                    )}
+                    {!isLoggedIn && <Login setIsLoading={setIsLoading} />}
 
                     <div className="side-panel-config-container">
-                        <SettingsPanel isVisible={settingsPanelCollapsed} />
+                        <SettingsPanel isVisible={isLoggedIn && settingsPanelCollapsed} />
                         <div className="side-panel-bottom-banner">
                             <h1>Nardium</h1>
                             <p>{VERSION_NUMBER}</p>
 
-                            <button className="toggle-settings-button" onClick={toggleSettingsPanel} title="Settings">
-                                <SettingsGear />
-                            </button>
+                            {isLoggedIn && (
+                                <button
+                                    className="toggle-settings-button"
+                                    onClick={toggleSettingsPanel}
+                                    title="Settings"
+                                >
+                                    <SettingsGear />
+                                </button>
+                            )}
+
                             <button
                                 className="collapse-button"
                                 onClick={toggleMainPanel}
