@@ -23,7 +23,7 @@ export const getDocumentId = async (setDocumentId: (details: DocumentInfo) => vo
         return documentId;
         // documentCtx.updateDocumentDetails({ documentId: documentId } as DocumentInfo);
     } catch (e) {
-        console.error(e);
+        console.error("caught error: ", e);
         return null;
     }
 };

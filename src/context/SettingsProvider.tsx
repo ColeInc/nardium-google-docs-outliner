@@ -113,7 +113,7 @@ const SettingsProvider = (props: { children: ReactNode }) => {
 
                 results.forEach(result => {
                     if (result.status === "fulfilled") {
-                        console.log("cole item", result);
+                        // console.log("cole item", result);
                         const { data } = result.value;
                         // console.log("cole key data", key, data);
                         // console.log("cole key === 'userZoom'", key === "userZoom");
@@ -139,7 +139,7 @@ const SettingsProvider = (props: { children: ReactNode }) => {
                     }
                 });
 
-                console.log("final loaded settings", settings);
+                // console.log("final loaded settings", settings);
                 updateUserSettings(settings);
             })
             .catch(error => {

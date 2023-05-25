@@ -1,12 +1,17 @@
 import React from "react";
 import { DocumentInfo, IDocumentContext } from "../models";
 import { UnfilteredBody } from "../models/body";
+import { useLogoutUser } from "./useLogoutUser";
+
+let counter = 0;
 
 // Get access token of logged in user, then use it to call google docs API to fetch document info
-export const fetchFileContents = async (
+export const useFetchFileContents = async (
     documentId: string | null,
     documentCtx: IDocumentContext
 ): Promise<UnfilteredBody | undefined> => {
+    // const { logoutUser } = useLogoutUser();
+
     // // // //  MOCK FOR VANILLA REACT. TODO: Remove this:
     // const contents = {
     //     title: "Nardium Headlines Testing",
@@ -524,6 +529,18 @@ export const fetchFileContents = async (
                 });
         } else {
             console.log("No authToken or google docs documentId found");
+            counter++;
+            if (counter >= 3) {
+                // logoutUser();
+                console.log("logging out user");
+                chrome.runtime.sendMessage({ type: "logoutUser", token }, () => {
+                    documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo); // remove token from our UserProvider
+                    console.log("logging out successful");
+                });
+                // logoutUser();
+                // };
+            }
+            console.log("counter", counter);
             return Promise.resolve(undefined);
         }
     } catch (e) {

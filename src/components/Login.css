@@ -15,3 +15,8 @@
     font-size: 12pt;
     border: none;
 }
+
+.login-button:hover {
+    cursor: pointer;
+    filter: brightness(90%);
+}

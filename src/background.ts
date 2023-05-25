@@ -40,24 +40,53 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             chrome.identity.removeCachedAuthToken({ token: request.token });
 
             // Clear all cached auth tokens.
+            console.log("bing gets to here chrome.identity.clearAllCachedAuthTokens();");
             chrome.identity.clearAllCachedAuthTokens();
 
             console.log("Successfully logged out user!");
         }
     }
+    // Check if user is logged in:
+    else if (request.type === "isLoggedIn") {
+        if (!chrome.identity) {
+            console.error("Chrome Identity API not available :(");
+            sendResponse(false);
+            return;
+        }
+
+        // interactive=false allows checking the login status without showing any authentication prompts.
+        chrome.identity.getAuthToken({ interactive: false }, token => {
+            console.log("isLoggedIn repsonse", token);
+            if (chrome.runtime.lastError || !token) {
+                console.log("User is not logged in");
+                sendResponse(false);
+                return;
+            } else {
+                console.log("User is logged in");
+                sendResponse(true);
+            }
+        });
+        return true;
+    }
     // Fetch documentId:
     else if (request.type === "getDocumentId") {
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
-            setTimeout(() => {
-                const url = tabs[0].url;
-                const match = /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(url);
-                const documentId = match && match[1];
-                if (!documentId) {
-                    sendResponse({ error: "Failed to get document ID" });
-                } else {
-                    sendResponse({ documentId });
-                }
-            }, 300);
+            try {
+                setTimeout(() => {
+                    const url = tabs[0].url;
+                    const match = /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(
+                        url
+                    );
+                    const documentId = match && match[1];
+                    if (!documentId) {
+                        sendResponse({ error: "Failed to get document ID" });
+                    } else {
+                        sendResponse({ documentId });
+                    }
+                }, 300);
+            } catch (error) {
+                console.log(error);
+            }
         });
         return true;
     }

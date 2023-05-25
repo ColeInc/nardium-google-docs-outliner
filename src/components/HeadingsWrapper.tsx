@@ -1,11 +1,12 @@
 import React, { FC, useContext, useEffect, useState } from "react";
 import DocumentContext from "../context/document-context";
 import SettingsContext from "../context/settings-context";
-import { fetchFileContents } from "../helpers/fetchFileContents";
 import { filterDocumentContent } from "../helpers/filterDocumentContent";
 import { generateHeadingsHierarchy } from "../helpers/generateHeadingsHierarchy";
 import { useHeadingsDifference } from "../hooks/useHeadingsDifference";
+import { useFetchFileContents } from "../hooks/useFetchFileContents";
 import { getDocumentId } from "../helpers/getDocumentId";
+import { useLogoutUser } from "../hooks/useLogoutUser";
 import { IHeading } from "../models/heading";
 import Headings from "./Headings";
 import "./HeadingsWrapper.css";
@@ -17,12 +18,15 @@ interface HeadingsWrapperProps {
 const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     const [documentContent, setDocumentContent] = useState<IHeading[]>();
 
+    const { checkHeadingsDifference } = useHeadingsDifference();
+    const { logoutUser } = useLogoutUser();
+
     const documentCtx = useContext(DocumentContext);
+    const { isLoggedIn } = documentCtx.documentDetails;
+
     const settingsCtx = useContext(SettingsContext);
     const { userSettings } = settingsCtx;
     const { userZoom } = userSettings;
-
-    const { checkHeadingsDifference } = useHeadingsDifference();
 
     // // // // Main onLoad steps:
     // // // useEffect(() => {
@@ -31,7 +35,7 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     // // //         const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
     // // //         // const documentId = "beans";
     // // //         console.log("3)");
-    // // //         const fileContents = await fetchFileContents(documentId, documentCtx);
+    // // //         const fileContents = await useFetchFileContents(documentId, documentCtx);
 
     // // //         // TODO: instead of if statement here i think just do a try catch and if error occurs at any point render an error component instead of <Headings>
     // // //         if (!fileContents) {
@@ -47,7 +51,12 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
     // // //     onLoad();
 
     const refetch = async (documentId: string | null) => {
-        const fileContents = await fetchFileContents(documentId, documentCtx);
+        console.log("user logged in at REFETCH?", isLoggedIn);
+        if (!isLoggedIn) {
+            return;
+        }
+
+        const fileContents = await useFetchFileContents(documentId, documentCtx);
 
         if (!fileContents) {
             return new Error("Document content was not able to be fetched.");
@@ -76,6 +85,10 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
             try {
                 const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
                 // const documentId = "testing";
+
+                if (!documentId) {
+                    logoutUser();
+                }
 
                 refetch(documentId);
 

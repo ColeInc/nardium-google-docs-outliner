@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import SettingsContext from "../context/settings-context";
 import SettingsGear from "../../public/assets/settings-gear.svg";
 import DocumentContext from "../context/document-context";
@@ -13,6 +13,7 @@ const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isLoading, setIsLoading] = useState(true);
+    const isFirstRender = useRef(true);
 
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;
@@ -44,6 +45,11 @@ const SidePanel = () => {
         }
     }, []);
 
+    // TODO: delete this useless print statement
+    useEffect(() => {
+        console.log("isLoading = ", isLoading);
+    }, [isLoading]);
+
     if (thirdPartyCookiesEnabled) {
         return (
             <div className="message">
@@ -68,7 +74,8 @@ const SidePanel = () => {
                         </div>
                     )}
 
-                    {!isLoggedIn && <Login setIsLoading={setIsLoading} />}
+                    {!isLoggedIn && <Login setIsLoading={setIsLoading} isFirstRender={isFirstRender} />}
+                    {isLoggedIn && <HeadingsWrapper setIsLoading={setIsLoading} />}
 
                     <div className="side-panel-config-container">
                         <SettingsPanel isVisible={isLoggedIn && settingsPanelCollapsed} />

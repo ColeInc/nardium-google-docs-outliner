@@ -1,24 +1,48 @@
-import React, { FC, useContext, useEffect } from "react";
+import React, { FC, useContext, useEffect, useRef } from "react";
 import DocumentContext from "../context/document-context";
 import { DocumentInfo } from "../models";
-import Logout from "./Logout";
 import "./Login.css";
 interface LoginProps {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    isFirstRender: React.MutableRefObject<boolean>;
 }
 
-const Login: FC<LoginProps> = ({ setIsLoading }) => {
+interface AuthTokenResponse {
+    token: string;
+}
+
+const Login: FC<LoginProps> = ({ setIsLoading, isFirstRender }) => {
     const documentCtx = useContext(DocumentContext);
 
     // attempt to log user in on page load:
     useEffect(() => {
-        handleLogin();
+        if (isFirstRender.current) {
+            // handleLogin();
+            console.log("ONLOAD checking if user is logged in");
+            checkLoggedIn();
+            isFirstRender.current = false;
+        }
     }, []);
 
+    // check if user is logged in without explicitly showing window prompt to login again:
+    const checkLoggedIn = () => {
+        chrome.runtime.sendMessage({ type: "isLoggedIn" }, (response: boolean) => {
+            console.log("checkLoggedIn resp:", response);
+            if (response) {
+                documentCtx.updateDocumentDetails({ isLoggedIn: true } as DocumentInfo);
+            } else {
+                documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
+            }
+            setIsLoading(false);
+        });
+    };
+
     const handleLogin = () => {
+        setIsLoading(true); // as soon as user clicks login, show loading spinner until either success or fail happens
+
         // TODO: convert this response into valid type once we have final user object shape:
-        chrome.runtime.sendMessage({ type: "getAuthToken" }, (response: any) => {
-            console.log("RESP TO CONVERT TO TYPESCRIPT", JSON.stringify(response));
+        chrome.runtime.sendMessage({ type: "getAuthToken" }, (response: AuthTokenResponse | undefined) => {
+            // console.log("RESP TO CONVERT TO TYPESCRIPT", JSON.stringify(response));
             if (response) {
                 // console.log("repsonse fetched back at content.js", response);
                 documentCtx.updateDocumentDetails({ isLoggedIn: true, token: response.token } as DocumentInfo);
@@ -26,10 +50,10 @@ const Login: FC<LoginProps> = ({ setIsLoading }) => {
                 console.error("Invalid response back from chrome Login background.js function");
                 documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
             }
+            // setIsLoading(false);
         });
         // next line is for testing only:
         // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } as DocumentInfo);
-        setIsLoading(false);
     };
 
     return (
