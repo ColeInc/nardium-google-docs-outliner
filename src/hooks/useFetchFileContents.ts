@@ -508,7 +508,7 @@ export const useFetchFileContents = async (
     try {
         const { token } = documentCtx.documentDetails;
 
-        // console.log("trying with these token/documentId,", !!token, !!documentId);
+        console.log("trying with these token/documentId,", !!token, !!documentId);
 
         if (token && documentId) {
             // console.log("going with these:", token, "\n/////\n", documentId);
@@ -523,23 +523,23 @@ export const useFetchFileContents = async (
                     return response;
                 })
                 .then(contents => {
-                    // console.log("docs API call response (content)", JSON.stringify(contents));
+                    console.log("docs API call response (content)", JSON.stringify(contents));
                     documentCtx.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
                     return contents as UnfilteredBody;
                 });
         } else {
             console.log("No authToken or google docs documentId found");
             counter++;
-            if (counter >= 3) {
-                // logoutUser();
-                console.log("logging out user");
-                chrome.runtime.sendMessage({ type: "logoutUser", token }, () => {
-                    documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo); // remove token from our UserProvider
-                    console.log("logging out successful");
-                });
-                // logoutUser();
-                // };
-            }
+            // // // if (counter >= 3) {
+            // // //     // logoutUser();
+            // // //     console.log("logging out user");
+            // // //     await chrome.runtime.sendMessage({ type: "logoutUser", token }, () => {
+            // // //         documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo); // remove token from our UserProvider
+            // // //         console.log("logging out successful");
+            // // //     });
+            // // //     // logoutUser();
+            // // //     // };
+            // // // }
             console.log("counter", counter);
             return Promise.resolve(undefined);
         }

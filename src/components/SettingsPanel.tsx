@@ -39,6 +39,7 @@ export const SettingsPanel = ({ isVisible }: { isVisible: boolean }) => {
                                 onClick={() => handleVisibleHeadings(headingDigit)}
                                 className={active ? "settings-grid-active" : ""}
                                 title={`Display Heading ${headingDigit}`}
+                                key={headingDigit}
                             >{`H${headingDigit}`}</button>
                         );
                     })}

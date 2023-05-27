@@ -7,13 +7,12 @@ interface DocumentProviderProps {
 }
 
 const DocumentProvider = (props: DocumentProviderProps) => {
-    const [documentDetails, setdocumentDetails] = useState<DocumentInfo>(defaultDocumentState);
-    // console.log("userDeatils", documentDetails);
+    const [documentDetails, setDocumentDetails] = useState<DocumentInfo>(defaultDocumentState);
 
     const updateDocumentDetails = (details: DocumentInfo) => {
-        setdocumentDetails(prevState => {
+        setDocumentDetails(prevState => {
             // console.log("prevState", prevState);
-            // console.log("new Provider:", { ...prevState, ...details });
+            console.log("new Provider:", { ...prevState, ...details });
             return { ...prevState, ...details } as DocumentInfo;
         });
     };
@@ -26,7 +25,6 @@ const DocumentProvider = (props: DocumentProviderProps) => {
         [documentDetails, updateDocumentDetails]
     );
 
-    // return <DocumentContext.Provider value={DocumentContext}>{props.children}</DocumentContext.Provider>;
     return <DocumentContext.Provider value={documentContext}>{props.children}</DocumentContext.Provider>;
 };
 

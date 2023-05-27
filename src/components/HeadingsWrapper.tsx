@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useState } from "react";
+import React, { FC, MutableRefObject, useContext, useEffect, useRef, useState } from "react";
 import DocumentContext from "../context/document-context";
 import SettingsContext from "../context/settings-context";
 import { filterDocumentContent } from "../helpers/filterDocumentContent";
@@ -10,119 +10,128 @@ import { useLogoutUser } from "../hooks/useLogoutUser";
 import { IHeading } from "../models/heading";
 import Headings from "./Headings";
 import "./HeadingsWrapper.css";
+import { DocumentInfo, IDocumentContext } from "../models";
 
 interface HeadingsWrapperProps {
-    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    // setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
-    const [documentContent, setDocumentContent] = useState<IHeading[]>();
+const HeadingsWrapper: FC<HeadingsWrapperProps> = () => {
+    // const [documentContent, setDocumentContent] = useState<IHeading[]>();
 
     const { checkHeadingsDifference } = useHeadingsDifference();
     const { logoutUser } = useLogoutUser();
 
     const documentCtx = useContext(DocumentContext);
-    const { isLoggedIn } = documentCtx.documentDetails;
+    // const documentCtxRef = useRef(DocumentContext);
+    const documentCtxRef = useRef(documentCtx);
+    const { isLoggedIn, documentContent } = documentCtx.documentDetails;
 
     const settingsCtx = useContext(SettingsContext);
     const { userSettings } = settingsCtx;
     const { userZoom } = userSettings;
 
+    // // // const refetch = async (documentId: string | null, passedDocumentCtx: IDocumentContext) => {
+    // // //     // const refetch = async (documentId: string | null) => {
+    // // //     // Access the updated documentCtx using the useRef. Must to do this because referencing the original one gave me a stale closure which only stored the original state of the ctx.
+    // // //     // const internalDocumentCtx = documentCtxRef.current;
+    // // //     // console.log("intervalDocumentCtx:", internalDocumentCtx.documentDetails);
+
+    // // //     // const loggedIn = passedDocumentCtx.documentDetails.isLoggedIn;
+    // // //     // const { isLoggedIn } = passedDocumentCtx.documentDetails;
+
+    // // //     // documentCtx.updateDocumentDetails({ email: "coletesting@gmail.com" } as DocumentInfo);
+    // // //     // const loggedIn = false;
+
+    // // //     console.log("documentCtx @ refresh", passedDocumentCtx.documentDetails);
+    // // //     // console.log("user logged in at REFETCH?", loggedIn);
+    // // //     console.log("docId", documentId);
+    // // //     // // if (!loggedIn) {
+    // // //     // //     return;
+    // // //     // // }
+
+    // // //     const fileContents = await useFetchFileContents(documentId, passedDocumentCtx);
+
+    // // //     if (!fileContents) {
+    // // //         return new Error("Document content was not able to be fetched.");
+    // // //     }
+
+    // // //     // send to function to CHECK DIFFERENCE, if no difference then don't continue
+    // // //     const hasChanges = checkHeadingsDifference(fileContents);
+
+    // // //     // if no changes found then don't run entire calculation to render headings:
+    // // //     if (!hasChanges) {
+    // // //         setIsLoading(false);
+    // // //         return;
+    // // //     }
+    // // //     // if difference found, run entire filterDocumentContent
+    // // //     const filteredHeadings = filterDocumentContent(fileContents);
+
+    // // //     // generateHeadingsHierarchy & render it out
+    // // //     const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings, documentCtx);
+    // // //     setDocumentContent(headingsHierarchy);
+    // // //     setIsLoading(false);
+    // // // };
+
     // // // // Main onLoad steps:
     // // // useEffect(() => {
+    // // //     // const innerDocumentCtx = documentCtxRef.current;
+    // // //     // console.log("xxx v1", innerDocumentCtx.documentDetails);
+
     // // //     const onLoad = async () => {
-    // // //         console.log("1)");
-    // // //         const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
-    // // //         // const documentId = "beans";
-    // // //         console.log("3)");
-    // // //         const fileContents = await useFetchFileContents(documentId, documentCtx);
+    // // //         try {
+    // // //             const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
+    // // //             // const documentId = "testing";
 
-    // // //         // TODO: instead of if statement here i think just do a try catch and if error occurs at any point render an error component instead of <Headings>
-    // // //         if (!fileContents) {
-    // // //             console.log("Document content was not able to be fetched.");
-    // // //             // return;
-    // // //         } else {
-    // // //             const filteredHeadings = filterDocumentContent(fileContents);
-    // // //             const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings, documentCtx);
-    // // //             setDocumentContent(headingsHierarchy);
+    // // //             if (!documentId) {
+    // // //                 await logoutUser();
+    // // //             }
+
+    // // //             // await refetch(documentId);
+    // // //             await refetch(documentId, documentCtxRef.current);
+
+    // // //             // Every 5 secs check headings data for new changes:
+    // // //             console.log("CREATED NEW INTERVAL (should definitely only be one)");
+    // // //             const interval = setInterval(async () => {
+    // // //                 // console.log("xxx v2", innerDocumentCtx.documentDetails);
+    // // //                 updateDocumentInfoRef();
+    // // //                 await refetch(documentId, documentCtxRef.current);
+    // // //                 // await refetch(documentId);
+    // // //             }, 5000); // fetch data every 5 seconds
+
+    // // //             return () => clearInterval(interval);
+    // // //         } catch (error) {
+    // // //             setIsLoading(false);
+    // // //             console.log(error);
     // // //         }
-    // // //         setIsLoading(false);
     // // //     };
-    // // //     onLoad();
 
-    const refetch = async (documentId: string | null) => {
-        console.log("user logged in at REFETCH?", isLoggedIn);
-        if (!isLoggedIn) {
-            return;
-        }
+    // // //     onLoad().catch(e => {
+    // // //         console.log(e);
+    // // //     });
+    // // // }, []);
 
-        const fileContents = await useFetchFileContents(documentId, documentCtx);
+    // // // // Update the reference whenever documentCtx changes
+    // // // useEffect(() => {
+    // // //     // documentCtxRef.current = documentCtx;
+    // // //     updateDocumentInfoRef();
+    // // //     console.log("111 should trigger each time we update");
+    // // // }, [documentCtx]);
+    // // // useEffect(() => {
+    // // //     // documentCtxRef.current = documentCtx;
+    // // //     updateDocumentInfoRef();
+    // // //     console.log("222 should trigger each time we update");
+    // // // }, [documentCtx.documentDetails]);
+    // // // useEffect(() => {
+    // // //     // documentCtxRef.current = documentCtx;
+    // // //     console.log("333 should trigger each time we update");
+    // // //     updateDocumentInfoRef();
+    // // // }, [isLoggedIn]);
 
-        if (!fileContents) {
-            return new Error("Document content was not able to be fetched.");
-        }
-
-        // send to function to CHECK DIFFERENCE, if no difference then don't continue
-        const hasChanges = checkHeadingsDifference(fileContents);
-
-        // if no changes found then don't run entire calculation to render headings:
-        if (!hasChanges) {
-            setIsLoading(false);
-            return;
-        }
-        // if difference found, run entire filterDocumentContent
-        const filteredHeadings = filterDocumentContent(fileContents);
-
-        // generateHeadingsHierarchy & render it out
-        const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings, documentCtx);
-        setDocumentContent(headingsHierarchy);
-        setIsLoading(false);
-    };
-
-    // Main onLoad steps:
-    useEffect(() => {
-        const onLoad = async () => {
-            try {
-                const documentId = await getDocumentId(documentCtx.updateDocumentDetails);
-                // const documentId = "testing";
-
-                if (!documentId) {
-                    logoutUser();
-                }
-
-                refetch(documentId);
-
-                // Every 5 secs check headings data for new changes:
-                const interval = setInterval(async () => {
-                    refetch(documentId);
-                }, 5000); // fetch data every 5 seconds
-
-                return () => clearInterval(interval);
-            } catch (error) {
-                setIsLoading(false);
-                console.log(error);
-            }
-        };
-        onLoad();
-    }, []);
-
-    // // // On initial page load check localStorage for existing zoom preferences AND Visible Headings Lvl and set them if found:
-    // // useEffect(() => {
-    // //     getLocalStorage("userZoom")
-    // //         .then(response => {
-    // //             updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
-    // //         })
-    // //         .catch(error => {
-    // //             console.error(error);
-    // //         });
-    // //     getLocalStorage("userHeadingLvl")
-    // //         .then(response => {
-    // //             updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
-    // //         })
-    // //         .catch(error => {
-    // //             console.error(error);
-    // //         });
-    // // }, []);
+    // // // const updateDocumentInfoRef = () => {
+    // // //     documentCtxRef.current = documentCtx;
+    // // //     console.log("bing - updated ref to:", documentCtxRef.current.documentDetails);
+    // // // };
 
     // any time user clicks +/- zoom buttons, update corresponding --user-zoom CSS variable
     useEffect(() => {
@@ -140,6 +149,14 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = ({ setIsLoading }) => {
             )}
 
             {/* <SettingsPanel /> */}
+            <button
+                onClick={() => {
+                    console.log("does nothing atm lmao");
+                    // updateDocumentInfoRef();
+                }}
+            >
+                BEANS
+            </button>
         </>
     );
 };

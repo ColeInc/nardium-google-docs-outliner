@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import SettingsContext from "../context/settings-context";
+import { useInitialAppLoad } from "../hooks/useInitialAppLoad";
 import SettingsGear from "../../public/assets/settings-gear.svg";
 import DocumentContext from "../context/document-context";
 import HeadingsWrapper from "./HeadingsWrapper";
@@ -8,11 +9,12 @@ import SettingsPanel from "./SettingsPanel";
 import Chevron from "../../public/assets/chevron.svg";
 import Login from "./Login";
 import "./SidePanel.css";
+import LoadingContext from "../context/loading-context";
 
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    const [isLoading, setIsLoading] = useState(true);
+    // const [isLoading, setIsLoading] = useState(true);
     const isFirstRender = useRef(true);
 
     const documentCtx = useContext(DocumentContext);
@@ -22,7 +24,13 @@ const SidePanel = () => {
     const { userSettings, toggleMainPanel, toggleSettingsPanel } = settingsCtx;
     const { mainPanelCollapsed, settingsPanelCollapsed } = userSettings;
 
+    const loadingCtx = useContext(LoadingContext);
+    const { loadingState } = loadingCtx;
+    const isLoading = loadingState.loginLoading;
+
     const VERSION_NUMBER = "v0.1.0";
+
+    useInitialAppLoad(); // trigger all logic that should run on first app load
 
     useEffect(() => {
         const handleResize = () => {
@@ -74,8 +82,8 @@ const SidePanel = () => {
                         </div>
                     )}
 
-                    {!isLoggedIn && <Login setIsLoading={setIsLoading} isFirstRender={isFirstRender} />}
-                    {isLoggedIn && <HeadingsWrapper setIsLoading={setIsLoading} />}
+                    {!isLoggedIn && <Login isLoading={isLoading} isFirstRender={isFirstRender} />}
+                    {isLoggedIn && <HeadingsWrapper />}
 
                     <div className="side-panel-config-container">
                         <SettingsPanel isVisible={isLoggedIn && settingsPanelCollapsed} />
@@ -99,6 +107,14 @@ const SidePanel = () => {
                                 title="Hide Document Outline Panel"
                             >
                                 <Chevron />
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    console.log("FETCHED REAL LOGGED IN", isLoggedIn);
+                                }}
+                            >
+                                FETCH
                             </button>
                         </div>
                     </div>

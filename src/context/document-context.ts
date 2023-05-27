@@ -6,7 +6,7 @@ export const defaultDocumentState: DocumentInfo = {
     token: "",
     email: "",
     documentId: "",
-    documentContent: {},
+    documentContent: undefined,
 };
 
 const DocumentContext = React.createContext<IDocumentContext>({

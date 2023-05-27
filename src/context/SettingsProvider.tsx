@@ -1,8 +1,8 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import SettingsContext, { defaultSettings } from "./settings-context";
-import { Settings } from "../models/settings";
 import { setLocalStorage } from "../helpers/setLocalStorage";
 import { getLocalStorage } from "../helpers/getLocalStorage";
+import { Settings } from "../models/settings";
 
 const SettingsProvider = (props: { children: ReactNode }) => {
     const [userSettings, setUserSettings] = useState<Settings>(defaultSettings);
@@ -143,7 +143,7 @@ const SettingsProvider = (props: { children: ReactNode }) => {
                 updateUserSettings(settings);
             })
             .catch(error => {
-                console.error("An error occurred:", error);
+                console.log("Unable to fetch item from localStorage. Error given was:", error);
             });
     }, []);
 

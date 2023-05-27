@@ -10,8 +10,9 @@ export const useLogoutUser = () => {
         console.log("logging out user");
         chrome.runtime.sendMessage({ type: "logoutUser", token }, () => {
             documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo); // remove token from our UserProvider
-            console.log("logging out successful");
+            console.log("🦈 logging out successful");
         });
+        // documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo); // remove token from our UserProvider
     };
 
     return { logoutUser };

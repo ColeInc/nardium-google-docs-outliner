@@ -32,6 +32,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     }
     // Logout user:
     else if (request.type === "logoutUser") {
+        console.log("trying to log out user...");
         if (chrome.identity && request.token) {
             // // // // remove user's token from cache
             // // // chrome.identity.removeCachedAuthToken({ token: request.token });

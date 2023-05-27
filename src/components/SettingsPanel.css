@@ -55,7 +55,8 @@
 }
 
 .headings-grid-container button.settings-grid-active {
-    background-color: var(--color1);
+    /* background-color: var(--color1); */
+    filter: brightness(70%);
 }
 
 .zoom-controls-container button svg {

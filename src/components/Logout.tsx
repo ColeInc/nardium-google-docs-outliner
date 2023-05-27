@@ -8,13 +8,13 @@ const Logout: FC = () => {
     // const token = documentCtx.documentDetails?.token;
     const { logoutUser } = useLogoutUser();
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         // console.log("logging out user");
         // chrome.runtime.sendMessage({ type: "logoutUser", token }, () => {
         //     documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo); // remove token from our UserProvider
         //     console.log("logging out successful");
         // });
-        logoutUser();
+        await logoutUser();
     };
 
     return (
