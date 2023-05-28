@@ -8,7 +8,9 @@ let counter = 0;
 // Get access token of logged in user, then use it to call google docs API to fetch document info
 export const useFetchFileContents = async (
     documentId: string | null,
-    documentCtx: IDocumentContext
+    // documentCtx: IDocumentContext
+    docInfo: React.MutableRefObject<DocumentInfo>,
+    setDocInfo: React.Dispatch<React.SetStateAction<DocumentInfo>>
 ): Promise<UnfilteredBody | undefined> => {
     // const { logoutUser } = useLogoutUser();
 
@@ -506,7 +508,7 @@ export const useFetchFileContents = async (
     // return Promise.resolve(contents);
 
     try {
-        const { token } = documentCtx.documentDetails;
+        const { token } = docInfo.current;
 
         console.log("trying with these token/documentId,", !!token, !!documentId);
 
@@ -524,7 +526,7 @@ export const useFetchFileContents = async (
                 })
                 .then(contents => {
                     console.log("docs API call response (content)", JSON.stringify(contents));
-                    documentCtx.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
+                    setDocInfo({ documentContent: contents } as DocumentInfo);
                     return contents as UnfilteredBody;
                 });
         } else {

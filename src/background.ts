@@ -78,7 +78,8 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                     const match = /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(
                         url
                     );
-                    const documentId = match && match[1];
+                    const documentId = match?.[1];
+                    console.log("DOCUMENT ID FOUND:", documentId);
                     if (!documentId) {
                         sendResponse({ error: "Failed to get document ID" });
                     } else {

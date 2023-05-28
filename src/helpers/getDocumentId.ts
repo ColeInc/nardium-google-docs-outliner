@@ -1,12 +1,14 @@
 import React from "react";
-import { DocumentInfo } from "../models";
+import { DocumentInfo, IDocumentContext } from "../models";
 
 interface Document {
     documentId: string;
 }
 
-export const getDocumentId = async (setDocumentId: (details: DocumentInfo) => void): Promise<string | null> => {
+// export const getDocumentId = async (setDocumentId: (details: DocumentInfo) => void): Promise<string | null> => {
+export const getDocumentId = async (): Promise<string | null> => {
     console.log("triggering req to getDocumentId");
+    // const { updateDocumentDetails } = documentCtx;
 
     try {
         const documentId = await new Promise<string>((resolve, reject) => {
@@ -19,7 +21,9 @@ export const getDocumentId = async (setDocumentId: (details: DocumentInfo) => vo
             });
         });
 
-        setDocumentId({ documentId: documentId } as DocumentInfo);
+        // console.log("cole docId being sent in", documentId);
+        // setDocumentId({ documentId } as DocumentInfo);
+        // updateDocumentDetails({ documentId } as DocumentInfo);
         return documentId;
         // documentCtx.updateDocumentDetails({ documentId: documentId } as DocumentInfo);
     } catch (e) {

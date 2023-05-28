@@ -114,7 +114,14 @@ const SidePanel = () => {
                                     console.log("FETCHED REAL LOGGED IN", isLoggedIn);
                                 }}
                             >
-                                FETCH
+                                FETCH loggedIn
+                            </button>
+                            <button
+                                onClick={() => {
+                                    console.log("FETCHED REAL docInfo", documentCtx.documentDetails);
+                                }}
+                            >
+                                FETCH docInfo
                             </button>
                         </div>
                     </div>
