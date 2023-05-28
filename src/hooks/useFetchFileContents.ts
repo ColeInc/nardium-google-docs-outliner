@@ -9,8 +9,10 @@ let counter = 0;
 export const useFetchFileContents = async (
     documentId: string | null,
     // documentCtx: IDocumentContext
-    docInfo: React.MutableRefObject<DocumentInfo>,
-    setDocInfo: React.Dispatch<React.SetStateAction<DocumentInfo>>
+    docCtx: React.MutableRefObject<IDocumentContext>
+    // docInfo: React.MutableRefObject<DocumentInfo>,
+    // setDocInfo: React.Dispatch<React.SetStateAction<DocumentInfo>>
+    // setDocInfo: React.MutableRefObject<(newState: React.SetStateAction<DocumentInfo>) => void>
 ): Promise<UnfilteredBody | undefined> => {
     // const { logoutUser } = useLogoutUser();
 
@@ -508,7 +510,7 @@ export const useFetchFileContents = async (
     // return Promise.resolve(contents);
 
     try {
-        const { token } = docInfo.current;
+        const { token } = docCtx.current.documentDetails;
 
         console.log("trying with these token/documentId,", !!token, !!documentId);
 
@@ -526,7 +528,8 @@ export const useFetchFileContents = async (
                 })
                 .then(contents => {
                     console.log("docs API call response (content)", JSON.stringify(contents));
-                    setDocInfo({ documentContent: contents } as DocumentInfo);
+                    // setDocInfo.current({ documentContent: contents } as DocumentInfo);
+                    // // // // docCtx.current.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
                     return contents as UnfilteredBody;
                 });
         } else {

@@ -7,7 +7,9 @@ import { BodyContent } from "../models/body";
 export const generateHeadingsHierarchy = (
     filteredHeadings: BodyContent[],
     // documentCtx: IDocumentContext
-    setDocInfo: React.Dispatch<React.SetStateAction<DocumentInfo>>
+    // setDocInfo: React.Dispatch<React.SetStateAction<DocumentInfo>>
+    // setDocInfo: React.MutableRefObject<(newState: React.SetStateAction<DocumentInfo>) => void>
+    docCtx: React.MutableRefObject<IDocumentContext>
 ): IHeading[] => {
     let headingsHierarchy: IHeading[] = [];
     let currentParentPath: string[] = [];
@@ -222,6 +224,7 @@ export const generateHeadingsHierarchy = (
 
     // console.log("final filteredContent", JSON.stringify(headingsHierarchy));
     // documentCtx.updateDocumentDetails({ documentContent: headingsHierarchy } as DocumentInfo);
-    setDocInfo({ documentContent: headingsHierarchy } as DocumentInfo);
+    // setDocInfo.current({ documentContent: headingsHierarchy } as DocumentInfo);
+    // // // // docCtx.current.updateDocumentDetails({ documentContent: headingsHierarchy } as DocumentInfo);
     return headingsHierarchy;
 };

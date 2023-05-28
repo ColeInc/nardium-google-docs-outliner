@@ -147,16 +147,6 @@ const HeadingsWrapper: FC<HeadingsWrapperProps> = () => {
                     </ul>
                 </div>
             )}
-
-            {/* <SettingsPanel /> */}
-            <button
-                onClick={() => {
-                    console.log("does nothing atm lmao: ", documentCtx.documentDetails);
-                    // updateDocumentInfoRef();
-                }}
-            >
-                BEANS
-            </button>
         </>
     );
 };
