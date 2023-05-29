@@ -8,96 +8,6 @@ const SettingsProvider = (props: { children: ReactNode }) => {
     const [userSettings, setUserSettings] = useState<Settings>(defaultSettings);
     const { darkTheme } = userSettings;
 
-    // // // On initial page load check localStorage for all settings, and if anything is found then overwrite default settings:
-    // // useEffect(() => {
-    // //     getLocalStorage("userZoom")
-    // //         .then(response => {
-    // //             updateUserSettings({ userZoom: response.data["userZoom"] } as Settings);
-    // //         })
-    // //         .catch(error => {
-    // //             console.error(error);
-    // //         });
-    // //     getLocalStorage("userHeadingLvl")
-    // //         .then(response => {
-    // //             updateUserSettings({ userHeadingLvl: response.data["userHeadingLvl"] } as Settings);
-    // //         })
-    // //         .catch(error => {
-    // //             console.error(error);
-    // //         });
-    // //     getLocalStorage("darkTheme")
-    // //         .then(response => {
-    // //             // response.data["darkTheme"] ? toggleDarkMode() : null;
-    // //             updateUserSettings({ darkTheme: response.data["darkTheme"] } as Settings);
-    // //         })
-    // //         .catch(error => {
-    // //             console.error(error);
-    // //         });
-    // //     getLocalStorage("mainPanelCollapsed")
-    // //         .then(response => {
-    // //             updateUserSettings({ mainPanelCollapsed: response.data["mainPanelCollapsed"] } as Settings);
-    // //         })
-    // //         .catch(error => {
-    // //             console.error(error);
-    // //         });
-    // //     getLocalStorage("sidePanelCollapsed")
-    // //         .then(response => {
-    // //             updateUserSettings({ settingsPanelCollapsed: response.data["sidePanelCollapsed"] } as Settings);
-    // //         })
-    // //         .catch(error => {
-    // //             console.error(error);
-    // //         });
-    // // }, []);
-
-    // // // On initial page load check localStorage for all settings, and if anything is found then overwrite default settings:
-    // // useEffect(() => {
-    // //     Promise.all([
-    // //         getLocalStorage("userZoom"),
-    // //         getLocalStorage("userHeadingLvl"),
-    // //         getLocalStorage("darkTheme"),
-    // //         getLocalStorage("mainPanelCollapsed"),
-    // //         getLocalStorage("sidePanelCollapsed"),
-    // //     ])
-    // //         .then(
-    // //             ([
-    // //                 userZoomResponse,
-    // //                 userHeadingLvlResponse,
-    // //                 darkThemeResponse,
-    // //                 mainPanelResponse,
-    // //                 sidePanelResponse,
-    // //             ]) => {
-    // //                 const settings = defaultSettings;
-
-    // //                 console.log("userZoomResponse.data", userZoomResponse.data);
-    // //                 console.log("userHeadingLvlResponse.data", userHeadingLvlResponse.data);
-    // //                 console.log("darkThemeResponse.data", darkThemeResponse.data);
-    // //                 console.log("mainPanelResponse.data", mainPanelResponse.data);
-    // //                 console.log("sidePanelResponse.data", sidePanelResponse.data);
-
-    // //                 if (userZoomResponse.data["userZoom"]) {
-    // //                     settings.userZoom = userZoomResponse.data["userZoom"];
-    // //                 }
-    // //                 if (userHeadingLvlResponse.data["userHeadingLvl"]) {
-    // //                     settings.userHeadingLvl = userHeadingLvlResponse.data["userHeadingLvl"];
-    // //                 }
-    // //                 if (darkThemeResponse.data["darkTheme"]) {
-    // //                     settings.darkTheme = darkThemeResponse.data["darkTheme"];
-    // //                 }
-    // //                 if (mainPanelResponse.data["mainPanelCollapsed"]) {
-    // //                     settings.mainPanelCollapsed = mainPanelResponse.data["mainPanelCollapsed"];
-    // //                 }
-    // //                 if (sidePanelResponse.data["sidePanelCollapsed"]) {
-    // //                     settings.settingsPanelCollapsed = sidePanelResponse.data["sidePanelCollapsed"];
-    // //                 }
-
-    // //                 console.log("final loaded settings", settings);
-    // //                 updateUserSettings(settings);
-    // //             }
-    // //         )
-    // //         .catch(error => {
-    // //             console.log("LocalStorage item not found. ", error);
-    // //         });
-    // // }, []);
-
     // On initial page load check localStorage for all settings, and if anything is found then overwrite default settings:
     useEffect(() => {
         Promise.allSettled([
@@ -113,12 +23,12 @@ const SettingsProvider = (props: { children: ReactNode }) => {
 
                 results.forEach(result => {
                     if (result.status === "fulfilled") {
-                        // console.log("cole item", result);
-                        const { data } = result.value;
-                        // console.log("cole key data", key, data);
-                        // console.log("cole key === 'userZoom'", key === "userZoom");
-                        // console.log("cole data['userZoom']", data["userZoom"]);
+                        if (result.value.error) {
+                            return;
+                        }
 
+                        const { data } = result.value;
+                        // console.log("cole localstorage:", data);
                         if (data["userZoom"]) {
                             settings.userZoom = data["userZoom"];
                         }
@@ -135,7 +45,7 @@ const SettingsProvider = (props: { children: ReactNode }) => {
                             settings.settingsPanelCollapsed = data["settingsPanelCollapsed"];
                         }
                     } else if (result.status === "rejected") {
-                        console.error(result.reason); // Handle individual promise failure
+                        console.error(result.reason); // handle individual promise failure
                     }
                 });
 

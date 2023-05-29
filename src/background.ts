@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     else if (request.type === "isLoggedIn") {
         if (!chrome.identity) {
             console.error("Chrome Identity API not available :(");
-            sendResponse(false);
+            sendResponse(undefined);
             return;
         }
 
@@ -60,11 +60,12 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             console.log("isLoggedIn repsonse", token);
             if (chrome.runtime.lastError || !token) {
                 console.log("User is not logged in");
-                sendResponse(false);
+                sendResponse(undefined);
                 return;
             } else {
                 console.log("User is logged in");
-                sendResponse(true);
+                // sendResponse(true);
+                sendResponse({ token: token });
             }
         });
         return true;

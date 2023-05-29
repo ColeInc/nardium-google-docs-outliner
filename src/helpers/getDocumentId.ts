@@ -5,15 +5,11 @@ interface Document {
     documentId: string;
 }
 
-// export const getDocumentId = async (setDocumentId: (details: DocumentInfo) => void): Promise<string | null> => {
 export const getDocumentId = async (): Promise<string | null> => {
-    console.log("triggering req to getDocumentId");
-    // const { updateDocumentDetails } = documentCtx;
-
     try {
         const documentId = await new Promise<string>((resolve, reject) => {
             chrome.runtime.sendMessage({ type: "getDocumentId" }, (response: Document) => {
-                if (response && response.documentId) {
+                if (response?.documentId) {
                     resolve(response.documentId);
                 } else {
                     reject(new Error("No documentId found"));
@@ -21,13 +17,9 @@ export const getDocumentId = async (): Promise<string | null> => {
             });
         });
 
-        // console.log("cole docId being sent in", documentId);
-        // setDocumentId({ documentId } as DocumentInfo);
-        // updateDocumentDetails({ documentId } as DocumentInfo);
         return documentId;
-        // documentCtx.updateDocumentDetails({ documentId: documentId } as DocumentInfo);
     } catch (e) {
-        console.error("caught error: ", e);
+        console.log("Failed to fetch Document ID.");
         return null;
     }
 };

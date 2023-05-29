@@ -1,21 +1,12 @@
 import React from "react";
-import { DocumentInfo, IDocumentContext } from "../models";
+import { IDocumentContext } from "../models";
 import { UnfilteredBody } from "../models/body";
-import { useLogoutUser } from "./useLogoutUser";
-
-let counter = 0;
 
 // Get access token of logged in user, then use it to call google docs API to fetch document info
-export const useFetchFileContents = async (
+export const fetchFileContents = async (
     documentId: string | null,
-    // documentCtx: IDocumentContext
     docCtx: React.MutableRefObject<IDocumentContext>
-    // docInfo: React.MutableRefObject<DocumentInfo>,
-    // setDocInfo: React.Dispatch<React.SetStateAction<DocumentInfo>>
-    // setDocInfo: React.MutableRefObject<(newState: React.SetStateAction<DocumentInfo>) => void>
 ): Promise<UnfilteredBody | undefined> => {
-    // const { logoutUser } = useLogoutUser();
-
     // // // //  MOCK FOR VANILLA REACT. TODO: Remove this:
     // const contents = {
     //     title: "Nardium Headlines Testing",
@@ -512,12 +503,9 @@ export const useFetchFileContents = async (
     try {
         const { token } = docCtx.current.documentDetails;
 
-        console.log("trying with these token/documentId,", !!token, !!documentId);
+        // console.log("trying with these token/documentId,", !!token, !!documentId);
 
         if (token && documentId) {
-            // console.log("going with these:", token, "\n/////\n", documentId);
-            // console.log("4)");
-
             return fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
                 method: "GET",
                 headers: new Headers({ Authorization: "Bearer " + token }),
@@ -527,25 +515,13 @@ export const useFetchFileContents = async (
                     return response;
                 })
                 .then(contents => {
-                    console.log("docs API call response (content)", JSON.stringify(contents));
+                    // console.log("docs API call response (content)", JSON.stringify(contents));
                     // setDocInfo.current({ documentContent: contents } as DocumentInfo);
                     // // // // docCtx.current.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
                     return contents as UnfilteredBody;
                 });
         } else {
             console.log("No authToken or google docs documentId found");
-            counter++;
-            // // // if (counter >= 3) {
-            // // //     // logoutUser();
-            // // //     console.log("logging out user");
-            // // //     await chrome.runtime.sendMessage({ type: "logoutUser", token }, () => {
-            // // //         documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo); // remove token from our UserProvider
-            // // //         console.log("logging out successful");
-            // // //     });
-            // // //     // logoutUser();
-            // // //     // };
-            // // // }
-            console.log("counter", counter);
             return Promise.resolve(undefined);
         }
     } catch (e) {

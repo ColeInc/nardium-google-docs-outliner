@@ -8,12 +8,9 @@ interface HeadingsProps {
 }
 
 const Headings: FC<HeadingsProps> = ({ headings }) => {
-    // if (!headings || Object.keys(headings).length === 0) {
     if (!headings) {
         return <div>---</div>;
     }
-
-    console.log("headings", headings);
 
     return (
         <>

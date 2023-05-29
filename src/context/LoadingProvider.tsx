@@ -11,8 +11,8 @@ const LoadingProvider = (props: LoadingProviderProps) => {
 
     const updateLoadingState = (loading: Loading) => {
         setLoadingState(prevState => {
-            console.log("LOADING prevState ", prevState);
-            console.log("LOADING new Provider:", { ...prevState, ...loading });
+            // console.log("LOADING prevState ", prevState);
+            // console.log("LOADING new Provider:", { ...prevState, ...loading });
             return { ...prevState, ...loading };
         });
     };

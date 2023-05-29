@@ -12,7 +12,7 @@ const DocumentProvider = (props: DocumentProviderProps) => {
     const updateDocumentDetails = (details: DocumentInfo) => {
         setDocumentDetails(prevState => {
             // console.log("prevState", prevState);
-            console.log("new Provider:", { ...prevState, ...details });
+            // console.log("new Provider:", { ...prevState, ...details });
             return { ...prevState, ...details } as DocumentInfo;
         });
     };

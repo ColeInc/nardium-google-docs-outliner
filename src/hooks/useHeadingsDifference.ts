@@ -21,7 +21,7 @@ export const useHeadingsDifference = () => {
         }
 
         prevFileContentsRef.current = fileContents;
-        console.log("DIFFERENT?", isDifferent);
+        // console.log("DIFFERENT?", isDifferent);
         return isDifferent;
     };
 
