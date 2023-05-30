@@ -1,11 +1,14 @@
 import React from "react";
-import { IDocumentContext } from "../models";
+import { DocumentInfo, IDocumentContext } from "../models";
 import { UnfilteredBody } from "../models/body";
+import { ILoadingContext } from "../models/loading";
 
+let counter = 0;
 // Get access token of logged in user, then use it to call google docs API to fetch document info
 export const fetchFileContents = async (
     documentId: string | null,
-    docCtx: React.MutableRefObject<IDocumentContext>
+    docCtx: React.MutableRefObject<IDocumentContext>,
+    loadingCtx: React.MutableRefObject<ILoadingContext>
 ): Promise<UnfilteredBody | undefined> => {
     // // // //  MOCK FOR VANILLA REACT. TODO: Remove this:
     // const contents = {
@@ -518,10 +521,19 @@ export const fetchFileContents = async (
                     // console.log("docs API call response (content)", JSON.stringify(contents));
                     // setDocInfo.current({ documentContent: contents } as DocumentInfo);
                     // // // // docCtx.current.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
+                    counter = 0;
                     return contents as UnfilteredBody;
                 });
         } else {
-            console.log("No authToken or google docs documentId found");
+            // try refetch() 2 times, if it still fails then log user out:
+            console.log("counter", counter);
+            if (counter === 2) {
+                docCtx.current.updateDocumentDetails({ isLoggedIn: false, documentContent: "" } as DocumentInfo);
+                loadingCtx.current.updateLoadingState({ loginLoading: false });
+            } else {
+                console.log("No authToken or google docs documentId found");
+            }
+            counter++;
             return Promise.resolve(undefined);
         }
     } catch (e) {

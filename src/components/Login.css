@@ -4,19 +4,30 @@
     justify-content: center;
     align-items: center;
     height: 75%;
-    /* background-color: red; */
 }
 
 .login-button {
-    padding: 10px 58px;
-    border-radius: 9px;
-    background-color: var(--color3);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 30px;
+    border-radius: 999px;
+    border: 1px solid var(--font-color);
+    /* background-color: #fff; */
+    background-color: var(--color4);
     color: var(--font-color);
-    font-size: 12pt;
-    border: none;
+    font-family: "Inter";
+    font-size: 10pt;
+    font-weight: 500;
 }
 
 .login-button:hover {
     cursor: pointer;
     filter: brightness(90%);
+}
+
+.login-button svg {
+    width: 30px;
+    height: 30px;
 }

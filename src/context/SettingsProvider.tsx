@@ -63,6 +63,7 @@ const SettingsProvider = (props: { children: ReactNode }) => {
             document.documentElement.style.setProperty("--color1", "#070707");
             document.documentElement.style.setProperty("--color2", "#414141");
             document.documentElement.style.setProperty("--color3", "#242222");
+            document.documentElement.style.setProperty("--color4", "#242222");
             document.documentElement.style.setProperty("--font-color", "#e2e2e2");
             document.documentElement.style.setProperty("--font-highlighted-color", "#f6f3f3");
             document.documentElement.style.setProperty("--chevron-color", "#414141");
@@ -71,6 +72,7 @@ const SettingsProvider = (props: { children: ReactNode }) => {
             document.documentElement.style.setProperty("--color1", "#edf2fa");
             document.documentElement.style.setProperty("--color2", "#e1e4e7");
             document.documentElement.style.setProperty("--color3", "#cbcfd1");
+            document.documentElement.style.setProperty("--color4", "#fff");
             document.documentElement.style.setProperty("--font-color", "#262424");
             document.documentElement.style.setProperty("--font-highlighted-color", "#000000");
             document.documentElement.style.setProperty("--chevron-color", "#c9bcbc");

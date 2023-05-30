@@ -33,18 +33,24 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     // Logout user:
     else if (request.type === "logoutUser") {
         console.log("trying to log out user...");
-        if (chrome.identity && request.token) {
+
+        const logout = async (token: string) => {
             // // // // remove user's token from cache
             // // // chrome.identity.removeCachedAuthToken({ token: request.token });
 
             // remove user's token from cache
-            chrome.identity.removeCachedAuthToken({ token: request.token });
+            await chrome.identity.removeCachedAuthToken({ token });
 
             // Clear all cached auth tokens.
-            console.log("bing gets to here chrome.identity.clearAllCachedAuthTokens();");
-            chrome.identity.clearAllCachedAuthTokens();
+            await chrome.identity.clearAllCachedAuthTokens();
 
             console.log("Successfully logged out user!");
+        };
+
+        if (chrome.identity && request.token) {
+            logout(request.token).catch(e => {
+                console.log(e);
+            });
         }
     }
     // Check if user is logged in:
@@ -64,7 +70,6 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                 return;
             } else {
                 console.log("User is logged in");
-                // sendResponse(true);
                 sendResponse({ token: token });
             }
         });
@@ -80,7 +85,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                         url
                     );
                     const documentId = match?.[1];
-                    console.log("DOCUMENT ID FOUND:", documentId);
+                    // console.log("DOCUMENT ID FOUND:", documentId);
                     if (!documentId) {
                         sendResponse({ error: "Failed to get document ID" });
                     } else {

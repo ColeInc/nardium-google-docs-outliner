@@ -30,7 +30,7 @@ export const useInitialAppLoad = () => {
         const docCtx = documentCtxRef.current;
         const loadingCtx = loadingCtxRef.current;
 
-        const fileContents = await fetchFileContents(documentId, documentCtxRef);
+        const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef);
 
         if (!fileContents) {
             return new Error("Document content was not able to be fetched.");
