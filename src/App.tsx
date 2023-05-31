@@ -5,6 +5,9 @@ import SettingsProvider from "./context/SettingsProvider";
 import LoadingProvider from "./context/LoadingProvider";
 import SidePanel from "./components/SidePanel";
 import "./App.css";
+import { initGoogleAnalytics } from "./helpers/initGoogleAnalytics";
+
+initGoogleAnalytics();
 
 const App = () => {
     return (

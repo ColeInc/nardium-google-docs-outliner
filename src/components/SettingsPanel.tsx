@@ -36,7 +36,7 @@ export const SettingsPanel = ({ isVisible }: { isVisible: boolean }) => {
                         const active = userSettings.userHeadingLvl === headingDigit;
                         return (
                             <button
-                                onClick={() => handleVisibleHeadings(headingDigit)}
+                                onClick={e => handleVisibleHeadings(headingDigit)}
                                 className={active ? "settings-grid-active" : ""}
                                 title={`Display Heading ${headingDigit}`}
                                 key={headingDigit}
