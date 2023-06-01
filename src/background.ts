@@ -75,6 +75,19 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         });
         return true;
     }
+    // Fetch User Details:
+    else if (request.type === "fetchUserDetails") {
+        chrome.identity.getProfileUserInfo(userInfo => {
+            if (chrome.runtime.lastError || !userInfo) {
+                console.error("Failed to retrieve user info", chrome?.runtime?.lastError);
+                sendResponse(undefined);
+                return;
+            } else {
+                console.log("userInfo details:", userInfo);
+                sendResponse(userInfo);
+            }
+        });
+    }
     // Fetch documentId:
     else if (request.type === "getDocumentId") {
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {

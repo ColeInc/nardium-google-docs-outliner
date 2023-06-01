@@ -10,6 +10,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import SettingsPanel from "./SettingsPanel";
 import Login from "./Login";
 import "./SidePanel.css";
+import { useMixPanelAnalytics } from "../hooks/useMixPanelAnalytics";
 
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
@@ -27,6 +28,8 @@ const SidePanel = () => {
     const loadingCtx = useContext(LoadingContext);
     const { loadingState } = loadingCtx;
     const isLoading = loadingState.loginLoading;
+
+    const { mixPanelAnalyticsClick } = useMixPanelAnalytics();
 
     const VERSION_NUMBER = "v0.1.0";
 
@@ -66,6 +69,11 @@ const SidePanel = () => {
     useEffect(() => {
         console.log("isLoading = ", isLoading);
     }, [isLoading]);
+
+    const toggleSidePanel = () => {
+        toggleMainPanel();
+        mixPanelAnalyticsClick("Hide SidePanel");
+    };
 
     // dynamically calculate sidepanel total width depending on page width:
     const sidePanelWidth = windowWidth > 1460 ? 285 + 0.5 * (windowWidth - 1600) : 285;
@@ -116,7 +124,7 @@ const SidePanel = () => {
 
             <button
                 className={`${mainPanelCollapsed ? "side-panel-collapsed" : ""} expand-button`}
-                onClick={toggleMainPanel}
+                onClick={toggleSidePanel}
                 title="Show Document Outline"
             >
                 <Chevron />

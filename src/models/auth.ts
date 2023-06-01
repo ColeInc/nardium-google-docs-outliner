@@ -3,6 +3,7 @@ export interface DocumentInfo {
     isLoggedIn: boolean;
     token: string;
     email: string;
+    userId: string;
     documentId: string;
     documentContent: any;
 }

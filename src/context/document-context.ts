@@ -5,6 +5,7 @@ export const defaultDocumentState: DocumentInfo = {
     isLoggedIn: false,
     token: "",
     email: "",
+    userId: "",
     documentId: "",
     documentContent: undefined,
 };

@@ -9,6 +9,13 @@ declare namespace chrome {
         }
 
         function removeCachedAuthToken(details: { token: string }): Promise<void>;
+
+        interface ProfileUserInfo {
+            id: string;
+            email?: string;
+        }
+
+        function getProfileUserInfo(callback: (userInfo: ProfileUserInfo) => void): void;
     }
 
     declare namespace runtime {

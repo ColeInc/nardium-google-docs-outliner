@@ -15,6 +15,11 @@ interface AuthTokenResponse {
     token: string;
 }
 
+interface ChromeProfileUserInfo {
+    email: string;
+    id: string;
+}
+
 const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     const documentCtx = useContext(DocumentContext);
     const loadingCtx = useContext(LoadingContext);
@@ -38,7 +43,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         // setIsLoading(true); // as soon as user clicks login, show loading spinner until either success or fail happens
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens
         sendChromeMessage("getAuthToken");
-        // next line is for testing only:
+        // TODO: next line is for testing only:
         // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } as DocumentInfo);
     };
 
@@ -46,9 +51,23 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         chrome.runtime.sendMessage({ type }, (response: AuthTokenResponse | undefined) => {
             if (response && response.token) {
                 documentCtx.updateDocumentDetails({ isLoggedIn: true, token: response.token } as DocumentInfo);
+                fetchLoggedInUserDetails();
             } else {
                 console.error("Error while logging in. Invalid response back from chrome Login background.js function");
                 documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
+            }
+        });
+    };
+
+    const fetchLoggedInUserDetails = () => {
+        chrome.runtime.sendMessage({ type: "fetchUserDetails" }, (response: ChromeProfileUserInfo | undefined) => {
+            if (response) {
+                documentCtx.updateDocumentDetails({
+                    email: response.email,
+                    userId: response.id,
+                } as DocumentInfo);
+            } else {
+                console.log("Unable to fetch logged in user details.");
             }
         });
     };

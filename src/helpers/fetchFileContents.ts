@@ -527,7 +527,7 @@ export const fetchFileContents = async (
         } else {
             // try refetch() 2 times, if it still fails then log user out:
             console.log("counter", counter);
-            if (counter === 2) {
+            if (counter === 1) {
                 docCtx.current.updateDocumentDetails({ isLoggedIn: false, documentContent: "" } as DocumentInfo);
                 loadingCtx.current.updateLoadingState({ loginLoading: false });
             } else {
