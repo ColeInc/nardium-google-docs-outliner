@@ -30,6 +30,8 @@ export const useInitialAppLoad = () => {
         const docCtx = documentCtxRef.current;
         const loadingCtx = loadingCtxRef.current;
 
+        console.log("data @ refetch", docCtx.documentDetails);
+
         const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef);
 
         if (!fileContents) {
@@ -72,7 +74,7 @@ export const useInitialAppLoad = () => {
 
                 // Every 5 secs check headings data for new changes:
                 const interval = setInterval(async () => {
-                    await refetch(documentId, documentCtxRef, loadingCtxRef);
+                    refetch(documentId, documentCtxRef, loadingCtxRef);
                 }, 5000);
 
                 return () => clearInterval(interval);

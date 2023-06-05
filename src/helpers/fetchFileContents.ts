@@ -506,7 +506,7 @@ export const fetchFileContents = async (
     try {
         const { token } = docCtx.current.documentDetails;
 
-        // console.log("trying with these token/documentId,", !!token, !!documentId);
+        console.log("trying with these token/documentId,", !!token, !!documentId);
 
         if (token && documentId) {
             return fetch("https://docs.googleapis.com/v1/documents/" + documentId, {

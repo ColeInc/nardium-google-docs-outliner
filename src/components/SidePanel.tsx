@@ -10,7 +10,6 @@ import LoadingSpinner from "./LoadingSpinner";
 import SettingsPanel from "./SettingsPanel";
 import Login from "./Login";
 import "./SidePanel.css";
-import { useMixPanelAnalytics } from "../hooks/useMixPanelAnalytics";
 
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
@@ -28,8 +27,6 @@ const SidePanel = () => {
     const loadingCtx = useContext(LoadingContext);
     const { loadingState } = loadingCtx;
     const isLoading = loadingState.loginLoading;
-
-    const { mixPanelAnalyticsClick } = useMixPanelAnalytics();
 
     const VERSION_NUMBER = "v0.1.0";
 
@@ -72,7 +69,6 @@ const SidePanel = () => {
 
     const toggleSidePanel = () => {
         toggleMainPanel();
-        mixPanelAnalyticsClick("Hide SidePanel");
     };
 
     // dynamically calculate sidepanel total width depending on page width:
@@ -117,6 +113,8 @@ const SidePanel = () => {
                             >
                                 <Chevron />
                             </button>
+
+                            <button onClick={() => console.log(documentCtx.documentDetails)}>FETCH LOGIN</button>
                         </div>
                     </div>
                 </div>

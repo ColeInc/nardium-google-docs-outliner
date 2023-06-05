@@ -5,6 +5,7 @@ import { DocumentInfo } from "../models";
 import GoogleLogo from "../../public/assets/google-logo.svg";
 
 import "./Login.css";
+import { useMixPanelAnalytics } from "../hooks/useMixPanelAnalytics";
 
 interface LoginProps {
     isLoading: boolean;
@@ -24,6 +25,8 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     const documentCtx = useContext(DocumentContext);
     const loadingCtx = useContext(LoadingContext);
     const { updateLoadingState } = loadingCtx;
+
+    const { mixPanelAnalyticsClick } = useMixPanelAnalytics();
 
     // attempt to log user in on page load:
     useEffect(() => {
@@ -45,13 +48,18 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         sendChromeMessage("getAuthToken");
         // TODO: next line is for testing only:
         // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } as DocumentInfo);
+        console.log("docDetails b4 calling fetchLogged", documentCtx.documentDetails);
+        fetchLoggedInUserDetails();
+
+        mixPanelAnalyticsClick("Login Button");
     };
 
     const sendChromeMessage = (type: string) => {
         chrome.runtime.sendMessage({ type }, (response: AuthTokenResponse | undefined) => {
             if (response && response.token) {
                 documentCtx.updateDocumentDetails({ isLoggedIn: true, token: response.token } as DocumentInfo);
-                fetchLoggedInUserDetails();
+                // console.log("docDetails b4 calling fetchLogged", documentCtx.documentDetails);
+                // fetchLoggedInUserDetails();
             } else {
                 console.error("Error while logging in. Invalid response back from chrome Login background.js function");
                 documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);

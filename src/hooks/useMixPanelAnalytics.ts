@@ -1,71 +1,17 @@
-// let _gaq = _gaq || [];
-// const googleAnalyticsKey = process.env.REACT_GOOGLE_ANALYTICS_KEY;
-// _gaq.push(["_setAccount", googleAnalyticsKey]);
-// _gaq.push(["_trackPageview"]);
-
-// (function () {
-//     var ga = document.createElement("script");
-//     ga.type = "text/javascript";
-//     ga.async = true;
-//     ga.src = "https://ssl.google-analytics.com/ga.js";
-//     var s = document.getElementsByTagName("script")[0];
-//     s.parentNode.insertBefore(ga, s);
-// })();
-
-// // declare let _gaq: any[];
-
-// // export const initGoogleAnalytics = () => {
-// //     _gaq = _gaq || [];
-// //     const googleAnalyticsKey = process.env.REACT_GOOGLE_ANALYTICS_KEY;
-// //     console.log("cole key found", googleAnalyticsKey);
-// //     _gaq.push(["_setAccount", googleAnalyticsKey]);
-// //     _gaq.push(["_trackPageview"]);
-
-// //     (() => {
-// //         const ga = document.createElement("script");
-// //         ga.type = "text/javascript";
-// //         ga.async = true;
-// //         ga.src = "https://ssl.google-analytics.com/ga.js";
-// //         const s = document.getElementsByTagName("script")[0];
-// //         s?.parentNode?.insertBefore(ga, s);
-// //     })();
-// // };
-
-// // export const trackGoogleAnalyticsClick = (itemName: string) => {
-// //     console.log("trackButton. sending this:", itemName);
-// //     _gaq.push(["_trackEvent", itemName, "clicked"]);
-// // };
-
-// // // import ReactGA from "react-ga4";
-
-// // // export const initGoogleAnalytics = () => {
-// // //     const googleAnalyticsKey = process.env.REACT_GOOGLE_ANALYTICS_KEY ?? "";
-// // //     ReactGA.initialize(googleAnalyticsKey);
-
-// // //     console.log("triggering first pageview!");
-// // //     ReactGA.send({ hitType: "pageview", page: window.location.href, title: document.title });
-// // // };
-
-// // // export const trackGoogleAnalyticsPageView = () => {
-// // //     // Send pageview with a custom path
-// // //     ReactGA.send({ hitType: "pageview", page: window.location.href, title: document.title });
-// // // };
-
-// // // export const trackGoogleAnalyticsClick = (itemName: string) => {
-// // //     // Send a custom event
-// // //     ReactGA.event({
-// // //         category: "your category",
-// // //         action: "your action",
-// // //         label: "your label", // optional
-// // //         value: 99, // optional, must be a number
-// // //         nonInteraction: true, // optional, true/false
-// // //         transport: "xhr", // optional, beacon/xhr/image
-// // //     });
-// // // };
-
 import mixpanel from "mixpanel-browser";
+import { useContext, useEffect, useRef } from "react";
+import DocumentContext from "../context/document-context";
 
 export const useMixPanelAnalytics = () => {
+    const documentCtx = useContext(DocumentContext);
+    const { isLoggedIn, userId, email, documentId } = documentCtx.documentDetails;
+    const isFirstRender = useRef(true);
+
+    // if we hear any change in the isLoggedIn state, recheck identify user to see if they've possibly logged in, else call .reset() to log them out:
+    useEffect(() => {
+        identifyUser();
+    }, [isLoggedIn]);
+
     // Init MixPanel Analytics:
     const initMixPanel = () => {
         const mixPanelKey = process.env.REACT_MIXPANEL_KEY ?? "";
@@ -76,11 +22,21 @@ export const useMixPanelAnalytics = () => {
     };
     // initMixPanel();
 
-    // console.log("triggering first pageview!");
-
     const identifyUser = () => {
-        // TODO: if user is logged in pass google id, else generate random id or smth
-        mixpanel.identify("7777777777777");
+        if (!isLoggedIn) {
+            console.log("mixpanel.reset");
+            mixpanel.reset();
+        } else {
+            console.log("mixpanel.identify", userId);
+            // Only if the user is logged in we call mixpanel.identify(). Otherwise all events are deemed as anonymous.
+            mixpanel.identify(userId);
+        }
+
+        // if it's user's first render of app then +1 page view
+        if (isFirstRender.current) {
+            mixPanelAnalyticsPageView(); // add +1 page view
+            isFirstRender.current = false;
+        }
     };
 
     // Track an event. It can be anything, but in this example, we're tracking a Signed Up event.
@@ -97,9 +53,21 @@ export const useMixPanelAnalytics = () => {
     // mixpanel.init("YOUR_TOKEN", { track_pageview: true });
 
     const mixPanelAnalyticsPageView = () => {
-        // Send pageview with a custom path
+        console.log(
+            "triggering pageview with:",
+            JSON.stringify({
+                userId,
+                isLoggedIn,
+                email,
+                documentId,
+            })
+        );
+
         mixpanel.track("PageView", {
-            isLoggedIn: false,
+            userId,
+            isLoggedIn,
+            email,
+            documentId,
         });
     };
 
