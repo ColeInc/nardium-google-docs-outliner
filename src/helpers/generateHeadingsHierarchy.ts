@@ -1,16 +1,8 @@
-import React, { useContext } from "react";
-import DocumentContext from "../context/document-context";
-import { IHeading } from "../models/heading";
-import { DocumentInfo, IDocumentContext } from "../models";
+import React from "react";
 import { BodyContent } from "../models/body";
+import { IHeading } from "../models/heading";
 
-export const generateHeadingsHierarchy = (
-    filteredHeadings: BodyContent[],
-    // documentCtx: IDocumentContext
-    // setDocInfo: React.Dispatch<React.SetStateAction<DocumentInfo>>
-    // setDocInfo: React.MutableRefObject<(newState: React.SetStateAction<DocumentInfo>) => void>
-    docCtx: React.MutableRefObject<IDocumentContext>
-): IHeading[] => {
+export const generateHeadingsHierarchy = (filteredHeadings: BodyContent[]): IHeading[] => {
     let headingsHierarchy: IHeading[] = [];
     let currentParentPath: string[] = [];
     let prevHeadingDigit = 0;
@@ -25,10 +17,7 @@ export const generateHeadingsHierarchy = (
     };
 
     const popParentPath = (numTimes = 1) => {
-        // console.log("popParentPath NUM TIMES", numTimes);
-        // console.log("popParentPath BEFORE", currentParentPath);
         currentParentPath = currentParentPath.slice(0, -numTimes);
-        // console.log("popParentPath AFTER", currentParentPath);
     };
 
     // TODO: remove. was for testing only.
@@ -157,7 +146,7 @@ export const generateHeadingsHierarchy = (
 
         const headingType = para.paragraphStyle?.namedStyleType;
         const headingId = para.paragraphStyle.headingId;
-        const headingText = para.elements[0]?.textRun?.content;
+        const headingText = para.elements[0]?.textRun?.content ?? "";
         const currHeadingDigit = +headingType.substring(headingType.length - 1);
         const startIndex = heading.startIndex;
         const endIndex = heading.endIndex;
@@ -192,7 +181,6 @@ export const generateHeadingsHierarchy = (
         //  1) if the current heading IS going to be a child of parent (E.g. we go from Heading2 to Heading3):
         else if (currHeadingDigit > prevHeadingDigit) {
             // console.log("1)", headingText, "prev", prevHeadingDigit, "curr", currHeadingDigit);
-            // console.log("original headingsHierarchy", headingsHierarchy);
 
             // add new child to current parent:
             appendChildHeading(newChild);
@@ -222,9 +210,5 @@ export const generateHeadingsHierarchy = (
         prevHeadingDigit = currHeadingDigit;
     });
 
-    // console.log("final filteredContent", JSON.stringify(headingsHierarchy));
-    // documentCtx.updateDocumentDetails({ documentContent: headingsHierarchy } as DocumentInfo);
-    // setDocInfo.current({ documentContent: headingsHierarchy } as DocumentInfo);
-    // // // // docCtx.current.updateDocumentDetails({ documentContent: headingsHierarchy } as DocumentInfo);
     return headingsHierarchy;
 };

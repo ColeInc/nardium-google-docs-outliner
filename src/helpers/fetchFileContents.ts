@@ -1,16 +1,16 @@
 import React from "react";
-import { DocumentInfo, IDocumentContext } from "../models";
+import { IDocumentContext } from "../models";
 import { UnfilteredBody } from "../models/body";
 import { ILoadingContext } from "../models/loading";
 
 let counter = 0;
-// Get access token of logged in user, then use it to call google docs API to fetch document info
+// Gets access token of logged in user, then use it to call google docs API to fetch document info
 export const fetchFileContents = async (
     documentId: string | null,
     docCtx: React.MutableRefObject<IDocumentContext>,
     loadingCtx: React.MutableRefObject<ILoadingContext>
 ): Promise<UnfilteredBody | undefined> => {
-    // // // //  MOCK FOR VANILLA REACT. TODO: Remove this:
+    // TODO: MOCK FOR TESTING:
     // const contents = {
     //     title: "Nardium Headlines Testing",
     //     body: {
@@ -504,11 +504,12 @@ export const fetchFileContents = async (
     // return Promise.resolve(contents);
 
     try {
-        const { token } = docCtx.current.documentDetails;
+        const { token, isLoggedIn, hasClickedLogin } = docCtx.current.documentDetails;
+        const { loginLoading } = loadingCtx.current.loadingState;
 
-        console.log("trying with these token/documentId,", !!token, !!documentId);
+        // console.log("trying with these token/documentId,", !!token, !!documentId);
 
-        if (token && documentId) {
+        if (isLoggedIn && token && documentId) {
             return fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
                 method: "GET",
                 headers: new Headers({ Authorization: "Bearer " + token }),
@@ -519,21 +520,19 @@ export const fetchFileContents = async (
                 })
                 .then(contents => {
                     // console.log("docs API call response (content)", JSON.stringify(contents));
-                    // setDocInfo.current({ documentContent: contents } as DocumentInfo);
-                    // // // // docCtx.current.updateDocumentDetails({ documentContent: contents } as DocumentInfo);
                     counter = 0;
                     return contents as UnfilteredBody;
                 });
         } else {
-            // try refetch() 2 times, if it still fails then log user out:
-            console.log("counter", counter);
-            if (counter === 1) {
-                docCtx.current.updateDocumentDetails({ isLoggedIn: false, documentContent: "" } as DocumentInfo);
+            // try refetch() 3 times, if it still fails then log user out:
+            // console.log("counter", counter);
+            if (counter === 3) {
+                docCtx.current.clearDocumentDetails();
                 loadingCtx.current.updateLoadingState({ loginLoading: false });
             } else {
                 console.log("No authToken or google docs documentId found");
             }
-            counter++;
+            !hasClickedLogin && loginLoading && counter++; // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
             return Promise.resolve(undefined);
         }
     } catch (e) {

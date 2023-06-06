@@ -16,13 +16,17 @@ const DocumentProvider = (props: DocumentProviderProps) => {
             return { ...prevState, ...details } as DocumentInfo;
         });
     };
+    const clearDocumentDetails = () => {
+        setDocumentDetails(defaultDocumentState);
+    };
 
     const documentContext = useMemo(
         () => ({
             documentDetails,
             updateDocumentDetails,
+            clearDocumentDetails,
         }),
-        [documentDetails, updateDocumentDetails]
+        [documentDetails, updateDocumentDetails, clearDocumentDetails]
     );
 
     return <DocumentContext.Provider value={documentContext}>{props.children}</DocumentContext.Provider>;

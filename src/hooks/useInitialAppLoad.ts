@@ -1,14 +1,14 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
+import DocumentContext from "../context/document-context";
+import LoadingContext from "../context/loading-context";
 import { fetchFileContents } from "../helpers/fetchFileContents";
-import { useHeadingsDifference } from "./useHeadingsDifference";
-import { useLogoutUser } from "./useLogoutUser";
-import DocumentContext, { defaultDocumentState } from "../context/document-context";
-import { DocumentInfo, IDocumentContext } from "../models";
 import { filterDocumentContent } from "../helpers/filterDocumentContent";
 import { generateHeadingsHierarchy } from "../helpers/generateHeadingsHierarchy";
 import { getDocumentId } from "../helpers/getDocumentId";
-import LoadingContext from "../context/loading-context";
+import { DocumentInfo, IDocumentContext } from "../models";
 import { ILoadingContext } from "../models/loading";
+import { useHeadingsDifference } from "./useHeadingsDifference";
+import { useLogoutUser } from "./useLogoutUser";
 
 export const useInitialAppLoad = () => {
     const { checkHeadingsDifference } = useHeadingsDifference();

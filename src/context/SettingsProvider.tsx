@@ -57,7 +57,6 @@ const SettingsProvider = (props: { children: ReactNode }) => {
             });
     }, []);
 
-    // TODO: extract each individual color out into json object so we can refer to them by like darktheme.fontcolor
     useEffect(() => {
         if (darkTheme) {
             document.documentElement.style.setProperty("--color1", "#070707");

@@ -14,7 +14,6 @@ import "./SidePanel.css";
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    // const [isLoading, setIsLoading] = useState(true);
     const isFirstRender = useRef(true);
 
     const documentCtx = useContext(DocumentContext);

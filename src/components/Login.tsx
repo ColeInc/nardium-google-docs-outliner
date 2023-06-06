@@ -1,11 +1,10 @@
 import React, { FC, useContext, useEffect } from "react";
+import { useMixPanelAnalytics } from "../hooks/useMixPanelAnalytics";
+import GoogleLogo from "../../public/assets/google-logo.svg";
 import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
 import { DocumentInfo } from "../models";
-import GoogleLogo from "../../public/assets/google-logo.svg";
-
 import "./Login.css";
-import { useMixPanelAnalytics } from "../hooks/useMixPanelAnalytics";
 
 interface LoginProps {
     isLoading: boolean;
@@ -26,12 +25,13 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     const loadingCtx = useContext(LoadingContext);
     const { updateLoadingState } = loadingCtx;
 
-    const { mixPanelAnalyticsClick } = useMixPanelAnalytics();
+    const { identifyUser, mixPanelAnalyticsClick } = useMixPanelAnalytics();
 
     // attempt to log user in on page load:
     useEffect(() => {
         if (isFirstRender.current) {
             checkLoggedIn();
+            identifyUser();
             isFirstRender.current = false;
         }
     }, []);
@@ -43,7 +43,8 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     };
 
     const handleLogin = () => {
-        // setIsLoading(true); // as soon as user clicks login, show loading spinner until either success or fail happens
+        documentCtx.updateDocumentDetails({ hasClickedLogin: true } as DocumentInfo); // update context to say that login button has been clicked
+
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens
         sendChromeMessage("getAuthToken");
         // TODO: next line is for testing only:
@@ -57,12 +58,17 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     const sendChromeMessage = (type: string) => {
         chrome.runtime.sendMessage({ type }, (response: AuthTokenResponse | undefined) => {
             if (response && response.token) {
-                documentCtx.updateDocumentDetails({ isLoggedIn: true, token: response.token } as DocumentInfo);
-                // console.log("docDetails b4 calling fetchLogged", documentCtx.documentDetails);
-                // fetchLoggedInUserDetails();
+                documentCtx.updateDocumentDetails({
+                    isLoggedIn: true,
+                    token: response.token,
+                    hasClickedLogin: false,
+                } as DocumentInfo);
             } else {
-                console.error("Error while logging in. Invalid response back from chrome Login background.js function");
+                console.log(
+                    "Error while logging in. Invalid response back from background.js. Please refresh page and try again"
+                );
                 documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
+                updateLoadingState({ loginLoading: false });
             }
         });
     };
@@ -84,9 +90,6 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         <>
             {!isLoading && (
                 <div className="login-container">
-                    {/* <button className="login-button" onClick={handleLogin}>
-                        LOGIN
-                    </button> */}
                     <button className="login-button" onClick={handleLogin}>
                         <GoogleLogo />
                         <p>Sign in with Google</p>

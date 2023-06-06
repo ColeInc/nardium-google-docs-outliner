@@ -11,7 +11,7 @@ const Logout: FC = () => {
     const handleLogout = async () => {
         await logoutUser();
         // clear stored document content:
-        documentCtx.updateDocumentDetails({ documentContent: "" } as DocumentInfo);
+        documentCtx.clearDocumentDetails();
         return;
     };
 

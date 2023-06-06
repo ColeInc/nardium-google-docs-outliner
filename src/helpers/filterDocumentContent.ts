@@ -1,7 +1,7 @@
 import { UnfilteredBody } from "../models/body";
 
 export const filterDocumentContent = (unfilteredContent: UnfilteredBody) => {
-    const filteredHeadings = unfilteredContent.body.content.filter(bodyItem => {
+    const filteredHeadings = unfilteredContent?.body?.content?.filter(bodyItem => {
         const para = bodyItem.paragraph;
         if (!para) return false;
 

@@ -3,6 +3,7 @@ import { DocumentInfo, IDocumentContext } from "../models";
 
 export const defaultDocumentState: DocumentInfo = {
     isLoggedIn: false,
+    hasClickedLogin: false,
     token: "",
     email: "",
     userId: "",
@@ -13,6 +14,7 @@ export const defaultDocumentState: DocumentInfo = {
 const DocumentContext = React.createContext<IDocumentContext>({
     documentDetails: defaultDocumentState,
     updateDocumentDetails: (details: DocumentInfo) => {},
+    clearDocumentDetails: () => {},
 });
 
 export default DocumentContext;

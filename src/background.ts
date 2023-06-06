@@ -35,9 +35,6 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         console.log("trying to log out user...");
 
         const logout = async (token: string) => {
-            // // // // remove user's token from cache
-            // // // chrome.identity.removeCachedAuthToken({ token: request.token });
-
             // remove user's token from cache
             await chrome.identity.removeCachedAuthToken({ token });
 
@@ -98,7 +95,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                         url
                     );
                     const documentId = match?.[1];
-                    // console.log("DOCUMENT ID FOUND:", documentId);
+                    // console.log("Document ID found:", documentId);
                     if (!documentId) {
                         sendResponse({ error: "Failed to get document ID" });
                     } else {
@@ -121,12 +118,12 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         }
 
         chrome.storage.local.set({ [key]: payload }, () => {
-            console.log(`Data saved to local storage for key >${key}<`);
+            // console.log(`Data saved to local storage for key >${key}<`);
         });
     }
     // GET - Check Localstorage for anything stored under key parameter. (Store the passed payload under the passed key in Local Storage (Fetch User's Heading Lvl or Zoom lvl from Local Storage):
     else if (request.type === "getLocalStorage") {
-        console.log("fetching localStorage for this key...", request.key);
+        // console.log("fetching localStorage for this key...", request.key);
         if (!request.key) {
             sendResponse({ error: "Invalid key passed to fetch from Localstorage." });
             return;
