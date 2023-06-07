@@ -49,7 +49,6 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         sendChromeMessage("getAuthToken");
         // TODO: next line is for testing only:
         // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } as DocumentInfo);
-        console.log("docDetails b4 calling fetchLogged", documentCtx.documentDetails);
         fetchLoggedInUserDetails();
 
         mixPanelAnalyticsClick("Login Button");

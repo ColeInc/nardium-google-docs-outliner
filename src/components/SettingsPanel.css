@@ -56,7 +56,6 @@
 }
 
 .headings-grid-container button.settings-grid-active {
-    /* background-color: var(--color1); */
     filter: brightness(70%);
 }
 
@@ -84,7 +83,6 @@
     color: var(--font-color);
     font-size: 8pt;
     margin: 0;
-    /* font-weight: 600; */
     font-weight: 400;
     padding-bottom: 1px;
     cursor: default;

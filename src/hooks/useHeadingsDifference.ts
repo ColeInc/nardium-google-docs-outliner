@@ -11,7 +11,6 @@ export const useHeadingsDifference = () => {
 
     // Listening to isLoggedIn. if it changes at any time, set isDifferent to true to force fresh api call:
     useEffect(() => {
-        console.log("forcing hard DIFF refresh!");
         isDifferent.current = true;
     }, [isLoggedIn]);
 

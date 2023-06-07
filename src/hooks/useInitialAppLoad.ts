@@ -30,8 +30,6 @@ export const useInitialAppLoad = () => {
         const docCtx = documentCtxRef.current;
         const loadingCtx = loadingCtxRef.current;
 
-        console.log("data @ refetch", docCtx.documentDetails);
-
         const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef);
 
         if (!fileContents) {
@@ -50,7 +48,7 @@ export const useInitialAppLoad = () => {
         const filteredHeadings = filterDocumentContent(fileContents);
 
         // generateHeadingsHierarchy & render it out
-        const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings, documentCtxRef);
+        const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings);
         docCtx.updateDocumentDetails({ documentContent: headingsHierarchy } as DocumentInfo);
 
         loadingCtx.updateLoadingState({ loginLoading: false });

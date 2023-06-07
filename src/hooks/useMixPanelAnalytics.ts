@@ -9,21 +9,20 @@ export const useMixPanelAnalytics = () => {
 
     // Init MixPanel Analytics:
     const initMixPanel = () => {
-        const mixPanelKey = process.env.REACT_MIXPANEL_KEY ?? "";
+        const mixPanelKey = process.env["REACT_MIXPANEL_KEY"] ?? "";
 
-        mixpanel.init(mixPanelKey, { debug: true });
+        mixpanel.init(mixPanelKey, { debug: false });
 
         identifyUser();
     };
 
     const identifyUser = () => {
         if (!isLoggedIn) {
-            console.log("mixpanel.reset");
             mixpanel.reset();
         } else {
-            console.log("mixpanel.identify", userId);
             // Only if the user is logged in we call mixpanel.identify(). Otherwise all events are deemed as anonymous.
             mixpanel.identify(userId);
+            // console.log("mixpanel.identify", userId);
         }
 
         // if it's user's first render of app then +1 page view
@@ -34,15 +33,7 @@ export const useMixPanelAnalytics = () => {
     };
 
     const mixPanelAnalyticsPageView = () => {
-        console.log(
-            "triggering pageview with:",
-            JSON.stringify({
-                userId,
-                isLoggedIn,
-                email,
-                documentId,
-            })
-        );
+        // console.log("triggering pageview with:", JSON.stringify({userId, isLoggedIn, email, documentId}));
 
         mixpanel.track("PageView", {
             userId,

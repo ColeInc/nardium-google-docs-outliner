@@ -1,4 +1,4 @@
-// TODO: convert documentContent to proper type
+// TODO: convert documentContent from any to proper type
 export interface DocumentInfo {
     isLoggedIn: boolean;
     hasClickedLogin: boolean;

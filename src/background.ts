@@ -32,7 +32,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     }
     // Logout user:
     else if (request.type === "logoutUser") {
-        console.log("trying to log out user...");
+        console.log("Attempting to log out user...");
 
         const logout = async (token: string) => {
             // remove user's token from cache
@@ -60,13 +60,11 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 
         // interactive=false allows checking the login status without showing any authentication prompts.
         chrome.identity.getAuthToken({ interactive: false }, token => {
-            console.log("isLoggedIn repsonse", token);
             if (chrome.runtime.lastError || !token) {
-                console.log("User is not logged in");
+                console.log("Unable to login user.");
                 sendResponse(undefined);
                 return;
             } else {
-                console.log("User is logged in");
                 sendResponse({ token: token });
             }
         });
@@ -80,7 +78,6 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                 sendResponse(undefined);
                 return;
             } else {
-                console.log("userInfo details:", userInfo);
                 sendResponse(userInfo);
             }
         });

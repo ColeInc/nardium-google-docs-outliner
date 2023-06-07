@@ -61,11 +61,6 @@ const SidePanel = () => {
         );
     }
 
-    // TODO: delete this useless print statement
-    useEffect(() => {
-        console.log("isLoading = ", isLoading);
-    }, [isLoading]);
-
     const toggleSidePanel = () => {
         toggleMainPanel();
     };
@@ -112,8 +107,6 @@ const SidePanel = () => {
                             >
                                 <Chevron />
                             </button>
-
-                            <button onClick={() => console.log(documentCtx.documentDetails)}>FETCH LOGIN</button>
                         </div>
                     </div>
                 </div>

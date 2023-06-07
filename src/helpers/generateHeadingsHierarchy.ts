@@ -13,7 +13,6 @@ export const generateHeadingsHierarchy = (filteredHeadings: BodyContent[]): IHea
 
     const appendToParentPath = (segment: string) => {
         currentParentPath.push(segment);
-        // console.log("latest official path stored:", currentParentPath);
     };
 
     const popParentPath = (numTimes = 1) => {
@@ -135,7 +134,6 @@ export const generateHeadingsHierarchy = (filteredHeadings: BodyContent[]): IHea
         // console.log("final headingsHierarchy", JSON.stringify(headingsHierarchy));
     };
 
-    // TODO: remove any here
     filteredHeadings.forEach(heading => {
         const para = heading.paragraph;
 

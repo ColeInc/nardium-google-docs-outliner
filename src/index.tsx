@@ -1,25 +1,11 @@
+import "@fontsource/inter";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "@fontsource/inter";
-import "@fontsource/poppins";
 import App from "./App";
 import "./index.css";
 
-// const rootElement = document.createElement("div");
-// rootElement.id = "nardium";
-// document.body.appendChild(rootElement);
-
-// const rootElement = document.createElement("div");
-// rootElement.id = "nardium";
-// const leftSidebarContainer = document.getElementsByClassName("left-sidebar-container")[0]; // replacing the original google docs outline div with my one
-// if (leftSidebarContainer) {
-//     leftSidebarContainer.replaceWith(rootElement);
-// }
-
 const rootElement = document.createElement("div");
 rootElement.id = "nardium";
-// const leftSidebarContainer = document.getElementsByClassName("left-sidebar-container")[0] as HTMLElement; // replacing the original google docs outline div with my one
-// const leftSidebarContainer = document.getElementsByClassName("left-sidebar-container")[0] as HTMLElement;
 const leftSidebarContainer = document.querySelector(
     ".left-sidebar-container.docs-ui-unprintable.left-sidebar-container-animation"
 ) as HTMLElement;
@@ -31,7 +17,6 @@ if (leftSidebarContainer) {
 document.body.appendChild(rootElement);
 
 const root = ReactDOM.createRoot(rootElement);
-// const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
     <React.StrictMode>

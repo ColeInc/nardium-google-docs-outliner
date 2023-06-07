@@ -22,7 +22,6 @@ code {
 /* For Chrome, Edge, and Safari */
 .headings::-webkit-scrollbar {
     display: none;
-    /* width: 0.5em; */
 }
 
 .headings::-webkit-scrollbar-thumb {

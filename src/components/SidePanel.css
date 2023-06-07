@@ -7,20 +7,13 @@
     top: 102px;
     bottom: 0;
     min-width: 285px;
-    /* z-index: 9999999; */
     z-index: 10;
-    /* padding: 16px 0 10px 16px; */
     padding: 16px 0 16px 16px;
-    /* transition: width 0.5s ease-in-out; */
-    /* transition: transform 2s ease-in-out; */
     transition: transform 0.4s ease;
-    /* transform: translateX(0px); */
-    /* position: relative; */
 }
 
 .side-panel {
     background-color: var(--color1);
-    /* border-radius: 15px; */
     border-radius: 12px;
     display: flex;
     flex-direction: column;
@@ -28,7 +21,6 @@
     height: 100%;
     width: 100%;
     padding: 10px;
-    /* overflow: auto; */
     position: relative !important;
 }
 
@@ -47,11 +39,6 @@
 
 .side-panel-container.side-panel-collapsed {
     transform: translateX(-400px);
-    /* left: -400px; */
-    /* transition: transform 0.5s ease-in-out; */
-    /* transform: translateX(-400px); */
-    /* width: 0px; */
-    /* overflow: hidden !important; */
 }
 
 .side-panel .toggle-settings-button,
