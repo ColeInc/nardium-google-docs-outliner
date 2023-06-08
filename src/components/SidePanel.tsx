@@ -42,9 +42,9 @@ const SidePanel = () => {
         };
     }, []);
 
+    // check user's 3rd party cookies are enabled:
     useEffect(() => {
-        console.log("cookies enabled?", navigator.cookieEnabled);
-
+        // console.log("cookies enabled?", navigator.cookieEnabled);
         if (navigator.cookieEnabled) {
             setThirdPartyCookiesEnabled(false);
         } else {

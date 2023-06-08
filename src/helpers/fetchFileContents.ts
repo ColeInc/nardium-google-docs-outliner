@@ -522,10 +522,14 @@ export const fetchFileContents = async (
                     // console.log("docs API call response (content)", JSON.stringify(contents));
                     counter = 0;
                     return contents as UnfilteredBody;
+                })
+                .catch(error => {
+                    console.log("Cole error while fetching:", error);
+                    return undefined;
                 });
         } else {
             // try refetch() 3 times, if it still fails then log user out:
-            // console.log("counter", counter);
+            console.log("counter", counter);
             if (counter === 3) {
                 docCtx.current.clearDocumentDetails();
                 loadingCtx.current.updateLoadingState({ loginLoading: false });

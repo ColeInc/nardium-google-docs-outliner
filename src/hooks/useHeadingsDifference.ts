@@ -20,7 +20,7 @@ export const useHeadingsDifference = () => {
         // let isDifferent = true;
         isDifferent.current = true;
 
-        if (!prevFileContents) {
+        if (!prevFileContents || !prevFileContents.body.content || !fileContents.body.content) {
             // isDifferent = true;
             isDifferent.current = true;
         } else {

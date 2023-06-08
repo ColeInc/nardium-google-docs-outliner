@@ -1,1 +1,11 @@
-# nardium-google-docs-outliner
+# Nardium - Google Docs Navigation Tool
+
+![nardium google docs outline preview](https://drive.google.com/uc?export=view&id=1aLPs3eu3T2yYLQ-BcD40vFiAZwv4v54Y)
+
+## Features:
+
+-   ✅ Intuitive Navigation: Effortlessly visualise and navigate your document's headings.
+-   ✅ Google Docs Integration: Nardium seamlessly integrates into your Google Docs workflow for a smooth experience.
+-   ✅ Customizable Display: Filter and display specific heading levels to customise what you see in the navigation panel.
+-   ✅ Zoom Functionality: Zoom in and out to specify the size of the text shown in the navigation panel.
+-   ✅ Dark theme: Switch to an eye-friendly dark theme for a comfortable editing experience, especially during late-night sessions.
