@@ -507,7 +507,7 @@ export const fetchFileContents = async (
         const { token, isLoggedIn, hasClickedLogin } = docCtx.current.documentDetails;
         const { loginLoading } = loadingCtx.current.loadingState;
 
-        // console.log("trying with these token/documentId,", !!token, !!documentId);
+        console.log("trying with these isLoggedIn/token/documentId,", isLoggedIn, "/", token, "/", documentId);
 
         if (isLoggedIn && token && documentId) {
             return fetch("https://docs.googleapis.com/v1/documents/" + documentId, {

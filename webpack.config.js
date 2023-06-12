@@ -63,7 +63,12 @@ module.exports = {
     },
     plugins: [
         new CopyPlugin({
-            patterns: [{ from: "public/manifest.json", to: "manifest.json" }],
+            patterns: [
+                { from: "public/manifest.json", to: "manifest.json" },
+                { from: "public/assets/icon16.png", to: "icon16.png" },
+                { from: "public/assets/icon48.png", to: "icon48.png" },
+                { from: "public/assets/icon128.png", to: "icon128.png" },
+            ],
         }),
         new HtmlWebpackPlugin({
             template: "./public/index.html",
@@ -75,20 +80,3 @@ module.exports = {
         port: 3000,
     },
 };
-
-// resolve: {
-//     extensions: [".tsx", ".ts", ".js"],
-//     fallback: {
-//         buffer: require.resolve("buffer/"),
-//         https: require.resolve("https-browserify"),
-//         url: require.resolve("url/"),
-//         crypto: require.resolve("crypto-browserify"),
-//         http2: require.resolve("http2"),
-//         zlib: require.resolve("browserify-zlib"),
-//         http: require.resolve("stream-http"),
-//         net: require.resolve("net"),
-//         tls: require.resolve("tls"),
-//         fs: false,
-//         child_process: false,
-//     },
-// },
