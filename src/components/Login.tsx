@@ -5,6 +5,7 @@ import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
 import { DocumentInfo } from "../models";
 import "./Login.css";
+import { useActiveTab } from "../hooks/useActiveTab";
 
 interface LoginProps {
     isLoading: boolean;
@@ -45,12 +46,12 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     };
 
     const handleLogin = () => {
-        documentCtx.updateDocumentDetails({ hasClickedLogin: true } as DocumentInfo); // update context to say that login button has been clicked
+        documentCtx.updateDocumentDetails({ hasClickedLogin: true }); // update context to say that login button has been clicked
 
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens
         sendChromeMessage("getAuthToken");
         // TODO: next line is for testing only:
-        // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } as DocumentInfo);
+        // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } );
         fetchLoggedInUserDetails();
 
         mixPanelAnalyticsClick("Login Button");
@@ -63,12 +64,12 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
                     isLoggedIn: true,
                     token: response.token,
                     hasClickedLogin: false,
-                } as DocumentInfo);
+                });
             } else {
                 console.log(
                     "Error while logging in. Invalid response back from background.js. Please refresh page and try again"
                 );
-                documentCtx.updateDocumentDetails({ isLoggedIn: false } as DocumentInfo);
+                documentCtx.updateDocumentDetails({ isLoggedIn: false });
                 updateLoadingState({ loginLoading: false });
             }
         });
@@ -80,7 +81,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
                 documentCtx.updateDocumentDetails({
                     email: response.email,
                     userId: response.id,
-                } as DocumentInfo);
+                });
             } else {
                 console.log("Unable to fetch logged in user details.");
             }

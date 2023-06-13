@@ -10,11 +10,13 @@ import LoadingSpinner from "./LoadingSpinner";
 import SettingsPanel from "./SettingsPanel";
 import Login from "./Login";
 import "./SidePanel.css";
+import { useActiveTab } from "../hooks/useActiveTab";
 
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const isFirstRender = useRef(true);
+    const activeTab = useActiveTab();
 
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;
@@ -24,7 +26,7 @@ const SidePanel = () => {
     const { mainPanelCollapsed, settingsPanelCollapsed } = userSettings;
 
     const loadingCtx = useContext(LoadingContext);
-    const { loadingState } = loadingCtx;
+    const { loadingState, setRetryCount } = loadingCtx;
     const isLoading = loadingState.loginLoading;
 
     const VERSION_NUMBER = "v0.1.0";
@@ -52,6 +54,11 @@ const SidePanel = () => {
             console.error("Cookies are not enabled in the current environment.");
         }
     }, []);
+
+    useEffect(() => {
+        setRetryCount(0);
+        console.log("cole setting counter retry to = 0 on PAGE VISIT");
+    }, [activeTab]);
 
     if (thirdPartyCookiesEnabled) {
         return (

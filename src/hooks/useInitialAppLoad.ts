@@ -30,6 +30,8 @@ export const useInitialAppLoad = () => {
         const docCtx = documentCtxRef.current;
         const loadingCtx = loadingCtxRef.current;
 
+        console.log("data @ refetch", docCtx.documentDetails);
+
         const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef);
 
         if (!fileContents) {
@@ -49,7 +51,7 @@ export const useInitialAppLoad = () => {
 
         // generateHeadingsHierarchy & render it out
         const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings);
-        docCtx.updateDocumentDetails({ documentContent: headingsHierarchy } as DocumentInfo);
+        docCtx.updateDocumentDetails({ documentContent: headingsHierarchy });
 
         loadingCtx.updateLoadingState({ loginLoading: false });
     };
@@ -65,7 +67,7 @@ export const useInitialAppLoad = () => {
                     await logoutUser();
                     // return;
                 } else {
-                    documentCtx.updateDocumentDetails({ documentId } as DocumentInfo);
+                    documentCtx.updateDocumentDetails({ documentId });
                 }
 
                 await refetch(documentId, documentCtxRef, loadingCtxRef);
@@ -73,7 +75,7 @@ export const useInitialAppLoad = () => {
                 // Every 5 secs check headings data for new changes:
                 const interval = setInterval(async () => {
                     refetch(documentId, documentCtxRef, loadingCtxRef);
-                }, 5000);
+                }, 4000);
 
                 return () => clearInterval(interval);
             } catch (error) {

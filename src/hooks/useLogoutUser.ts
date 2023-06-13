@@ -8,7 +8,7 @@ export const useLogoutUser = () => {
 
     const logoutUser = async () => {
         chrome.runtime.sendMessage({ type: "logoutUser", token }, () => {
-            documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false } as DocumentInfo); // remove token from our UserProvider
+            documentCtx.updateDocumentDetails({ token: "", isLoggedIn: false }); // remove token from our UserProvider
         });
     };
 

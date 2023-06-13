@@ -9,11 +9,11 @@ interface DocumentProviderProps {
 const DocumentProvider = (props: DocumentProviderProps) => {
     const [documentDetails, setDocumentDetails] = useState<DocumentInfo>(defaultDocumentState);
 
-    const updateDocumentDetails = (details: DocumentInfo) => {
+    const updateDocumentDetails = (details: Partial<DocumentInfo>) => {
         setDocumentDetails(prevState => {
             // console.log("prevState", prevState);
             // console.log("new Provider:", { ...prevState, ...details });
-            return { ...prevState, ...details } as DocumentInfo;
+            return { ...prevState, ...details };
         });
     };
     const clearDocumentDetails = () => {

@@ -11,6 +11,6 @@ export interface DocumentInfo {
 
 export interface IDocumentContext {
     documentDetails: DocumentInfo;
-    updateDocumentDetails: (details: DocumentInfo) => void;
+    updateDocumentDetails: (details: Partial<DocumentInfo>) => void;
     clearDocumentDetails: () => void;
 }

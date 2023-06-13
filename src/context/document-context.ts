@@ -13,7 +13,7 @@ export const defaultDocumentState: DocumentInfo = {
 
 const DocumentContext = React.createContext<IDocumentContext>({
     documentDetails: defaultDocumentState,
-    updateDocumentDetails: (details: DocumentInfo) => {},
+    updateDocumentDetails: (details: Partial<DocumentInfo>) => {},
     clearDocumentDetails: () => {},
 });
 

@@ -128,7 +128,7 @@ export const generateHeadingsHierarchy = (filteredHeadings: BodyContent[]): IHea
                 appendToParentPath(heading.headingId);
             }
         } else {
-            console.error("No heading found.");
+            console.log("No valid parent heading found.");
         }
 
         // console.log("final headingsHierarchy", JSON.stringify(headingsHierarchy));
