@@ -18,14 +18,19 @@ export const fetchFileContents = async (
 
     const checkErrorCount = () => {
         console.log("counter", retryCount, !hasClickedLogin, loginLoading);
-        if (retryCount === 2) {
-            docCtx.current.clearDocumentDetails();
-            loadingCtx.current.updateLoadingState({ loginLoading: false });
+        if (retryCount >= 2) {
+            // docCtx.current.clearDocumentDetails();
+            // loadingCtx.current.updateLoadingState({ loginLoading: false });
+            setUserLoggedOut();
         } else {
             console.log("No authToken or google docs documentId found");
         }
-        // !hasClickedLogin && loginLoading && counter++; // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
         !hasClickedLogin && loginLoading && incrementRetryCount(); // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
+    };
+
+    const setUserLoggedOut = () => {
+        docCtx.current.clearDocumentDetails();
+        loadingCtx.current.updateLoadingState({ loginLoading: false });
     };
 
     // TODO: MOCK FOR TESTING:
@@ -527,13 +532,23 @@ export const fetchFileContents = async (
         if (isLoggedIn && token && documentId && retryCount < 3) {
             console.log("sending request - fetchFileContents");
 
+            // const token = "ya29.a0AWY7CkluOwa2uyHj2ETZ2GvCuznYyKPXTRsRLIZRO8aieAigBlPbfwrghseGUNs-w3KcW5DqBWLRyuqnPg2jgwJN2u1rQjsIN6iegTF_yYGSZjHSEMwMR0T3yAiVjy4YJ43_9mnqJKhk_FBHjFvwDy_Jpr_AtwaCgYKAYsSARMSFQG1tDrpK6yl6HCz-w2wIPGps_qoPQ0165";
+
             return fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
                 method: "GET",
                 headers: new Headers({ Authorization: "Bearer " + token }),
             })
                 .then(res => {
-                    const response = res.json();
-                    return response;
+                    // const response = res.json();
+                    // return response;
+                    return res.json().then(response => {
+                        if (res.status === 401) {
+                            throw new Error("UNAUTHENTICATED");
+                        } else if (response.error) {
+                            throw new Error(JSON.stringify(response.error));
+                        }
+                        return response;
+                    });
                 })
                 .then(contents => {
                     console.log("docs API call response (content)", contents);
@@ -542,13 +557,39 @@ export const fetchFileContents = async (
                 })
                 .catch(error => {
                     console.log("Cole error while fetching:", error);
-                    // !hasClickedLogin && loginLoading && counter++; // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
-                    checkErrorCount();
-                    return undefined;
+
+                    if (error.message === "UNAUTHENTICATED") {
+                        setUserLoggedOut();
+                    } else {
+                        // !hasClickedLogin && loginLoading && counter++; // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
+                        checkErrorCount();
+                        // // console.log("counter v1", retryCount, !hasClickedLogin, loginLoading);
+                        // // if (retryCount >= 2) {
+                        // //     docCtx.current.clearDocumentDetails();
+                        // //     loadingCtx.current.updateLoadingState({ loginLoading: false });
+                        // // } else {
+                        // //     console.log("No authToken or google docs documentId found");
+                        // // }
+                        // // // !hasClickedLogin && loginLoading && counter++; // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
+                        // // !hasClickedLogin && loginLoading && console.log("trig incrementRetryCount()");
+                        // // !hasClickedLogin && loginLoading && incrementRetryCount(); // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
+                        return undefined;
+                    }
                 });
         } else {
             // try refetch() 3 times, if it still fails then log user out:
             checkErrorCount();
+            // // console.log("counter v2", retryCount, !hasClickedLogin, loginLoading);
+            // // if (retryCount >= 2) {
+            // //     docCtx.current.clearDocumentDetails();
+            // //     loadingCtx.current.updateLoadingState({ loginLoading: false });
+            // // } else {
+            // //     console.log("No authToken or google docs documentId found");
+            // // }
+            // // // !hasClickedLogin && loginLoading && counter++; // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
+            // // !hasClickedLogin && loginLoading && console.log("trig incrementRetryCount()");
+            // // !hasClickedLogin && loginLoading && incrementRetryCount(); // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
+
             // !hasClickedLogin && loginLoading && counter++; // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
             return Promise.resolve(undefined);
         }

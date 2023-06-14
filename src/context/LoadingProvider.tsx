@@ -27,7 +27,7 @@ const LoadingProvider = (props: LoadingProviderProps) => {
 
     const incrementRetryCount = () => {
         setLoadingState(prevState => {
-            return { ...prevState, retryCount: prevState.retryCount++ };
+            return { ...prevState, retryCount: ++prevState.retryCount };
         });
     };
 

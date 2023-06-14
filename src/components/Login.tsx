@@ -5,7 +5,6 @@ import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
 import { DocumentInfo } from "../models";
 import "./Login.css";
-import { useActiveTab } from "../hooks/useActiveTab";
 
 interface LoginProps {
     isLoading: boolean;
@@ -46,6 +45,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     };
 
     const handleLogin = () => {
+        console.log("cole trig login button");
         documentCtx.updateDocumentDetails({ hasClickedLogin: true }); // update context to say that login button has been clicked
 
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens

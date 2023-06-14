@@ -5,7 +5,7 @@ import { fetchFileContents } from "../helpers/fetchFileContents";
 import { filterDocumentContent } from "../helpers/filterDocumentContent";
 import { generateHeadingsHierarchy } from "../helpers/generateHeadingsHierarchy";
 import { getDocumentId } from "../helpers/getDocumentId";
-import { DocumentInfo, IDocumentContext } from "../models";
+import { IDocumentContext } from "../models";
 import { ILoadingContext } from "../models/loading";
 import { useHeadingsDifference } from "./useHeadingsDifference";
 import { useLogoutUser } from "./useLogoutUser";
@@ -30,7 +30,7 @@ export const useInitialAppLoad = () => {
         const docCtx = documentCtxRef.current;
         const loadingCtx = loadingCtxRef.current;
 
-        console.log("data @ refetch", docCtx.documentDetails);
+        // console.log("data @ refetch", docCtx.documentDetails);
 
         const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef);
 
@@ -93,5 +93,5 @@ export const useInitialAppLoad = () => {
     useEffect(() => {
         documentCtxRef.current = documentCtx;
         loadingCtxRef.current = loadingCtx;
-    }, [documentCtx]);
+    }, [documentCtx, loadingCtx]);
 };

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import SettingsContext from "../context/settings-context";
 import { useInitialAppLoad } from "../hooks/useInitialAppLoad";
+import { useActiveTab } from "../hooks/useActiveTab";
 import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
 import SettingsGear from "../../public/assets/settings-gear.svg";
@@ -10,7 +11,6 @@ import LoadingSpinner from "./LoadingSpinner";
 import SettingsPanel from "./SettingsPanel";
 import Login from "./Login";
 import "./SidePanel.css";
-import { useActiveTab } from "../hooks/useActiveTab";
 
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
