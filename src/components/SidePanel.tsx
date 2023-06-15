@@ -55,9 +55,9 @@ const SidePanel = () => {
         }
     }, []);
 
+    // set retry count back to 0 when user revisits back to current tab:
     useEffect(() => {
         setRetryCount(0);
-        console.log("cole setting counter retry to = 0 on PAGE VISIT");
     }, [activeTab]);
 
     if (thirdPartyCookiesEnabled) {

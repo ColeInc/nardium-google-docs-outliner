@@ -7,9 +7,7 @@ export const useActiveTab = () => {
         const handleVisibilityChange = () => {
             if (!document.hidden) {
                 // User has switched back to the tab
-                console.log("vvvvvvvvvvv Tab is active");
                 setIsActive(true);
-                // Perform any actions you need here
             } else {
                 setIsActive(false);
             }

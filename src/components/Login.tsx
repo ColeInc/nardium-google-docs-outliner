@@ -38,14 +38,11 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
 
     // check if user is logged in without explicitly showing window prompt to login again:
     const checkLoggedIn = () => {
-        console.log("checking logged in?");
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens
         sendChromeMessage("isLoggedIn");
-        console.log("is logged in 👍");
     };
 
     const handleLogin = () => {
-        console.log("cole trig login button");
         documentCtx.updateDocumentDetails({ hasClickedLogin: true }); // update context to say that login button has been clicked
 
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens

@@ -92,7 +92,7 @@
     padding-right: 8px;
     cursor: pointer;
     transition: width 0.3s ease;
-    background-color: var(--color1);
+    background-color: var(--color2);
 }
 
 .side-panel-collapsed.expand-button {
