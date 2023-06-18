@@ -12,4 +12,6 @@
 
 ## Chrome Web Store:
 
-You can now install Nardium on the Chrome Web Store - ![HERE](https://chrome.google.com/webstore/detail/nardium-google-docs-outli/bmomoeeeljdicegfjigecnlmeifmhmam)
+You can now install Nardium on the Chrome Web Store - [HERE][1]
+
+[1]: https://chrome.google.com/webstore/detail/nardium-google-docs-outli/bmomoeeeljdicegfjigecnlmeifmhmam "HERE"
