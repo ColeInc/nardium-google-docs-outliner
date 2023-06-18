@@ -9,3 +9,7 @@
 -   ✅ Customizable Display: Filter and display specific heading levels to customise what you see in the navigation panel.
 -   ✅ Zoom Functionality: Zoom in and out to specify the size of the text shown in the navigation panel.
 -   ✅ Dark theme: Switch to an eye-friendly dark theme for a comfortable editing experience, especially during late-night sessions.
+
+## Chrome Web Store:
+
+You can now install Nardium on the Chrome Web Store - ![HERE](https://chrome.google.com/webstore/detail/nardium-google-docs-outli/bmomoeeeljdicegfjigecnlmeifmhmam)
