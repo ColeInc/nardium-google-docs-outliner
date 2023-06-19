@@ -1,5 +1,7 @@
 # Nardium - Google Docs Navigation Tool
 
+Explore and Navigate your Google Docs with Ease! 🔍
+
 ![nardium google docs outline preview](https://drive.google.com/uc?export=view&id=1aLPs3eu3T2yYLQ-BcD40vFiAZwv4v54Y)
 
 ## Features:
