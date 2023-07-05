@@ -12,8 +12,13 @@ Explore and Navigate your Google Docs with Ease! 🔍
 -   ✅ Zoom Functionality: Zoom in and out to specify the size of the text shown in the navigation panel.
 -   ✅ Dark theme: Switch to an eye-friendly dark theme for a comfortable editing experience, especially during late-night sessions.
 
+## Landing Page now Live!
+
+[Nardium Landing Page][2]
+
 ## Chrome Web Store:
 
 You can now install Nardium on the Chrome Web Store - [HERE][1]
 
 [1]: https://chrome.google.com/webstore/detail/nardium-google-docs-outli/bmomoeeeljdicegfjigecnlmeifmhmam "HERE"
+[2]: https://coleinc.github.io/nardium-landing-page/
