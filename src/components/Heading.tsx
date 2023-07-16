@@ -3,7 +3,7 @@ import { IHeading } from "../models/heading";
 import Headings from "./Headings";
 import Chevron from "../../public/assets/chevron.svg";
 import SettingsContext from "../context/settings-context";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface HeadingProps {
     heading: IHeading;
@@ -28,7 +28,7 @@ const Heading: FC<HeadingProps> = ({ heading }) => {
         }
     }, [location.hash]);
 
-    const digit = heading.headingDigit || 0;
+    const digit = heading.headingDigit ?? 0;
 
     useEffect(() => {
         // if this heading's Heading Digit is more than the current visibleHeadings value we want, then hide it. E.g. if user wants to see only H1H2H3, collapse all H4+
@@ -40,7 +40,8 @@ const Heading: FC<HeadingProps> = ({ heading }) => {
     }, [userHeadingLvl]);
 
     const toggleHidden = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.stopPropagation();
+        e.stopPropagation(); // should stop it jumping to corresponding heading when we try collapse it.
+        e.preventDefault();
         setIsHidden(s => !s);
     };
 
