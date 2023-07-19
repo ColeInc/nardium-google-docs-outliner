@@ -37,6 +37,10 @@
     padding-left: 4px !important;
 }
 
+.heading-arrow-container.heading1 h1 {
+    font-weight: 600;
+}
+
 .headings .heading-arrow-container:hover h1 {
     color: var(--font-highlighted-color);
 }

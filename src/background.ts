@@ -1,5 +1,7 @@
 import { setTimeout } from "timers";
 
+const clientId = process.env["REACT_CLIENT_ID"] ?? "";
+
 interface ChromeMessageRequest {
     type: string;
     token?: string;
@@ -14,21 +16,67 @@ interface ChromeMessageRequest {
 chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sendResponse) => {
     // Login User:
     if (request.type === "getAuthToken") {
+        console.log("starting background.js --> getAuthToken");
+
         if (!chrome.identity) {
             console.error("Chrome Identity API not available :(");
             sendResponse(undefined);
             return;
         }
 
-        chrome.identity.getAuthToken({ interactive: true }, token => {
-            if (chrome.runtime.lastError || !token) {
-                console.log(`SSO ended with an error: ${JSON.stringify(chrome.runtime.lastError)}`);
-                sendResponse(undefined);
-                return;
-            }
-            sendResponse({ token: token });
+        // // chrome.identity.getAuthToken({ interactive: true }, token => {
+        // //     if (chrome.runtime.lastError || !token) {
+        // //         console.log(`SSO ended with an error: ${JSON.stringify(chrome.runtime.lastError)}`);
+        // //         sendResponse(undefined);
+        // //         return;
+        // //     }
+        // //     sendResponse({ token: token });
+        // // });
+        // // return true;
+
+        // let authURL = "https://accounts.google.com/o/oauth2/v2/auth";
+        const redirectURL = chrome.identity.getRedirectURL("oauth2");
+        // const auth_params = {
+        //     client_id: clientId,
+        //     redirect_uri: redirectURL,
+        //     response_type: "code",
+        //     access_type: "offline",
+        //     scope: "https://www.googleapis.com/auth/spreadsheets",
+        // };
+
+        const authParams = new URLSearchParams({
+            client_id: clientId,
+            redirect_uri: redirectURL,
+            response_type: "code",
+            access_type: "offline",
+            scope: ["https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/documents"].join(
+                " "
+            ),
         });
-        return true;
+        const authURL = `https://accounts.google.com/o/oauth2/auth?${authParams.toString()}`;
+        console.log("final authURL", authURL);
+
+        chrome.identity.launchWebAuthFlow({ url: authURL, interactive: true }, responseURL =>
+            console.log("RESP URL", responseURL)
+        );
+
+        // // const url =
+        // //     "https://script.google.com/macros/s/AKfycbw-knd1N1qf2Ie2BCIPqx0luFMPVh8-Si6tS2jHsggDZuvzWDLrkv9P2j4rF6r3_bdL/exec";
+
+        // // fetch(url, {
+        // //     method: "GET",
+        // //     // headers: new Headers({ Authorization: "Bearer " + token }),
+        // // })
+        // //     .then(res => {
+        // //         console.log("resp raw", res);
+        // //         return res.json();
+        // //     })
+        // //     .then(contents => {
+        // //         console.log("resp response", contents);
+        // //     })
+        // //     .catch(error => {
+        // //         console.log("Error while fetching nardium auth:", error);
+        // //     });
     }
     // Logout user:
     else if (request.type === "logoutUser") {
