@@ -1,6 +1,8 @@
+import { send } from "process";
 import { setTimeout } from "timers";
 
-const clientId = process.env["REACT_CLIENT_ID"] ?? "";
+const clientId = process.env["REACT_GOOGLE_CLOUD_CLIENT_ID"] ?? "";
+const scopes = process.env["REACT_GOOGLE_CLOUD_SCOPES"] ?? "";
 
 interface ChromeMessageRequest {
     type: string;
@@ -36,6 +38,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 
         // let authURL = "https://accounts.google.com/o/oauth2/v2/auth";
         const redirectURL = chrome.identity.getRedirectURL("oauth2");
+        console.log("cole redirectURL", redirectURL);
         // const auth_params = {
         //     client_id: clientId,
         //     redirect_uri: redirectURL,
@@ -49,16 +52,28 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             redirect_uri: redirectURL,
             response_type: "code",
             access_type: "offline",
-            scope: ["https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/documents"].join(
-                " "
-            ),
+            scope: scopes,
         });
+        // scope: ["https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/documents"].join(
+        //     " "
+        // ),
         const authURL = `https://accounts.google.com/o/oauth2/auth?${authParams.toString()}`;
         console.log("final authURL", authURL);
 
-        chrome.identity.launchWebAuthFlow({ url: authURL, interactive: true }, responseURL =>
-            console.log("RESP URL", responseURL)
-        );
+        chrome.identity.launchWebAuthFlow({ url: authURL, interactive: true }, responseURL => {
+            console.log("raw RESP URL", responseURL);
+
+            if (!responseURL) {
+                console.error("Failed to fetch Authentication Code from OAUTH. Please try again.");
+                sendResponse(undefined);
+                return;
+            }
+
+            const url = new URL(responseURL);
+            const code = url.searchParams.get("code");
+            console.log("FINAL Extracted code:", code);
+            sendResponse({ token: code });
+        });
 
         // // const url =
         // //     "https://script.google.com/macros/s/AKfycbw-knd1N1qf2Ie2BCIPqx0luFMPVh8-Si6tS2jHsggDZuvzWDLrkv9P2j4rF6r3_bdL/exec";
