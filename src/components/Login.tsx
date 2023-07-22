@@ -86,53 +86,73 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         });
     };
 
-    const sendChromeMessagev2 = async (type: string): Promise<string | null> => {
-        try {
-            const authCode = await new Promise<string>((resolve, reject) => {
-                chrome.runtime.sendMessage({ type }, (response: AuthTokenResponse | undefined) => {
-                    console.log("raw resp FRONTEND", response);
-                    if (response && response.token) {
-                        console.log("CODE BACK AND FRONTEND?", response.token);
+    // const sendChromeMessagev2 = async (type: string): Promise<string | null> => {
+    //     try {
+    //         const authCode = await new Promise<string>((resolve, reject) => {
+    //             chrome.runtime.sendMessage({ type }, (response: AuthTokenResponse | undefined) => {
+    //                 console.log("raw resp FRONTEND", response);
+    //                 if (response && response.token) {
+    //                     console.log("CODE BACK AND FRONTEND?", response.token);
 
-                        documentCtx.updateDocumentDetails({
-                            isLoggedIn: true,
-                            token: response.token,
-                            hasClickedLogin: false,
-                        });
-                        resolve(response.token);
-                    } else {
-                        console.log(
-                            "Error while logging in. Invalid response back from background.js. Please refresh page and try again"
-                        );
-                        documentCtx.updateDocumentDetails({ isLoggedIn: false });
-                        updateLoadingState({ loginLoading: false });
-                        reject(new Error("No oauth auth code found :("));
-                    }
+    //                     documentCtx.updateDocumentDetails({
+    //                         isLoggedIn: true,
+    //                         token: response.token,
+    //                         hasClickedLogin: false,
+    //                     });
+    //                     resolve(response.token);
+    //                 } else {
+    //                     console.log(
+    //                         "Error while logging in. Invalid response back from background.js. Please refresh page and try again"
+    //                     );
+    //                     documentCtx.updateDocumentDetails({ isLoggedIn: false });
+    //                     updateLoadingState({ loginLoading: false });
+    //                     reject(new Error("No oauth auth code found :("));
+    //                 }
+    //             });
+    //         });
+
+    //         // // const authCode2 = await new Promise<string>((resolve, reject) => {
+    //         // //     // Add a listener to receive the final token from background.js
+    //         // //     chrome.runtime.onMessage.addListener((response: AuthTokenResponse | undefined) => {
+    //         // //         console.log("raw resp FRONTEND vvvv2", response);
+
+    //         // //         // if (event.data.type === "auth") {
+    //         // //         if (response && response.token) {
+    //         // //             resolve(response.token);
+    //         // //         } else {
+    //         // //             reject(new Error("Failed to fetch Authentication Code from OAUTH. Please try again."));
+    //         // //             // }
+    //         // //         }
+    //         // //     });
+    //         // // });
+
+    //         console.log("cole returning final authCode:", authCode);
+    //         // console.log("cole returning final authCode v2:", authCode2);
+    //         return authCode;
+    //     } catch (e) {
+    //         console.log("Failed to fetch Document ID.");
+    //         return null;
+    //     }
+    // };
+
+    const sendChromeMessagev2 = (type: string) => {
+        chrome.runtime.sendMessage({ type }, (response: AuthTokenResponse | undefined) => {
+            console.log("raw resp FRONTEND", response);
+
+            if (response && response.token) {
+                documentCtx.updateDocumentDetails({
+                    isLoggedIn: true,
+                    token: response.token,
+                    hasClickedLogin: false,
                 });
-            });
-
-            // // const authCode2 = await new Promise<string>((resolve, reject) => {
-            // //     // Add a listener to receive the final token from background.js
-            // //     chrome.runtime.onMessage.addListener((response: AuthTokenResponse | undefined) => {
-            // //         console.log("raw resp FRONTEND vvvv2", response);
-
-            // //         // if (event.data.type === "auth") {
-            // //         if (response && response.token) {
-            // //             resolve(response.token);
-            // //         } else {
-            // //             reject(new Error("Failed to fetch Authentication Code from OAUTH. Please try again."));
-            // //             // }
-            // //         }
-            // //     });
-            // // });
-
-            console.log("cole returning final authCode:", authCode);
-            // console.log("cole returning final authCode v2:", authCode2);
-            return authCode;
-        } catch (e) {
-            console.log("Failed to fetch Document ID.");
-            return null;
-        }
+            } else {
+                console.log(
+                    "Error while logging in. Invalid response back from background.js. Please refresh page and try again"
+                );
+                documentCtx.updateDocumentDetails({ isLoggedIn: false });
+                updateLoadingState({ loginLoading: false });
+            }
+        });
     };
 
     const fetchLoggedInUserDetails = () => {

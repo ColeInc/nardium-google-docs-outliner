@@ -3,6 +3,7 @@ import { setTimeout } from "timers";
 
 const clientId = process.env["REACT_GOOGLE_CLOUD_CLIENT_ID"] ?? "";
 const scopes = process.env["REACT_GOOGLE_CLOUD_SCOPES"] ?? "";
+const googleAppScriptUrl = process.env["REACT_GOOGLE_APP_SCRIPT_URL"] ?? "";
 
 interface ChromeMessageRequest {
     type: string;
@@ -15,10 +16,72 @@ interface ChromeMessageRequest {
     };
 }
 
+// const callOAuthEndpoint = async (authCode: string | null): Promise<string | null> => {
+//     if (!authCode) return Promise.reject(null);
+
+//     fetch(googleAppScriptUrl, {
+//         method: "GET",
+//         // headers: new Headers({ Authorization: "Bearer " + token }),
+//     })
+//         .then(res => {
+//             console.log("resp raw", res);
+//             return res.json();
+//         })
+//         .then(contents => {
+//             console.log("resp response", contents);
+//             return contents;
+//         })
+//         .catch(error => {
+//             console.log("Error while fetching nardium auth:", error);
+//             return null;
+//         });
+//     return Promise.reject(null);
+// };
+
+const callOAuthEndpoint = async (authCode: string | null): Promise<string | null> => {
+    // if (!authCode) return Promise.reject(null);
+    if (!authCode) return null;
+
+    const url = googleAppScriptUrl + "?code=" + authCode;
+
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            // headers: new Headers({ Authorization: "Bearer " + token }),
+        });
+
+        if (!response.ok) {
+            console.log("Error while fetching nardium auth:", response.status, response.statusText);
+            return null;
+        }
+
+        const content = await response.text(); // Use response.text() to get the response content as a plain text string
+        console.log("access_token response", content);
+        return content;
+    } catch (error) {
+        console.log("Error while fetching nardium auth:", error);
+        return null;
+    }
+};
+
 chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sendResponse) => {
     // Login User:
     if (request.type === "getAuthToken") {
-        console.log("starting background.js --> getAuthToken");
+        // //     const trigAuthFlow = async () => {
+        // //         console.log("starting background.js --> getAuthToken");
+
+        // //         await setTimeout(() => {
+        // //             sendResponse({ token: "C63333" });
+        // //             console.log("Successfully trigAuthFlow!");
+        // //         }, 3000);
+        // //     };
+
+        // //     if (chrome.identity) {
+        // //         trigAuthFlow().catch(e => {
+        // //             console.log(e);
+        // //         });
+        // //     }
+        // //     return true;
 
         if (!chrome.identity) {
             console.error("Chrome Identity API not available :(");
@@ -70,28 +133,29 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             }
 
             const url = new URL(responseURL);
-            const code = url.searchParams.get("code");
-            console.log("FINAL Extracted code:", code);
-            sendResponse({ token: code });
+            const authCode = url.searchParams.get("code");
+            console.log("FINAL Extracted code:", authCode);
+            // sendResponse({ token: code });
+
+            // try {
+            //     const token = callOAuthEndpoint(authCode);
+            //     console.log("token returned to first getAuthToken fn:", token);
+            //     // sendResponse({ token: code });
+            // } catch (error) {
+            //     console.log(error);
+            //     sendResponse("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
+            // }
+            callOAuthEndpoint(authCode)
+                .then(token => {
+                    console.log("token returned to first getAuthToken fn:", token);
+                    sendResponse({ token });
+                })
+                .catch(error => {
+                    console.log(error);
+                    sendResponse("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
+                });
         });
-
-        // // const url =
-        // //     "https://script.google.com/macros/s/AKfycbw-knd1N1qf2Ie2BCIPqx0luFMPVh8-Si6tS2jHsggDZuvzWDLrkv9P2j4rF6r3_bdL/exec";
-
-        // // fetch(url, {
-        // //     method: "GET",
-        // //     // headers: new Headers({ Authorization: "Bearer " + token }),
-        // // })
-        // //     .then(res => {
-        // //         console.log("resp raw", res);
-        // //         return res.json();
-        // //     })
-        // //     .then(contents => {
-        // //         console.log("resp response", contents);
-        // //     })
-        // //     .catch(error => {
-        // //         console.log("Error while fetching nardium auth:", error);
-        // //     });
+        return true;
     }
     // Logout user:
     else if (request.type === "logoutUser") {
