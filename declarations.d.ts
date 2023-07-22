@@ -1,6 +1,6 @@
 declare namespace chrome {
     declare namespace identity {
-        function getAuthToken(details: chrome.identity.TokenDetails, callback: (token: string) => void): void;
+        function authenticateUser(details: chrome.identity.TokenDetails, callback: (token: string) => void): void;
 
         interface TokenDetails {
             interactive?: boolean;

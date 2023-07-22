@@ -88,7 +88,8 @@ const SidePanel = () => {
                         </div>
                     )}
 
-                    {!isLoggedIn && <Login isLoading={isLoading} isFirstRender={isFirstRender} />}
+                    {/* {!isLoggedIn && <Login isLoading={isLoading} isFirstRender={isFirstRender} />} */}
+                    <Login isLoading={isLoading} isFirstRender={isFirstRender} />
                     {isLoggedIn && <HeadingsWrapper />}
 
                     <div className="side-panel-config-container">

@@ -14,32 +14,10 @@ interface ChromeMessageRequest {
     payload?: {
         [key: string]: number;
     };
+    interactive?: boolean;
 }
 
-// const callOAuthEndpoint = async (authCode: string | null): Promise<string | null> => {
-//     if (!authCode) return Promise.reject(null);
-
-//     fetch(googleAppScriptUrl, {
-//         method: "GET",
-//         // headers: new Headers({ Authorization: "Bearer " + token }),
-//     })
-//         .then(res => {
-//             console.log("resp raw", res);
-//             return res.json();
-//         })
-//         .then(contents => {
-//             console.log("resp response", contents);
-//             return contents;
-//         })
-//         .catch(error => {
-//             console.log("Error while fetching nardium auth:", error);
-//             return null;
-//         });
-//     return Promise.reject(null);
-// };
-
 const callOAuthEndpoint = async (authCode: string | null): Promise<string | null> => {
-    // if (!authCode) return Promise.reject(null);
     if (!authCode) return null;
 
     const url = googleAppScriptUrl + "?code=" + authCode;
@@ -47,7 +25,6 @@ const callOAuthEndpoint = async (authCode: string | null): Promise<string | null
     try {
         const response = await fetch(url, {
             method: "GET",
-            // headers: new Headers({ Authorization: "Bearer " + token }),
         });
 
         if (!response.ok) {
@@ -55,9 +32,13 @@ const callOAuthEndpoint = async (authCode: string | null): Promise<string | null
             return null;
         }
 
-        const content = await response.text(); // Use response.text() to get the response content as a plain text string
-        console.log("access_token response", content);
-        return content;
+        // const content = await response.text();
+        // console.log("access_token response", content);
+        // return content;
+        const responseData = await response.json();
+        console.log("resp response", responseData);
+        const { access_token, expires_in, refresh_token, scope, token_type, id_token } = responseData;
+        return responseData;
     } catch (error) {
         console.log("Error while fetching nardium auth:", error);
         return null;
@@ -66,30 +47,31 @@ const callOAuthEndpoint = async (authCode: string | null): Promise<string | null
 
 chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sendResponse) => {
     // Login User:
-    if (request.type === "getAuthToken") {
-        // //     const trigAuthFlow = async () => {
-        // //         console.log("starting background.js --> getAuthToken");
-
-        // //         await setTimeout(() => {
-        // //             sendResponse({ token: "C63333" });
-        // //             console.log("Successfully trigAuthFlow!");
-        // //         }, 3000);
-        // //     };
-
-        // //     if (chrome.identity) {
-        // //         trigAuthFlow().catch(e => {
-        // //             console.log(e);
-        // //         });
-        // //     }
-        // //     return true;
-
+    if (request.type === "authenticateUser") {
         if (!chrome.identity) {
             console.error("Chrome Identity API not available :(");
             sendResponse(undefined);
             return;
         }
 
-        // // chrome.identity.getAuthToken({ interactive: true }, token => {
+        const interactive = request.interactive ?? true;
+        console.log("running authenticateUser W/ interactive ===", interactive);
+
+        let details = {};
+        if (request.interactive) {
+            details = {
+                interactive: true,
+            };
+        } else {
+            details = {
+                interactive: false,
+                // abortOnLoadForNonInteractive: true,
+                // abortOnLoadForNonInteractive: false,
+                // timeoutMsForNonInteractive: 30000,
+            };
+        }
+
+        // // chrome.identity.authenticateUser({ interactive: true }, token => {
         // //     if (chrome.runtime.lastError || !token) {
         // //         console.log(`SSO ended with an error: ${JSON.stringify(chrome.runtime.lastError)}`);
         // //         sendResponse(undefined);
@@ -99,16 +81,8 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         // // });
         // // return true;
 
-        // let authURL = "https://accounts.google.com/o/oauth2/v2/auth";
         const redirectURL = chrome.identity.getRedirectURL("oauth2");
         console.log("cole redirectURL", redirectURL);
-        // const auth_params = {
-        //     client_id: clientId,
-        //     redirect_uri: redirectURL,
-        //     response_type: "code",
-        //     access_type: "offline",
-        //     scope: "https://www.googleapis.com/auth/spreadsheets",
-        // };
 
         const authParams = new URLSearchParams({
             client_id: clientId,
@@ -117,44 +91,46 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             access_type: "offline",
             scope: scopes,
         });
-        // scope: ["https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/documents"].join(
-        //     " "
-        // ),
+        // const manifest = chrome.runtime.getManifest();
+        // const clientId = encodeURIComponent(manifest.oauth2.client_id);
+        // const scopes = encodeURIComponent(manifest.oauth2.scopes.join(" "));
+
         const authURL = `https://accounts.google.com/o/oauth2/auth?${authParams.toString()}`;
-        console.log("final authURL", authURL);
 
-        chrome.identity.launchWebAuthFlow({ url: authURL, interactive: true }, responseURL => {
-            console.log("raw RESP URL", responseURL);
+        console.log("final details being used", JSON.stringify({ url: authURL, ...details }));
 
-            if (!responseURL) {
-                console.error("Failed to fetch Authentication Code from OAUTH. Please try again.");
-                sendResponse(undefined);
-                return;
-            }
+        try {
+            chrome.identity.launchWebAuthFlow({ url: authURL, ...details }, responseURL => {
+                console.log("raw RESP URL", responseURL);
 
-            const url = new URL(responseURL);
-            const authCode = url.searchParams.get("code");
-            console.log("FINAL Extracted code:", authCode);
-            // sendResponse({ token: code });
+                if (chrome.runtime.lastError) {
+                    console.log(chrome.runtime.lastError.message);
+                    // resolve(null);
+                }
 
-            // try {
-            //     const token = callOAuthEndpoint(authCode);
-            //     console.log("token returned to first getAuthToken fn:", token);
-            //     // sendResponse({ token: code });
-            // } catch (error) {
-            //     console.log(error);
-            //     sendResponse("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
-            // }
-            callOAuthEndpoint(authCode)
-                .then(token => {
-                    console.log("token returned to first getAuthToken fn:", token);
-                    sendResponse({ token });
-                })
-                .catch(error => {
-                    console.log(error);
-                    sendResponse("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
-                });
-        });
+                if (!responseURL) {
+                    console.error("Failed to fetch Authentication Code from OAUTH. Please try again.");
+                    sendResponse(undefined);
+                    return;
+                }
+
+                const url = new URL(responseURL);
+                const authCode = url.searchParams.get("code");
+                console.log("FINAL Extracted code:", authCode);
+
+                callOAuthEndpoint(authCode)
+                    .then(token => {
+                        console.log("token returned to first authenticateUser fn:", token);
+                        sendResponse({ token });
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        sendResponse("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
+                    });
+            });
+        } catch (error) {
+            console.log("Failed at chrome.identity.launchWebAuthFlow: \n", error);
+        }
         return true;
     }
     // Logout user:
@@ -177,26 +153,63 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             });
         }
     }
-    // Check if user is logged in:
-    else if (request.type === "isLoggedIn") {
-        if (!chrome.identity) {
-            console.error("Chrome Identity API not available :(");
-            sendResponse(undefined);
-            return;
-        }
+    // // Check if user is logged in:
+    // else if (request.type === "isLoggedIn") {
+    //     if (!chrome.identity) {
+    //         console.error("Chrome Identity API not available :(");
+    //         sendResponse(undefined);
+    //         return;
+    //     }
 
-        // interactive=false allows checking the login status without showing any authentication prompts.
-        chrome.identity.getAuthToken({ interactive: false }, token => {
-            if (chrome.runtime.lastError || !token) {
-                console.log("Unable to login user.");
-                sendResponse(undefined);
-                return;
-            } else {
-                sendResponse({ token: token });
-            }
-        });
-        return true;
-    }
+    //     // interactive=false allows checking the login status without showing any authentication prompts.
+    //     chrome.identity.authenticateUser({ interactive: false }, token => {
+    //         if (chrome.runtime.lastError || !token) {
+    //             console.log("Unable to login user.");
+    //             sendResponse(undefined);
+    //             return;
+    //         } else {
+    //             sendResponse({ token: token });
+    //         }
+    //     });
+    //     return true;
+    // }
+    // // // // Check if user is logged in:
+    // // // else if (request.type === "renewAccessToken") {
+    // // //     // if (!chrome.identity) {
+    // // //     //     console.error("Chrome Identity API not available :(");
+    // // //     //     sendResponse(undefined);
+    // // //     //     return;
+    // // //     // }
+
+    // // //     // // interactive=false allows checking the login status without showing any authentication prompts.
+    // // //     // chrome.identity.authenticateUser({ interactive: false }, token => {
+    // // //     //     if (chrome.runtime.lastError || !token) {
+    // // //     //         console.log("Unable to login user.");
+    // // //     //         sendResponse(undefined);
+    // // //     //         return;
+    // // //     //     } else {
+    // // //     //         sendResponse({ token: token });
+    // // //     //     }
+    // // //     // });
+    // // //     // return true;
+    // // //     if (!chrome.identity) {
+    // // //         console.error("Chrome Identity API not available :(");
+    // // //         sendResponse(undefined);
+    // // //         return;
+    // // //     }
+
+    // // //     // interactive=false allows checking the login status without showing any authentication prompts.
+    // // //     chrome.identity.launchWebAuthFlow({ interactive: false }, token => {
+    // // //         if (chrome.runtime.lastError || !token) {
+    // // //             console.log("Unable to login user.");
+    // // //             sendResponse(undefined);
+    // // //             return;
+    // // //         } else {
+    // // //             sendResponse({ token: token });
+    // // //         }
+    // // //     });
+    // // //     return true;
+    // // // }
     // Fetch User Details:
     else if (request.type === "fetchUserDetails") {
         chrome.identity.getProfileUserInfo(userInfo => {

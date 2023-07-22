@@ -30,10 +30,11 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     // attempt to log user in on page load:
     useEffect(() => {
         if (isFirstRender.current) {
-            checkLoggedIn();
+            // checkLoggedIn();
             identifyUser();
             isFirstRender.current = false;
         }
+        checkLoggedIn();
     }, []);
 
     // chrome.runtime.onMessage.addListener((response: AuthTokenResponse | undefined) => {
@@ -50,17 +51,18 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
 
     // check if user is logged in without explicitly showing window prompt to login again:
     const checkLoggedIn = () => {
-        console.log("trig checkLoggedIn");
+        console.log("COLE triGGERING checkLoggedIn");
 
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens
-        sendChromeMessage("isLoggedIn");
+        // sendChromeMessage("isLoggedIn", false);
+        sendChromeMessage("authenticateUser", false);
     };
 
     const handleLogin = () => {
         documentCtx.updateDocumentDetails({ hasClickedLogin: true }); // update context to say that login button has been clicked
 
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens
-        sendChromeMessagev2("getAuthToken");
+        sendChromeMessage("authenticateUser", true);
         // TODO: next line is for testing only:
         // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } );
         fetchLoggedInUserDetails();
@@ -68,23 +70,23 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         mixPanelAnalyticsClick("Login Button");
     };
 
-    const sendChromeMessage = (type: string) => {
-        chrome.runtime.sendMessage({ type }, (response: AuthTokenResponse | undefined) => {
-            if (response && response.token) {
-                documentCtx.updateDocumentDetails({
-                    isLoggedIn: true,
-                    token: response.token,
-                    hasClickedLogin: false,
-                });
-            } else {
-                console.log(
-                    "Error while logging in. Invalid response back from background.js. Please refresh page and try again"
-                );
-                documentCtx.updateDocumentDetails({ isLoggedIn: false });
-                updateLoadingState({ loginLoading: false });
-            }
-        });
-    };
+    // const sendChromeMessage = (type: string) => {
+    //     chrome.runtime.sendMessage({ type }, (response: AuthTokenResponse | undefined) => {
+    //         if (response && response.token) {
+    //             documentCtx.updateDocumentDetails({
+    //                 isLoggedIn: true,
+    //                 token: response.token,
+    //                 hasClickedLogin: false,
+    //             });
+    //         } else {
+    //             console.log(
+    //                 "Error while logging in. Invalid response back from background.js. Please refresh page and try again"
+    //             );
+    //             documentCtx.updateDocumentDetails({ isLoggedIn: false });
+    //             updateLoadingState({ loginLoading: false });
+    //         }
+    //     });
+    // };
 
     // const sendChromeMessagev2 = async (type: string): Promise<string | null> => {
     //     try {
@@ -135,8 +137,9 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     //     }
     // };
 
-    const sendChromeMessagev2 = (type: string) => {
-        chrome.runtime.sendMessage({ type }, (response: AuthTokenResponse | undefined) => {
+    const sendChromeMessage = (type: string, interactive = true) => {
+        // TODO: REENABLE DIS LINE, DELETE ONE ABOVE: const sendChromeMessage = (type: string, interactive = true) => {
+        chrome.runtime.sendMessage({ type, interactive }, (response: AuthTokenResponse | undefined) => {
             console.log("raw resp FRONTEND", response);
 
             if (response && response.token) {
@@ -176,6 +179,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
                         <GoogleLogo />
                         <p>Sign in with Google</p>
                     </button>
+                    <button onClick={checkLoggedIn}>CHECK LOGGED IN</button>
                 </div>
             )}
         </>
