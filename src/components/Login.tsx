@@ -12,7 +12,15 @@ interface LoginProps {
 }
 
 interface AuthTokenResponse {
-    token: string;
+    token: {
+        access_token?: string;
+        id_token?: string;
+        refresh_token?: string;
+        expires_in?: number;
+        scope?: string;
+        token_type?: string;
+        email: string;
+    };
 }
 
 interface ChromeProfileUserInfo {
@@ -65,7 +73,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         sendChromeMessage("authenticateUser", true);
         // TODO: next line is for testing only:
         // // // documentCtx.updateDocumentDetails({ isLoggedIn: true } );
-        fetchLoggedInUserDetails();
+        // fetchLoggedInUserDetails();
 
         mixPanelAnalyticsClick("Login Button");
     };
@@ -138,16 +146,22 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     // };
 
     const sendChromeMessage = (type: string, interactive = true) => {
-        // TODO: REENABLE DIS LINE, DELETE ONE ABOVE: const sendChromeMessage = (type: string, interactive = true) => {
         chrome.runtime.sendMessage({ type, interactive }, (response: AuthTokenResponse | undefined) => {
+            // chrome.runtime.sendMessage({ type, interactive }, (response: any | undefined) => {
             console.log("raw resp FRONTEND", response);
+            // console.log("raw resp FRONTEND", Object.keys(response));
+            // console.log("raw resp FRONTEND", response?.token);
+            // console.log("raw resp FRONTEND", response?.access_token);
 
             if (response && response.token) {
                 documentCtx.updateDocumentDetails({
                     isLoggedIn: true,
-                    token: response.token,
+                    token: response.token.access_token,
                     hasClickedLogin: false,
                 });
+
+                console.log("cole gets here 1");
+                fetchLoggedInUserDetails();
             } else {
                 console.log(
                     "Error while logging in. Invalid response back from background.js. Please refresh page and try again"
@@ -159,8 +173,12 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     };
 
     const fetchLoggedInUserDetails = () => {
+        console.log("cole gets here 2");
+
+        console.log("fetching user email details");
         chrome.runtime.sendMessage({ type: "fetchUserDetails" }, (response: ChromeProfileUserInfo | undefined) => {
             if (response) {
+                console.log("user details resp", response);
                 documentCtx.updateDocumentDetails({
                     email: response.email,
                     userId: response.id,

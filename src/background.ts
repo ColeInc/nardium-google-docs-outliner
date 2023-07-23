@@ -120,8 +120,21 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 
                 callOAuthEndpoint(authCode)
                     .then(token => {
-                        console.log("token returned to first authenticateUser fn:", token);
-                        sendResponse({ token });
+                        try {
+                            const tokenInfo = JSON.parse(token ?? "");
+                            // console.log("token returned to first authenticateUser fn:", token);
+
+                            // Get the user's email address.
+                            const tokenObject = chrome.identity.getAuthToken(tokenInfo.id_token);
+                            const emailAddress = (tokenObject as any).email;
+
+                            // Print the user's email address.
+                            console.log("email", emailAddress);
+
+                            sendResponse({ token: { ...tokenInfo, email: emailAddress } });
+                        } catch (error) {
+                            new Error("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
+                        }
                     })
                     .catch(error => {
                         console.log(error);
@@ -212,6 +225,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     // // // }
     // Fetch User Details:
     else if (request.type === "fetchUserDetails") {
+        console.log("cole gets here 3");
         chrome.identity.getProfileUserInfo(userInfo => {
             if (chrome.runtime.lastError || !userInfo) {
                 console.error("Failed to retrieve user info", chrome?.runtime?.lastError);
