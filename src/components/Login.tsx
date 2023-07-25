@@ -152,16 +152,39 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
             // console.log("raw resp FRONTEND", Object.keys(response));
             // console.log("raw resp FRONTEND", response?.token);
             // console.log("raw resp FRONTEND", response?.access_token);
+            // Step 1: Extract and decode the JWT (id_token) payload
 
             if (response && response.token) {
-                documentCtx.updateDocumentDetails({
-                    isLoggedIn: true,
-                    token: response.token.access_token,
-                    hasClickedLogin: false,
-                });
+                try {
+                    const idToken = response.token.id_token;
+                    const payloadBase64 = idToken?.split(".")[1];
+                    if (!payloadBase64) {
+                        new Error("failed to process extract JWT token");
+                        return;
+                    }
+                    const payloadJsonString = Buffer.from(payloadBase64, "base64").toString("utf-8");
+                    console.log("payloadJsonString", payloadJsonString);
 
-                console.log("cole gets here 1");
-                fetchLoggedInUserDetails();
+                    // Step 2: Parse the decoded payload to access its properties
+                    const decodedPayload = JSON.parse(payloadJsonString);
+                    console.log("decodedPayload", decodedPayload);
+                    const email = decodedPayload.email;
+
+                    // Now you can access the "email" field from the decoded payload
+                    console.log("Decoded email:", email);
+
+                    //
+                    documentCtx.updateDocumentDetails({
+                        isLoggedIn: true,
+                        token: response.token.access_token,
+                        hasClickedLogin: false,
+                    });
+
+                    console.log("cole gets here 1");
+                    fetchLoggedInUserDetails();
+                } catch (error) {
+                    console.log("failed while processing authorization response: ", error);
+                }
             } else {
                 console.log(
                     "Error while logging in. Invalid response back from background.js. Please refresh page and try again"

@@ -20,7 +20,7 @@ interface ChromeMessageRequest {
 const callOAuthEndpoint = async (authCode: string | null): Promise<string | null> => {
     if (!authCode) return null;
 
-    const url = googleAppScriptUrl + "?code=" + authCode;
+    const url = googleAppScriptUrl + "?code=" + authCode + "?type=authenticateUser";
 
     try {
         const response = await fetch(url, {
@@ -37,7 +37,7 @@ const callOAuthEndpoint = async (authCode: string | null): Promise<string | null
         // return content;
         const responseData = await response.json();
         console.log("resp response", responseData);
-        const { access_token, expires_in, refresh_token, scope, token_type, id_token } = responseData;
+        // const { access_token, expires_in, refresh_token, scope, token_type, id_token } = responseData;
         return responseData;
     } catch (error) {
         console.log("Error while fetching nardium auth:", error);
@@ -57,19 +57,19 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         const interactive = request.interactive ?? true;
         console.log("running authenticateUser W/ interactive ===", interactive);
 
-        let details = {};
-        if (request.interactive) {
-            details = {
-                interactive: true,
-            };
-        } else {
-            details = {
-                interactive: false,
-                // abortOnLoadForNonInteractive: true,
-                // abortOnLoadForNonInteractive: false,
-                // timeoutMsForNonInteractive: 30000,
-            };
-        }
+        // let details = {};
+        // if (request.interactive) {
+        //     details = {
+        //         interactive: true,
+        //     };
+        // } else {
+        //     details = {
+        //         interactive: false,
+        //         // abortOnLoadForNonInteractive: true,
+        //         // abortOnLoadForNonInteractive: false,
+        //         // timeoutMsForNonInteractive: 30000,
+        //     };
+        // }
 
         // // chrome.identity.authenticateUser({ interactive: true }, token => {
         // //     if (chrome.runtime.lastError || !token) {
@@ -83,6 +83,10 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 
         const redirectURL = chrome.identity.getRedirectURL("oauth2");
         console.log("cole redirectURL", redirectURL);
+        const manifest = chrome.runtime.getManifest();
+        console.log("cole manifest contents", manifest);
+        // const clientId = encodeURIComponent(manifest.oauth2.client_id);
+        // const scopes = encodeURIComponent(manifest.oauth2.scopes.join(" "));
 
         const authParams = new URLSearchParams({
             client_id: clientId,
@@ -91,38 +95,40 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             access_type: "offline",
             scope: scopes,
         });
-        // const manifest = chrome.runtime.getManifest();
-        // const clientId = encodeURIComponent(manifest.oauth2.client_id);
-        // const scopes = encodeURIComponent(manifest.oauth2.scopes.join(" "));
 
         const authURL = `https://accounts.google.com/o/oauth2/auth?${authParams.toString()}`;
 
-        console.log("final details being used", JSON.stringify({ url: authURL, ...details }));
+        // console.log("final details being used", JSON.stringify({ url: authURL, ...details }));
+        // console.log("final details being used", JSON.stringify({ url: authURL }));
 
         try {
-            chrome.identity.launchWebAuthFlow({ url: authURL, ...details }, responseURL => {
+            // chrome.identity.launchWebAuthFlow({ url: authURL, ...details }, responseURL => {
+            chrome.identity.launchWebAuthFlow({ url: authURL }, responseURL => {
                 console.log("raw RESP URL", responseURL);
 
+                // Check for errors:
                 if (chrome.runtime.lastError) {
                     console.log(chrome.runtime.lastError.message);
-                    // resolve(null);
+                    new Error(chrome.runtime.lastError.message);
                 }
-
                 if (!responseURL) {
                     console.error("Failed to fetch Authentication Code from OAUTH. Please try again.");
-                    sendResponse(undefined);
+                    new Error("Failed to fetch Authentication Code from OAUTH. Please try again.");
                     return;
                 }
 
+                // extract valid authorization code from end of response url:
                 const url = new URL(responseURL);
                 const authCode = url.searchParams.get("code");
                 console.log("FINAL Extracted code:", authCode);
 
+                // call our google apps script middleware to send req to oauth with secret key in payload:
                 callOAuthEndpoint(authCode)
                     .then(token => {
                         try {
+                            // store oauth response into chrome.storage:
+                            console.log("token returned to first authenticateUser fn:", token);
                             const tokenInfo = JSON.parse(token ?? "");
-                            // console.log("token returned to first authenticateUser fn:", token);
 
                             // Get the user's email address.
                             const tokenObject = chrome.identity.getAuthToken(tokenInfo.id_token);
@@ -143,6 +149,8 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             });
         } catch (error) {
             console.log("Failed at chrome.identity.launchWebAuthFlow: \n", error);
+            sendResponse(undefined);
+            return;
         }
         return true;
     }
