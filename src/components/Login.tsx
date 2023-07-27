@@ -11,16 +11,18 @@ interface LoginProps {
     isFirstRender: React.MutableRefObject<boolean>;
 }
 
-interface AuthTokenResponse {
-    token: {
-        access_token?: string;
-        id_token?: string;
-        refresh_token?: string;
-        expires_in?: number;
-        scope?: string;
-        token_type?: string;
-        email: string;
-    };
+export interface AuthTokenResponse {
+    token: Token;
+}
+
+export interface Token {
+    access_token?: string;
+    id_token?: string;
+    refresh_token?: string;
+    expires_in?: number;
+    scope?: string;
+    token_type?: string;
+    // email: string;
 }
 
 interface ChromeProfileUserInfo {
@@ -42,7 +44,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
             identifyUser();
             isFirstRender.current = false;
         }
-        checkLoggedIn();
+        // checkLoggedIn();
     }, []);
 
     // chrome.runtime.onMessage.addListener((response: AuthTokenResponse | undefined) => {
@@ -156,24 +158,14 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
 
             if (response && response.token) {
                 try {
-                    const idToken = response.token.id_token;
-                    const payloadBase64 = idToken?.split(".")[1];
-                    if (!payloadBase64) {
-                        new Error("failed to process extract JWT token");
-                        return;
-                    }
-                    const payloadJsonString = Buffer.from(payloadBase64, "base64").toString("utf-8");
-                    console.log("payloadJsonString", payloadJsonString);
+                    // 1) get the resp token back
 
-                    // Step 2: Parse the decoded payload to access its properties
-                    const decodedPayload = JSON.parse(payloadJsonString);
-                    console.log("decodedPayload", decodedPayload);
-                    const email = decodedPayload.email;
+                    // 2) send call to function to start a timer based on "expires_in" field of token
 
-                    // Now you can access the "email" field from the decoded payload
-                    console.log("Decoded email:", email);
+                    // 3) once timer goes off we need to call "renewAccessToken" API endpoint, and pass in our encrypted refresh token from localstorage
 
-                    //
+                    // 4) if successful it should return us a new access_token that we can update user context + localstorage with :)
+
                     documentCtx.updateDocumentDetails({
                         isLoggedIn: true,
                         token: response.token.access_token,
