@@ -20,6 +20,7 @@ export interface Token {
     id_token?: string;
     refresh_token?: string;
     expires_in?: number;
+    expiry_date?: string;
     scope?: string;
     token_type?: string;
     email?: string;
@@ -41,7 +42,8 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     useEffect(() => {
         if (isFirstRender.current) {
             // checkLoggedIn();
-            identifyUser();
+            // identifyUser();
+            fetchAccessToken();
             isFirstRender.current = false;
         }
         // checkLoggedIn();
@@ -66,6 +68,18 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens
         // sendChromeMessage("isLoggedIn", false);
         sendChromeMessage("authenticateUser", false);
+    };
+
+    const fetchAccessToken = () => {
+        // chrome.runtime.sendMessage({ type: "fetchAccessToken" }, (response: AuthTokenResponse | undefined) => {
+        //     console.log("raw resp FRONTEND", response);
+
+        //     if (response && response.token) {
+        //         try {
+        //         } catch (error) {}
+        //     }
+        // });
+        sendChromeMessage("fetchAccessToken", false);
     };
 
     const handleLogin = () => {

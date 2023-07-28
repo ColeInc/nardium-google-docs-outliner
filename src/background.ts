@@ -50,16 +50,22 @@ const callOAuthEndpoint = async (authCode: string | null): Promise<Token | null>
 // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
 const storeOAuthToken = (token: Token | undefined | null) => {
     try {
+        console.log("gets to storeOAuthToken");
         if (!token) {
             new Error("invalid token received at storeOAuthToken");
+            return;
         }
-        console.log("gets to storeOAuthToken");
         // const { access_token, id_token, refresh_token, expires_in, scope, token_type } = token;
 
         // get current tabId:
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
             const currentTabId = tabs[0].id;
             console.log("Current Tab ID:", currentTabId);
+
+            const userEmail = extractUserEmail(token);
+            token.email = userEmail;
+            const expiryDateTime = calculateExpiryDate(token.expires_in);
+            token.expiry_date = JSON.stringify(expiryDateTime);
 
             // store token into localstorage
             chrome.storage.local.set({ [`nardium-${currentTabId}`]: JSON.stringify(token) }, () => {
@@ -140,13 +146,14 @@ const extractUserEmail = (token: Token) => {
 const fetchNewAccessToken = async () => {
     try {
         // 1) get current tab ID and fetch auth token from local storage via TAB ID
-        const currentTabId = await new Promise((resolve, reject) => {
-            chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
-                const currentTabId = tabs[0].id;
-                // return currentTabId;
-                resolve(currentTabId);
-            });
-        });
+        // const currentTabId = await new Promise((resolve, reject) => {
+        //     chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+        //         const currentTabId = tabs[0].id;
+        //         // return currentTabId;
+        //         resolve(currentTabId);
+        //     });
+        // });
+        const currentTabId = await getCurrentTabId();
         console.log("Current Tab ID:", currentTabId);
 
         // fetch auth token from localstorage:
@@ -154,13 +161,14 @@ const fetchNewAccessToken = async () => {
         //     console.log("fetched from localstorage:", resp);
         //     return resp;
         // });
-        const authToken = await new Promise((resolve, reject) => {
-            chrome.storage.local.get(`nardium-${currentTabId}`, resp => {
-                console.log("fetched dis authToken from localstorage:", resp);
-                resolve(resp[`nardium-${currentTabId}`]);
-                // resolve(resp);
-            });
-        });
+        // const authToken = await new Promise((resolve, reject) => {
+        //     chrome.storage.local.get(`nardium-${currentTabId}`, resp => {
+        //         console.log("fetched dis authToken from localstorage:", resp);
+        //         resolve(resp[`nardium-${currentTabId}`]);
+        //         // resolve(resp);
+        //     });
+        // });
+        const authToken = await getAuthTokenFromLocalStorage(currentTabId as string);
 
         // 2) extract user email
         console.log("trying to convert dis", authToken);
@@ -168,13 +176,14 @@ const fetchNewAccessToken = async () => {
         const userEmail = extractUserEmail(token);
 
         // 3) fetch refresh_token from localstorage with that email
-        const refreshToken = await new Promise((resolve, reject) => {
-            chrome.storage.local.get(`nardium-${userEmail}`, resp => {
-                console.log("fetched this refreshToken from localstorage:", resp);
-                resolve(resp[`nardium-${userEmail}`]);
-                // resolve(resp);
-            });
-        });
+        // const refreshToken = await new Promise((resolve, reject) => {
+        //     chrome.storage.local.get(`nardium-${userEmail}`, resp => {
+        //         console.log("fetched this refreshToken from localstorage:", resp);
+        //         resolve(resp[`nardium-${userEmail}`]);
+        //         // resolve(resp);
+        //     });
+        // });
+        const refreshToken = await getRefreshTokenFromLocalStorage(userEmail);
 
         // 4) send req out to renewAccessToken GAS MW API
         const newToken = await renewAccessToken(refreshToken as string);
@@ -186,6 +195,41 @@ const fetchNewAccessToken = async () => {
     }
     return true;
 };
+
+function getCurrentTabId() {
+    return new Promise((resolve, reject) => {
+        chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                const currentTabId = tabs[0].id;
+                resolve(currentTabId);
+            }
+        });
+    });
+}
+
+function getAuthTokenFromLocalStorage(currentTabId: string) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(`nardium-${currentTabId}`, resp => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                console.log("fetched dis authToken from localstorage:", resp);
+                resolve(resp[`nardium-${currentTabId}`]);
+            }
+        });
+    });
+}
+
+function getRefreshTokenFromLocalStorage(userEmail: string) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(`nardium-${userEmail}`, resp => {
+            console.log("fetched this refreshToken from localstorage:", resp);
+            resolve(resp[`nardium-${userEmail}`]);
+        });
+    });
+}
 
 const renewAccessToken = async (refreshToken: string) => {
     try {
@@ -214,7 +258,25 @@ const renewAccessToken = async (refreshToken: string) => {
         return newToken;
     } catch (error) {
         console.log("failed at renewAccessToken", error);
+        return null;
     }
+};
+
+const calculateExpiryDate = (expiresInSeconds: number | undefined) => {
+    if (!expiresInSeconds) {
+        return "";
+    }
+    const currentDate = new Date();
+    const expiryDate = new Date(currentDate.getTime() + expiresInSeconds * 1000);
+    return expiryDate;
+};
+
+const checkIfExpired = (expiryDate: Date | undefined) => {
+    if (!expiryDate) {
+        return true;
+    }
+    const currentDate = new Date();
+    return expiryDate.getTime() <= currentDate.getTime();
 };
 
 chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sendResponse) => {
@@ -309,7 +371,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                 storeOAuthToken(token);
 
                                 const userEmail = extractUserEmail(token);
-                                token.email = userEmail;
+                                // token.email = userEmail;
                                 // console.log("val returned from storeOAuthToken", userEmail);
 
                                 // 2) store refresh token into chrome.storage with user email as key:
@@ -494,5 +556,37 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             }
         });
         return true;
+    }
+    // Fetch valid access_token and return back to user:
+    else if (request.type === "fetchAccessToken") {
+        const fetchAccessToken = async () => {
+            // starts by just checking expired_in of current localstorage one, returns that if valid,
+            const currentTabId = await getCurrentTabId();
+            console.log("Current Tab ID:", currentTabId);
+            const authToken = await getAuthTokenFromLocalStorage(currentTabId as string);
+
+            console.log("trying to convert dis", authToken);
+            const token = JSON.parse(authToken as string);
+
+            // Check if token has expired:
+            const expired = checkIfExpired(JSON.parse(token.expiry_date));
+
+            if (!expired) {
+                sendResponse({ token });
+                return;
+            }
+
+            // Else, goes gets one with refresh token, else asks user to login.
+            const userEmail = extractUserEmail(token);
+            const refreshToken = await getRefreshTokenFromLocalStorage(userEmail);
+            const newToken = await renewAccessToken(refreshToken as string);
+
+            // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
+            storeOAuthToken(newToken as Token);
+        };
+
+        fetchAccessToken().catch(e => {
+            console.log(e);
+        });
     }
 });
