@@ -285,4 +285,12 @@ declare namespace chrome {
             callback?: (result: any[]) => void
         ): void;
     }
+
+    declare namespace alarms {
+        interface ChromeAlarm {
+            name: string;
+            scheduledTime: number;
+            periodInMinutes?: number;
+        }
+    }
 }

@@ -18,7 +18,7 @@ interface ChromeMessageRequest {
     interactive?: boolean;
 }
 
-const callOAuthEndpoint = async (authCode: string | null): Promise<string | null> => {
+const callOAuthEndpoint = async (authCode: string | null): Promise<Token | null> => {
     if (!authCode) return null;
 
     const url = googleAppScriptUrl + "?code=" + encodeURIComponent(authCode) + "&type=authenticateUser";
@@ -29,10 +29,10 @@ const callOAuthEndpoint = async (authCode: string | null): Promise<string | null
         });
 
         if (!response.ok) {
-            console.log("Error while fetching nardium auth:", response.status, response.statusText);
+            console.log("Something went fetching nardium auth. ERROR:", response);
             return null;
         }
-        console.log("callOAuthEndpoint RAW", response);
+        // console.log("callOAuthEndpoint RAW", response);
 
         // const content = await response.text();
         // console.log("access_token response", content);
@@ -40,7 +40,7 @@ const callOAuthEndpoint = async (authCode: string | null): Promise<string | null
         const responseData = await response.json();
         console.log("resp response", responseData);
         // const { access_token, expires_in, refresh_token, scope, token_type, id_token } = responseData;
-        return responseData;
+        return responseData as Token;
     } catch (error) {
         console.log("Error while fetching nardium auth:", error);
         return null;
@@ -48,25 +48,13 @@ const callOAuthEndpoint = async (authCode: string | null): Promise<string | null
 };
 
 // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-const storeOAuthToken = (token: Token): string | undefined => {
+const storeOAuthToken = (token: Token | undefined | null) => {
     try {
-        // const { access_token, id_token, refresh_token, expires_in, scope, token_type } = token;
-        const { id_token } = token;
-
-        // const idToken = token.id_token;
-        const payloadBase64 = id_token?.split(".")[1];
-        if (!payloadBase64) {
-            new Error("failed to process extract JWT token");
-            return undefined;
+        if (!token) {
+            new Error("invalid token received at storeOAuthToken");
         }
-        const payloadJsonString = Buffer.from(payloadBase64, "base64").toString("utf-8");
-        console.log("payloadJsonString", payloadJsonString);
-
-        // Step 2: Parse the decoded payload to access its properties
-        const decodedPayload = JSON.parse(payloadJsonString);
-        console.log("decodedPayload", decodedPayload);
-        const email = decodedPayload.email ?? "";
-        console.log("Decoded email:", email);
+        console.log("gets to storeOAuthToken");
+        // const { access_token, id_token, refresh_token, expires_in, scope, token_type } = token;
 
         // get current tabId:
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
@@ -75,11 +63,11 @@ const storeOAuthToken = (token: Token): string | undefined => {
 
             // store token into localstorage
             chrome.storage.local.set({ [`nardium-${currentTabId}`]: JSON.stringify(token) }, () => {
-                console.log(`Data saved to local storage for key >nardium-${currentTabId}<`);
+                console.log(`Data saved to local storage for key >nardium-${currentTabId}<`, token);
             });
         });
 
-        return email;
+        return;
     } catch (error) {
         console.log("failed while processing authorization response: ", error);
         return undefined;
@@ -100,6 +88,135 @@ const storeRefreshToken = (userEmail: string, refreshToken: string) => {
     }
 };
 
+const startAccessTokenTimer = (expiresIn: number | undefined) => {
+    console.log("gets to start of timer fn");
+    if (!expiresIn) {
+        console.log("No timer started. Invalid expires_in provided.");
+        return;
+    }
+    // subtract 1 min from expiry time so we got 1 min to fetch new one:
+    const timeSeconds = expiresIn - 60;
+    // TODO: uncomment dis so its real 1:
+    // const timeMins = timeSeconds / 60;
+    const timeMins = 0.1;
+
+    // Set an alarm to go off after that time
+    chrome.alarms.create("accessTokenTimer", { delayInMinutes: timeMins });
+    console.log("TIMER CREATED TO GO OFF IN --->", timeMins, "mins");
+
+    // Listener to handle the alarm firing
+    // chrome.alarms.onAlarm.addListener(alarm => {
+    //     if (alarm.name === "accessTokenTimer") {
+    //         console.log("Timer finished! Access token has expired.");
+    //         // Your code here to handle the token expiration, e.g., refresh token, logout, etc.
+    //     }
+    // });
+    return;
+};
+
+// when timer goes off, fetch new access_token with refresh_token:
+chrome.alarms.onAlarm.addListener(alarm => {
+    if (alarm.name === "accessTokenTimer") {
+        console.log("Timer finished! Access token has expired.");
+        fetchNewAccessToken();
+    }
+});
+
+const extractUserEmail = (token: Token) => {
+    const { id_token } = token;
+
+    const payloadBase64 = id_token?.split(".")[1];
+    if (!payloadBase64) {
+        new Error("failed to process extract JWT token");
+        return undefined;
+    }
+    const payloadJsonString = atob(payloadBase64);
+    const decodedPayload = JSON.parse(payloadJsonString);
+    const email = decodedPayload.email ?? "";
+    console.log("Decoded email:", email);
+    return email;
+};
+
+const fetchNewAccessToken = async () => {
+    try {
+        // 1) get current tab ID and fetch auth token from local storage via TAB ID
+        const currentTabId = await new Promise((resolve, reject) => {
+            chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+                const currentTabId = tabs[0].id;
+                // return currentTabId;
+                resolve(currentTabId);
+            });
+        });
+        console.log("Current Tab ID:", currentTabId);
+
+        // fetch auth token from localstorage:
+        // const authToken = chrome.storage.local.get(`nardium-${currentTabId}`, resp => {
+        //     console.log("fetched from localstorage:", resp);
+        //     return resp;
+        // });
+        const authToken = await new Promise((resolve, reject) => {
+            chrome.storage.local.get(`nardium-${currentTabId}`, resp => {
+                console.log("fetched dis authToken from localstorage:", resp);
+                resolve(resp[`nardium-${currentTabId}`]);
+                // resolve(resp);
+            });
+        });
+
+        // 2) extract user email
+        console.log("trying to convert dis", authToken);
+        const token = JSON.parse(authToken as string);
+        const userEmail = extractUserEmail(token);
+
+        // 3) fetch refresh_token from localstorage with that email
+        const refreshToken = await new Promise((resolve, reject) => {
+            chrome.storage.local.get(`nardium-${userEmail}`, resp => {
+                console.log("fetched this refreshToken from localstorage:", resp);
+                resolve(resp[`nardium-${userEmail}`]);
+                // resolve(resp);
+            });
+        });
+
+        // 4) send req out to renewAccessToken GAS MW API
+        const newToken = await renewAccessToken(refreshToken as string);
+
+        // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
+        storeOAuthToken(newToken as Token);
+    } catch (error) {
+        console.log("Failed at fetchNewAccessToken", error);
+    }
+    return true;
+};
+
+const renewAccessToken = async (refreshToken: string) => {
+    try {
+        if (!refreshToken) {
+            return;
+        }
+
+        const url = googleAppScriptUrl + "?type=renewAccessToken&refreshToken=" + encodeURIComponent(refreshToken);
+        console.log("renewAccessToken url going out:", url);
+        const response = await fetch(url, {
+            method: "GET",
+        });
+
+        if (!response.ok) {
+            console.log("Something went wrong renewing access token. ERROR:", response);
+            return null;
+        }
+        console.log("renewRefreshToken resp RAW", response);
+
+        const newToken = await response.text();
+        console.log("newToken response", newToken);
+        // return content;
+        // const responseData = await response.json();
+        // console.log("resp response", responseData);
+        // const { access_token, expires_in, refresh_token, scope, token_type, id_token } = responseData;
+        return newToken;
+    } catch (error) {
+        console.log("failed at renewAccessToken", error);
+    }
+};
+
 chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sendResponse) => {
     // Login User:
     if (request.type === "authenticateUser") {
@@ -112,19 +229,19 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         const interactive = request.interactive ?? true;
         console.log("running authenticateUser W/ interactive ===", interactive);
 
-        // let details = {};
-        // if (request.interactive) {
-        //     details = {
-        //         interactive: true,
-        //     };
-        // } else {
-        //     details = {
-        //         interactive: false,
-        //         // abortOnLoadForNonInteractive: true,
-        //         // abortOnLoadForNonInteractive: false,
-        //         // timeoutMsForNonInteractive: 30000,
-        //     };
-        // }
+        let details = {};
+        if (request.interactive) {
+            details = {
+                interactive: true,
+            };
+        } else {
+            details = {
+                interactive: false,
+                // abortOnLoadForNonInteractive: true,
+                // abortOnLoadForNonInteractive: false,
+                // timeoutMsForNonInteractive: 30000,
+            };
+        }
 
         // // chrome.identity.authenticateUser({ interactive: true }, token => {
         // //     if (chrome.runtime.lastError || !token) {
@@ -154,11 +271,11 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         const authURL = `https://accounts.google.com/o/oauth2/auth?${authParams.toString()}`;
 
         // console.log("final details being used", JSON.stringify({ url: authURL, ...details }));
-        console.log("final details being used", JSON.stringify({ url: authURL }));
+        // console.log("final details being used", JSON.stringify({ url: authURL }));
 
         try {
-            // chrome.identity.launchWebAuthFlow({ url: authURL, ...details }, responseURL => {
-            chrome.identity.launchWebAuthFlow({ url: authURL }, responseURL => {
+            chrome.identity.launchWebAuthFlow({ url: authURL, ...details }, responseURL => {
+                // chrome.identity.launchWebAuthFlow({ url: authURL }, responseURL => {
                 console.log("raw RESP URL", responseURL);
 
                 // Check for errors:
@@ -179,21 +296,30 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 
                 // call our google apps script middleware to send req to oauth with secret key in payload:
                 callOAuthEndpoint(authCode)
-                    .then(response => {
+                    .then(token => {
                         try {
-                            console.log("token returned to first authenticateUser fn:", response);
+                            console.log("token returned to first authenticateUser fn:", token);
                             // store oauth response into chrome.storage:
-                            const token = JSON.parse(response ?? "");
+                            // const token = JSON.parse(response ?? "");
 
-                            if (!token.refresh_token) {
-                                console.warn("No refresh token found in response. Not user's first time logging in.");
+                            if (!token) {
+                                new Error("No valid auth token returned :(");
                             } else {
                                 // 1) store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-                                const userEmail = storeOAuthToken(token);
-                                console.log("val returned from storeOAuthToken", userEmail);
+                                storeOAuthToken(token);
+
+                                const userEmail = extractUserEmail(token);
+                                token.email = userEmail;
+                                // console.log("val returned from storeOAuthToken", userEmail);
 
                                 // 2) store refresh token into chrome.storage with user email as key:
-                                storeRefreshToken(userEmail ?? "", token.refresh_token);
+                                if (!token.refresh_token) {
+                                    console.warn(
+                                        "No refresh token found in response. Not user's first time logging in."
+                                    );
+                                } else {
+                                    storeRefreshToken(userEmail, token.refresh_token);
+                                }
 
                                 // Get the user's email address.
                                 // const tokenObject = chrome.identity.getAuthToken(tokenInfo.id_token);
@@ -204,7 +330,8 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                 // sendResponse({ token: { ...tokenInfo, email: emailAddress } });
                             }
                             // send access_token back to FE so we can store in state for subsequent HTTP requests:
-
+                            console.log("gets to end here, wid dis token: ", token);
+                            startAccessTokenTimer(token?.expires_in);
                             sendResponse({ token });
                         } catch (error) {
                             new Error("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
