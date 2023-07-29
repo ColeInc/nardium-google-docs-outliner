@@ -11,12 +11,14 @@ import LoadingSpinner from "./LoadingSpinner";
 import SettingsPanel from "./SettingsPanel";
 import Login from "./Login";
 import "./SidePanel.css";
+import { useFetchAccessToken } from "../hooks/useFetchAccessToken";
 
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const isFirstRender = useRef(true);
     const activeTab = useActiveTab();
+    const fetchAccessToken = useFetchAccessToken();
 
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;
@@ -58,6 +60,8 @@ const SidePanel = () => {
     // set retry count back to 0 when user revisits back to current tab:
     useEffect(() => {
         setRetryCount(0);
+        console.log("user came back to tab! trig fetchAccessToken!");
+        fetchAccessToken();
     }, [activeTab]);
 
     if (thirdPartyCookiesEnabled) {
@@ -88,8 +92,8 @@ const SidePanel = () => {
                         </div>
                     )}
 
-                    {/* {!isLoggedIn && <Login isLoading={isLoading} isFirstRender={isFirstRender} />} */}
-                    <Login isLoading={isLoading} isFirstRender={isFirstRender} />
+                    {!isLoggedIn && <Login isLoading={isLoading} isFirstRender={isFirstRender} />}
+                    {/* <Login isLoading={isLoading} isFirstRender={isFirstRender} /> */}
                     {isLoggedIn && <HeadingsWrapper />}
 
                     <div className="side-panel-config-container">

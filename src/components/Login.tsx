@@ -5,6 +5,7 @@ import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
 import { DocumentInfo } from "../models";
 import "./Login.css";
+import { useFetchAccessToken } from "../hooks/useFetchAccessToken";
 
 interface LoginProps {
     isLoading: boolean;
@@ -16,7 +17,7 @@ export interface AuthTokenResponse {
 }
 
 export interface Token {
-    access_token?: string;
+    access_token: string;
     id_token?: string;
     refresh_token?: string;
     expires_in?: number;
@@ -26,7 +27,7 @@ export interface Token {
     email?: string;
 }
 
-interface ChromeProfileUserInfo {
+export interface ChromeProfileUserInfo {
     email: string;
     id: string;
 }
@@ -37,14 +38,16 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     const { updateLoadingState } = loadingCtx;
 
     const { identifyUser, mixPanelAnalyticsClick } = useMixPanelAnalytics();
+    const fetchAccessToken = useFetchAccessToken();
 
     // attempt to log user in on page load:
     useEffect(() => {
         if (isFirstRender.current) {
             // checkLoggedIn();
             // identifyUser();
-            fetchAccessToken();
-            isFirstRender.current = false;
+            fetchAccessToken().then(() => {
+                isFirstRender.current = false;
+            });
         }
         // checkLoggedIn();
     }, []);
@@ -70,17 +73,17 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         sendChromeMessage("authenticateUser", false);
     };
 
-    const fetchAccessToken = () => {
-        // chrome.runtime.sendMessage({ type: "fetchAccessToken" }, (response: AuthTokenResponse | undefined) => {
-        //     console.log("raw resp FRONTEND", response);
+    // // const fetchAccessToken = () => {
+    // //     // chrome.runtime.sendMessage({ type: "fetchAccessToken" }, (response: AuthTokenResponse | undefined) => {
+    // //     //     console.log("raw resp FRONTEND", response);
 
-        //     if (response && response.token) {
-        //         try {
-        //         } catch (error) {}
-        //     }
-        // });
-        sendChromeMessage("fetchAccessToken", false);
-    };
+    // //     //     if (response && response.token) {
+    // //     //         try {
+    // //     //         } catch (error) {}
+    // //     //     }
+    // //     // });
+    // //     sendChromeMessage("fetchAccessToken", false);
+    // // };
 
     const handleLogin = () => {
         documentCtx.updateDocumentDetails({ hasClickedLogin: true }); // update context to say that login button has been clicked
@@ -226,7 +229,9 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
                         <GoogleLogo />
                         <p>Sign in with Google</p>
                     </button>
-                    <button onClick={checkLoggedIn}>CHECK LOGGED IN</button>
+                    {/* <button onClick={checkLoggedIn}>CHECK LOGGED IN</button> */}
+                    <button onClick={fetchAccessToken}>FETCH ACCESS TOKEN</button>
+                    <div>{documentCtx.documentDetails.isLoggedIn}</div>
                 </div>
             )}
         </>

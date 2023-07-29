@@ -19,7 +19,7 @@ export const fetchFileContents = async (
         if (retryCount >= 2) {
             setUserLoggedOut();
         } else {
-            console.log("No authToken or google docs documentId found");
+            console.log("No authToken or google docs documentId found. RetryCount", retryCount);
         }
         !hasClickedLogin && loginLoading && incrementRetryCount(); // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
     };

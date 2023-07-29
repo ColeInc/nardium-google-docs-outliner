@@ -51,18 +51,31 @@ const callOAuthEndpoint = async (authCode: string | null): Promise<Token | null>
 const storeOAuthToken = (token: Token | undefined | null) => {
     try {
         console.log("gets to storeOAuthToken");
-        if (!token) {
-            new Error("invalid token received at storeOAuthToken");
-            return;
-        }
+        // token = JSON.parse(token)
+        // token = JSON.parse(token);
         // const { access_token, id_token, refresh_token, expires_in, scope, token_type } = token;
+        if (typeof token === "string") {
+            try {
+                token = JSON.parse(token);
+            } catch (error) {
+                // If JSON parsing fails, just keep the original token (string)
+                return;
+            }
+        } else {
+            // If the token is not a string, just return it as it is
+        }
 
         // get current tabId:
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
             const currentTabId = tabs[0].id;
             console.log("Current Tab ID:", currentTabId);
 
+            if (!token) {
+                new Error("invalid token received at storeOAuthToken");
+                return;
+            }
             const userEmail = extractUserEmail(token);
+            console.log("trying to assign user email:", userEmail);
             token.email = userEmail;
             const expiryDateTime = calculateExpiryDate(token.expires_in);
             token.expiry_date = JSON.stringify(expiryDateTime);
@@ -103,8 +116,8 @@ const startAccessTokenTimer = (expiresIn: number | undefined) => {
     // subtract 1 min from expiry time so we got 1 min to fetch new one:
     const timeSeconds = expiresIn - 60;
     // TODO: uncomment dis so its real 1:
-    // const timeMins = timeSeconds / 60;
-    const timeMins = 0.1;
+    const timeMins = timeSeconds / 60;
+    // // // const timeMins = 0.1;
 
     // Set an alarm to go off after that time
     chrome.alarms.create("accessTokenTimer", { delayInMinutes: timeMins });
@@ -187,9 +200,13 @@ const fetchNewAccessToken = async () => {
 
         // 4) send req out to renewAccessToken GAS MW API
         const newToken = await renewAccessToken(refreshToken as string);
-
-        // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-        storeOAuthToken(newToken as Token);
+        if (!newToken) {
+            console.error("Invalid access token returned when trying to fetch one with refresh token.");
+            return;
+        } else {
+            // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
+            storeOAuthToken(JSON.parse(newToken) as Token);
+        }
     } catch (error) {
         console.log("Failed at fetchNewAccessToken", error);
     }
@@ -263,6 +280,7 @@ const renewAccessToken = async (refreshToken: string) => {
 };
 
 const calculateExpiryDate = (expiresInSeconds: number | undefined) => {
+    console.log("start calculateExpiryDate");
     if (!expiresInSeconds) {
         return "";
     }
@@ -271,11 +289,28 @@ const calculateExpiryDate = (expiresInSeconds: number | undefined) => {
     return expiryDate;
 };
 
-const checkIfExpired = (expiryDate: Date | undefined) => {
-    if (!expiryDate) {
+const checkIfExpired = (expiryDateString: string | undefined) => {
+    console.log("start checkIfExpired -->", expiryDateString);
+
+    if (!expiryDateString) {
         return true;
     }
+
+    // convert string to date if its currently a string:
+    const expiryDate = JSON.parse(expiryDateString, (key, value) => {
+        // Check if the value is a string and represents a valid date
+        const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+        if (dateRegex.test(value)) {
+            // If it's a valid date string, convert it back to a Date object
+            return new Date(value);
+        }
+        // For non-date values or invalid date strings, return the value as is
+        return value;
+    });
+    console.log("new date -->", expiryDate);
+
     const currentDate = new Date();
+    console.log("token isExpired?", expiryDate.getTime() <= currentDate.getTime());
     return expiryDate.getTime() <= currentDate.getTime();
 };
 
@@ -559,6 +594,8 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     }
     // Fetch valid access_token and return back to user:
     else if (request.type === "fetchAccessToken") {
+        console.log("starting fetchAccessToken");
+
         const fetchAccessToken = async () => {
             // starts by just checking expired_in of current localstorage one, returns that if valid,
             const currentTabId = await getCurrentTabId();
@@ -569,24 +606,32 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             const token = JSON.parse(authToken as string);
 
             // Check if token has expired:
-            const expired = checkIfExpired(JSON.parse(token.expiry_date));
+            const expired = checkIfExpired(token.expiry_date);
 
             if (!expired) {
+                console.log("token isn't expired, so FE should just keep on using new one for now!");
                 sendResponse({ token });
                 return;
             }
+            console.log("token expired. fetching new one via refresh token:");
 
             // Else, goes gets one with refresh token, else asks user to login.
             const userEmail = extractUserEmail(token);
             const refreshToken = await getRefreshTokenFromLocalStorage(userEmail);
             const newToken = await renewAccessToken(refreshToken as string);
 
-            // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-            storeOAuthToken(newToken as Token);
+            if (!newToken) {
+                console.error("Invalid access token returned when trying to fetch one with refresh token.");
+                return;
+            } else {
+                // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
+                storeOAuthToken(JSON.parse(newToken) as Token);
+            }
         };
 
         fetchAccessToken().catch(e => {
             console.log(e);
         });
+        return true;
     }
 });
