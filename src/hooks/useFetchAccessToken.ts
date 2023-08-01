@@ -9,17 +9,19 @@ export const useFetchAccessToken = () => {
     const { updateLoadingState } = loadingCtx;
 
     const fetchAccessToken = async () => {
-        await chrome.runtime.sendMessage({ type: "fetchAccessToken" }, (response: AuthTokenResponse | undefined) => {
+        chrome.runtime.sendMessage({ type: "fetchAccessToken" }, (response: AuthTokenResponse | undefined) => {
             console.log("raw resp FRONTEND", response);
             if (response && response.token) {
                 try {
                     documentCtx.updateDocumentDetails({
                         isLoggedIn: true,
                         token: response.token.access_token,
+                        email: response.token.email,
+                        userId: response.token.userId,
                         hasClickedLogin: false,
                     });
 
-                    fetchLoggedInUserDetails();
+                    // fetchLoggedInUserDetails();
                 } catch (error) {
                     console.log("failed while processing authorization response: ", error);
                 }
@@ -33,20 +35,20 @@ export const useFetchAccessToken = () => {
         });
     };
 
-    const fetchLoggedInUserDetails = () => {
-        console.log("fetching user email details");
-        chrome.runtime.sendMessage({ type: "fetchUserDetails" }, (response: ChromeProfileUserInfo | undefined) => {
-            if (response) {
-                console.log("user details resp", response);
-                documentCtx.updateDocumentDetails({
-                    email: response.email,
-                    userId: response.id,
-                });
-            } else {
-                console.log("Unable to fetch logged in user details.");
-            }
-        });
-    };
+    // const fetchLoggedInUserDetails = () => {
+    //     console.log("fetching user email details");
+    //     chrome.runtime.sendMessage({ type: "fetchUserDetails" }, (response: ChromeProfileUserInfo | undefined) => {
+    //         if (response) {
+    //             console.log("user details resp", response);
+    //             documentCtx.updateDocumentDetails({
+    //                 email: response.email,
+    //                 userId: response.id,
+    //             });
+    //         } else {
+    //             console.log("Unable to fetch logged in user details.");
+    //         }
+    //     });
+    // };
 
     return fetchAccessToken;
 };

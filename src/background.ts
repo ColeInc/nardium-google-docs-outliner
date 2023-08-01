@@ -1,6 +1,6 @@
 import { send } from "process";
 import { setTimeout } from "timers";
-import { Token } from "./components/Login";
+import { AuthTokenResponse, Token } from "./components/Login";
 
 const clientId = process.env["REACT_GOOGLE_CLOUD_CLIENT_ID"] ?? "";
 const scopes = process.env["REACT_GOOGLE_CLOUD_SCOPES"] ?? "";
@@ -74,15 +74,16 @@ const storeOAuthToken = (token: Token | undefined | null) => {
                 new Error("invalid token received at storeOAuthToken");
                 return;
             }
-            const userEmail = extractUserEmail(token);
-            console.log("trying to assign user email:", userEmail);
-            token.email = userEmail;
-            const expiryDateTime = calculateExpiryDate(token.expires_in);
-            token.expiry_date = JSON.stringify(expiryDateTime);
+            const enhancedToken = appendUserJWTInfo(token);
+            console.log("trying to assign user email:", enhancedToken.email);
+            // token.email = jwtInfo;
+            // token = { ...token, ...jwtInfo };
+            const expiryDateTime = calculateExpiryDate(enhancedToken.expires_in);
+            enhancedToken.expiry_date = JSON.stringify(expiryDateTime);
 
             // store token into localstorage
-            chrome.storage.local.set({ [`nardium-${currentTabId}`]: JSON.stringify(token) }, () => {
-                console.log(`Data saved to local storage for key >nardium-${currentTabId}<`, token);
+            chrome.storage.local.set({ [`nardium-token-${currentTabId}`]: JSON.stringify(enhancedToken) }, () => {
+                console.log(`Data saved to local storage for key >nardium-token-${currentTabId}<`, enhancedToken);
             });
         });
 
@@ -96,8 +97,8 @@ const storeOAuthToken = (token: Token | undefined | null) => {
 const storeRefreshToken = (userEmail: string, refreshToken: string) => {
     try {
         if (userEmail.length > 0 && refreshToken.length > 0) {
-            chrome.storage.local.set({ [`nardium-${userEmail}`]: refreshToken }, () => {
-                console.log(`Data saved to local storage for key >nardium-${userEmail}<`);
+            chrome.storage.local.set({ [`nardium-refresh-${userEmail}`]: refreshToken }, () => {
+                console.log(`Data saved to local storage for key >nardium-refresh-${userEmail}<`);
             });
         } else {
             new Error("Invalid user email or refresh_token provided to storeRefreshToken function.");
@@ -141,19 +142,22 @@ chrome.alarms.onAlarm.addListener(alarm => {
     }
 });
 
-const extractUserEmail = (token: Token) => {
+const appendUserJWTInfo = (token: Token): Token => {
     const { id_token } = token;
 
     const payloadBase64 = id_token?.split(".")[1];
     if (!payloadBase64) {
         new Error("failed to process extract JWT token");
-        return undefined;
+        return token;
     }
     const payloadJsonString = atob(payloadBase64);
     const decodedPayload = JSON.parse(payloadJsonString);
     const email = decodedPayload.email ?? "";
+    const userId = decodedPayload.sub ?? "";
     console.log("Decoded email:", email);
-    return email;
+    console.log("Decoded user id:", userId);
+    const finalToken = { ...token, email, userId };
+    return finalToken;
 };
 
 const fetchNewAccessToken = async () => {
@@ -170,33 +174,37 @@ const fetchNewAccessToken = async () => {
         console.log("Current Tab ID:", currentTabId);
 
         // fetch auth token from localstorage:
-        // const authToken = chrome.storage.local.get(`nardium-${currentTabId}`, resp => {
+        // const authToken = chrome.storage.local.get(`nardium-token-${currentTabId}`, resp => {
         //     console.log("fetched from localstorage:", resp);
         //     return resp;
         // });
         // const authToken = await new Promise((resolve, reject) => {
-        //     chrome.storage.local.get(`nardium-${currentTabId}`, resp => {
+        //     chrome.storage.local.get(`nardium-token-${currentTabId}`, resp => {
         //         console.log("fetched dis authToken from localstorage:", resp);
-        //         resolve(resp[`nardium-${currentTabId}`]);
+        //         resolve(resp[`nardium-token-${currentTabId}`]);
         //         // resolve(resp);
         //     });
         // });
         const authToken = await getAuthTokenFromLocalStorage(currentTabId as string);
+        if (!authToken) {
+            logout(undefined);
+            new Error("No valid access token found in localstorage. User must login manually.");
+        }
 
         // 2) extract user email
         console.log("trying to convert dis", authToken);
         const token = JSON.parse(authToken as string);
-        const userEmail = extractUserEmail(token);
+        const enhancedToken = appendUserJWTInfo(token);
 
         // 3) fetch refresh_token from localstorage with that email
         // const refreshToken = await new Promise((resolve, reject) => {
-        //     chrome.storage.local.get(`nardium-${userEmail}`, resp => {
+        //     chrome.storage.local.get(`nardium-refresh-${userEmail}`, resp => {
         //         console.log("fetched this refreshToken from localstorage:", resp);
-        //         resolve(resp[`nardium-${userEmail}`]);
+        //         resolve(resp[`nardium-refresh-${userEmail}`]);
         //         // resolve(resp);
         //     });
         // });
-        const refreshToken = await getRefreshTokenFromLocalStorage(userEmail);
+        const refreshToken = await getRefreshTokenFromLocalStorage(enhancedToken.email ?? "");
 
         // 4) send req out to renewAccessToken GAS MW API
         const newToken = await renewAccessToken(refreshToken as string);
@@ -205,10 +213,11 @@ const fetchNewAccessToken = async () => {
             return;
         } else {
             // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-            storeOAuthToken(JSON.parse(newToken) as Token);
+            storeOAuthToken(appendUserJWTInfo(JSON.parse(newToken) as Token));
         }
     } catch (error) {
         console.log("Failed at fetchNewAccessToken", error);
+        return null;
     }
     return true;
 };
@@ -228,12 +237,13 @@ function getCurrentTabId() {
 
 function getAuthTokenFromLocalStorage(currentTabId: string) {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get(`nardium-${currentTabId}`, resp => {
-            if (chrome.runtime.lastError) {
+        chrome.storage.local.get(`nardium-token-${currentTabId}`, resp => {
+            if (chrome.runtime.lastError || Object.keys(resp).length === 0) {
+                console.log("No valid AuthToken found in localstorage.");
                 reject(chrome.runtime.lastError);
             } else {
                 console.log("fetched dis authToken from localstorage:", resp);
-                resolve(resp[`nardium-${currentTabId}`]);
+                resolve(resp[`nardium-token-${currentTabId}`]);
             }
         });
     });
@@ -241,9 +251,9 @@ function getAuthTokenFromLocalStorage(currentTabId: string) {
 
 function getRefreshTokenFromLocalStorage(userEmail: string) {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get(`nardium-${userEmail}`, resp => {
+        chrome.storage.local.get(`nardium-refresh-${userEmail}`, resp => {
             console.log("fetched this refreshToken from localstorage:", resp);
-            resolve(resp[`nardium-${userEmail}`]);
+            resolve(resp[`nardium-refresh-${userEmail}`]);
         });
     });
 }
@@ -312,6 +322,37 @@ const checkIfExpired = (expiryDateString: string | undefined) => {
     const currentDate = new Date();
     console.log("token isExpired?", expiryDate.getTime() <= currentDate.getTime());
     return expiryDate.getTime() <= currentDate.getTime();
+};
+
+const logout = async (token: string | undefined) => {
+    if (token) {
+        // remove user's token from cache
+        await chrome.identity.removeCachedAuthToken({ token });
+    }
+
+    // Clear all cached auth tokens.
+    await chrome.identity.clearAllCachedAuthTokens();
+
+    // Clear localstorage of any JWT tokens stored:
+    removeAccessTokensFromLocalStorage();
+
+    console.log("Successfully logged out user!");
+    return;
+};
+
+const removeAccessTokensFromLocalStorage = () => {
+    // const currentTabId = await getCurrentTabId();
+    // console.log("Current Tab ID:", currentTabId);
+
+    chrome.storage.local.get(null, result => {
+        const tokensToRemove = Object.keys(result).filter(key => key.startsWith("nardium-token-"));
+
+        // It is fine to remove all "tokens" we find in localstorage globally, bc even if user is logged into different account in another tab their refresh token for that acc will stay there, so when user goes back to that tab it will fallback to using that refresh token to go out and fetch access token for user.
+        tokensToRemove &&
+            chrome.storage.local.remove(tokensToRemove, () => {
+                console.log(`Removed ${tokensToRemove.length} nardium tokens from local storage.`);
+            });
+    });
 };
 
 chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sendResponse) => {
@@ -402,10 +443,12 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                             if (!token) {
                                 new Error("No valid auth token returned :(");
                             } else {
+                                // append user email and id into our final token:
+                                token = appendUserJWTInfo(token);
+                                console.log("token resp from appendUserJWTInfo");
+
                                 // 1) store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
                                 storeOAuthToken(token);
-
-                                const userEmail = extractUserEmail(token);
                                 // token.email = userEmail;
                                 // console.log("val returned from storeOAuthToken", userEmail);
 
@@ -415,7 +458,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                         "No refresh token found in response. Not user's first time logging in."
                                     );
                                 } else {
-                                    storeRefreshToken(userEmail, token.refresh_token);
+                                    storeRefreshToken(token.email ?? "", token.refresh_token);
                                 }
 
                                 // Get the user's email address.
@@ -450,15 +493,15 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     else if (request.type === "logoutUser") {
         console.log("Attempting to log out user...");
 
-        const logout = async (token: string) => {
-            // remove user's token from cache
-            await chrome.identity.removeCachedAuthToken({ token });
+        // const logout = async (token: string) => {
+        //     // remove user's token from cache
+        //     await chrome.identity.removeCachedAuthToken({ token });
 
-            // Clear all cached auth tokens.
-            await chrome.identity.clearAllCachedAuthTokens();
+        //     // Clear all cached auth tokens.
+        //     await chrome.identity.clearAllCachedAuthTokens();
 
-            console.log("Successfully logged out user!");
-        };
+        //     console.log("Successfully logged out user!");
+        // };
 
         if (chrome.identity && request.token) {
             logout(request.token).catch(e => {
@@ -601,6 +644,10 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             const currentTabId = await getCurrentTabId();
             console.log("Current Tab ID:", currentTabId);
             const authToken = await getAuthTokenFromLocalStorage(currentTabId as string);
+            if (!authToken) {
+                logout(undefined);
+                new Error("No valid access token found in localstorage. User must login manually.");
+            }
 
             console.log("trying to convert dis", authToken);
             const token = JSON.parse(authToken as string);
@@ -616,7 +663,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             console.log("token expired. fetching new one via refresh token:");
 
             // Else, goes gets one with refresh token, else asks user to login.
-            const userEmail = extractUserEmail(token);
+            const userEmail = appendUserJWTInfo(token).email ?? "";
             const refreshToken = await getRefreshTokenFromLocalStorage(userEmail);
             const newToken = await renewAccessToken(refreshToken as string);
 
@@ -625,12 +672,13 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                 return;
             } else {
                 // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-                storeOAuthToken(JSON.parse(newToken) as Token);
+                storeOAuthToken(appendUserJWTInfo(JSON.parse(newToken) as Token));
             }
         };
 
         fetchAccessToken().catch(e => {
             console.log(e);
+            sendResponse(null);
         });
         return true;
     }

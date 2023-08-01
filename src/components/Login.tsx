@@ -25,6 +25,7 @@ export interface Token {
     scope?: string;
     token_type?: string;
     email?: string;
+    userId?: string;
 }
 
 export interface ChromeProfileUserInfo {
@@ -186,11 +187,13 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
                     documentCtx.updateDocumentDetails({
                         isLoggedIn: true,
                         token: response.token.access_token,
+                        email: response.token.email,
+                        userId: response.token.userId,
                         hasClickedLogin: false,
                     });
 
-                    console.log("cole gets here 1");
-                    fetchLoggedInUserDetails();
+                    // console.log("cole gets here 1");
+                    // fetchLoggedInUserDetails();
                 } catch (error) {
                     console.log("failed while processing authorization response: ", error);
                 }
@@ -204,22 +207,22 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
         });
     };
 
-    const fetchLoggedInUserDetails = () => {
-        console.log("cole gets here 2");
+    // const fetchLoggedInUserDetails = () => {
+    //     console.log("cole gets here 2");
 
-        console.log("fetching user email details");
-        chrome.runtime.sendMessage({ type: "fetchUserDetails" }, (response: ChromeProfileUserInfo | undefined) => {
-            if (response) {
-                console.log("user details resp", response);
-                documentCtx.updateDocumentDetails({
-                    email: response.email,
-                    userId: response.id,
-                });
-            } else {
-                console.log("Unable to fetch logged in user details.");
-            }
-        });
-    };
+    //     console.log("fetching user email details");
+    //     chrome.runtime.sendMessage({ type: "fetchUserDetails" }, (response: ChromeProfileUserInfo | undefined) => {
+    //         if (response) {
+    //             console.log("user details resp", response);
+    //             documentCtx.updateDocumentDetails({
+    //                 email: response.email,
+    //                 userId: response.id,
+    //             });
+    //         } else {
+    //             console.log("Unable to fetch logged in user details.");
+    //         }
+    //     });
+    // };
 
     return (
         <>
@@ -230,8 +233,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
                         <p>Sign in with Google</p>
                     </button>
                     {/* <button onClick={checkLoggedIn}>CHECK LOGGED IN</button> */}
-                    <button onClick={fetchAccessToken}>FETCH ACCESS TOKEN</button>
-                    <div>{documentCtx.documentDetails.isLoggedIn}</div>
+                    {/* <button onClick={fetchAccessToken}>FETCH ACCESS TOKEN</button> */}
                 </div>
             )}
         </>
