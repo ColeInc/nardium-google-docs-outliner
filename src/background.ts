@@ -114,11 +114,19 @@ const startAccessTokenTimer = (expiresIn: number | undefined) => {
         console.log("No timer started. Invalid expires_in provided.");
         return;
     }
+
+    // first check if we have an existing timer & clear it if found.
+    chrome.alarms.clear("accessTokenTimer", wasCleared => {
+        if (wasCleared) {
+            console.log(`Timer accessTokenTimer was successfully cleared.`);
+        }
+    });
+
     // subtract 1 min from expiry time so we got 1 min to fetch new one:
     const timeSeconds = expiresIn - 60;
     // TODO: uncomment dis so its real 1:
-    const timeMins = timeSeconds / 60;
-    // // // const timeMins = 0.1;
+    // const timeMins = timeSeconds / 60;
+    const timeMins = 0.1;
 
     // Set an alarm to go off after that time
     chrome.alarms.create("accessTokenTimer", { delayInMinutes: timeMins });
@@ -161,6 +169,7 @@ const appendUserJWTInfo = (token: Token): Token => {
 };
 
 const fetchNewAccessToken = async () => {
+    console.log("start fetchNewAccessToken");
     try {
         // 1) get current tab ID and fetch auth token from local storage via TAB ID
         // const currentTabId = await new Promise((resolve, reject) => {
@@ -213,7 +222,10 @@ const fetchNewAccessToken = async () => {
             return;
         } else {
             // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-            storeOAuthToken(appendUserJWTInfo(JSON.parse(newToken) as Token));
+            const newEnhancedToken = appendUserJWTInfo(newToken);
+            storeOAuthToken(newEnhancedToken);
+            // start timer for expiration of this new access_token:
+            startAccessTokenTimer(newEnhancedToken?.expires_in);
         }
     } catch (error) {
         console.log("Failed at fetchNewAccessToken", error);
@@ -258,10 +270,10 @@ function getRefreshTokenFromLocalStorage(userEmail: string) {
     });
 }
 
-const renewAccessToken = async (refreshToken: string) => {
+const renewAccessToken = async (refreshToken: string): Promise<Token | null> => {
     try {
         if (!refreshToken) {
-            return;
+            return null;
         }
 
         const url = googleAppScriptUrl + "?type=renewAccessToken&refreshToken=" + encodeURIComponent(refreshToken);
@@ -282,7 +294,7 @@ const renewAccessToken = async (refreshToken: string) => {
         // const responseData = await response.json();
         // console.log("resp response", responseData);
         // const { access_token, expires_in, refresh_token, scope, token_type, id_token } = responseData;
-        return newToken;
+        return JSON.parse(newToken) as Token;
     } catch (error) {
         console.log("failed at renewAccessToken", error);
         return null;
@@ -672,7 +684,10 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                 return;
             } else {
                 // store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-                storeOAuthToken(appendUserJWTInfo(JSON.parse(newToken) as Token));
+                const newEnhancedToken = appendUserJWTInfo(newToken);
+                storeOAuthToken(newEnhancedToken);
+                // start timer for expiration of this new access_token:
+                startAccessTokenTimer(newEnhancedToken?.expires_in);
             }
         };
 
