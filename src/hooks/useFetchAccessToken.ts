@@ -9,6 +9,7 @@ export const useFetchAccessToken = () => {
     const { updateLoadingState } = loadingCtx;
 
     const fetchAccessToken = async () => {
+        console.log("trig fetchAccessTOken");
         chrome.runtime.sendMessage({ type: "fetchAccessToken" }, (response: AuthTokenResponse | undefined) => {
             console.log("raw resp FRONTEND", response);
             if (response && response.token) {

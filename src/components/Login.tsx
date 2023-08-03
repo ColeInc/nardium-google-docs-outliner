@@ -45,8 +45,8 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     useEffect(() => {
         if (isFirstRender.current) {
             // checkLoggedIn();
-            // identifyUser();
             fetchAccessToken().then(() => {
+                identifyUser();
                 isFirstRender.current = false;
             });
         }

@@ -7,18 +7,23 @@ import { ILoadingContext } from "../models/loading";
 export const fetchFileContents = async (
     documentId: string | null,
     docCtx: React.MutableRefObject<IDocumentContext>,
-    loadingCtx: React.MutableRefObject<ILoadingContext>
+    loadingCtx: React.MutableRefObject<ILoadingContext>,
+    fetchNewAccessToken: () => void
 ): Promise<UnfilteredBody | undefined> => {
     const { token, isLoggedIn, hasClickedLogin } = docCtx.current.documentDetails;
     const loadCtx = loadingCtx.current;
     const { setRetryCount, incrementRetryCount } = loadCtx;
     const { loginLoading, retryCount } = loadCtx.loadingState;
 
+    // const fetchAccessToken = useFetchAccessToken();
+
     const checkErrorCount = () => {
         // try refetch() 3 times, if it still fails then log user out:
         if (retryCount >= 2) {
             setUserLoggedOut();
         } else {
+            // go off and try to fetch a new access token from either localstorage or via refresh token:
+            fetchNewAccessToken();
             console.log("No authToken or google docs documentId found. RetryCount", retryCount);
         }
         !hasClickedLogin && loginLoading && incrementRetryCount(); // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.
@@ -523,7 +528,7 @@ export const fetchFileContents = async (
     // return Promise.resolve(contents);
 
     try {
-        // console.log("trying with these isLoggedIn/token/documentId,", isLoggedIn, "/", token, "/", documentId);
+        console.log("sending request w/ these:", { isLoggedIn, token, documentId });
 
         if (isLoggedIn && token && documentId && retryCount < 3) {
             // const token = "ya29.a0AWY7CkluOwa2uyHj2ETZ2GvCuznYyKPXTRsRLIZRO8aieAigBlPbfwrghseGUNs-w3KcW5DqBWLRyuqnPg2jgwJN2u1rQjsIN6iegTF_yYGSZjHSEMwMR0T3yAiVjy4YJ43_9mnqJKhk_FBHjFvwDy_Jpr_AtwaCgYKAYsSARMSFQG1tDrpK6yl6HCz-w2wIPGps_qoPQ0165";
@@ -548,15 +553,24 @@ export const fetchFileContents = async (
                     return contents as UnfilteredBody;
                 })
                 .catch(error => {
-                    // console.log("Error while fetching:", error);
+                    console.log("Error while fetching:", error);
 
                     // if response status 401, log user out instantly
+                    // if (error.message === "UNAUTHENTICATED") {
+                    //     setUserLoggedOut();
+                    // } else {
+                    //     checkErrorCount();
+                    //     return undefined;
+                    // }
                     if (error.message === "UNAUTHENTICATED") {
-                        setUserLoggedOut();
+                        // setUserLoggedOut();
+                        // // // go off and try to fetch a new access token from either localstorage or via refresh token:
+                        // // fetchNewAccessToken();
                     } else {
                         checkErrorCount();
-                        return undefined;
+                        // return undefined;
                     }
+                    return undefined;
                 });
         } else {
             checkErrorCount();

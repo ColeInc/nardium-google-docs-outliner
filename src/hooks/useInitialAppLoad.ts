@@ -9,10 +9,12 @@ import { IDocumentContext } from "../models";
 import { ILoadingContext } from "../models/loading";
 import { useHeadingsDifference } from "./useHeadingsDifference";
 import { useLogoutUser } from "./useLogoutUser";
+import { useFetchAccessToken } from "./useFetchAccessToken";
 
 export const useInitialAppLoad = () => {
     const { checkHeadingsDifference } = useHeadingsDifference();
     const { logoutUser } = useLogoutUser();
+    const fetchAccessToken = useFetchAccessToken();
 
     const documentCtx = useContext(DocumentContext);
     const loadingCtx = useContext(LoadingContext);
@@ -24,7 +26,8 @@ export const useInitialAppLoad = () => {
     const refetch = async (
         documentId: string | null,
         documentCtxRef: React.MutableRefObject<IDocumentContext>,
-        loadingCtxRef: React.MutableRefObject<ILoadingContext>
+        loadingCtxRef: React.MutableRefObject<ILoadingContext>,
+        fetchNewAccessToken: () => void
     ) => {
         // Access the updated documentCtx using the useRef. Must to do this because referencing the original one gave me a stale closure which only stored the original state of the ctx.
         const docCtx = documentCtxRef.current;
@@ -32,7 +35,7 @@ export const useInitialAppLoad = () => {
 
         // console.log("data @ refetch", docCtx.documentDetails);
 
-        const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef);
+        const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef, fetchAccessToken);
 
         if (!fileContents) {
             return new Error("Document content was not able to be fetched.");
@@ -70,11 +73,11 @@ export const useInitialAppLoad = () => {
                     documentCtx.updateDocumentDetails({ documentId });
                 }
 
-                await refetch(documentId, documentCtxRef, loadingCtxRef);
+                await refetch(documentId, documentCtxRef, loadingCtxRef, fetchAccessToken);
 
                 // Every 5 secs check headings data for new changes:
                 const interval = setInterval(async () => {
-                    refetch(documentId, documentCtxRef, loadingCtxRef);
+                    refetch(documentId, documentCtxRef, loadingCtxRef, fetchAccessToken);
                 }, 4000);
 
                 return () => clearInterval(interval);
