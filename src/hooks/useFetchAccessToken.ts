@@ -10,6 +10,12 @@ export const useFetchAccessToken = () => {
 
     const fetchAccessToken = async () => {
         console.log("trig fetchAccessTOken");
+
+        // if the "SIGN IN WITH GOOGLE" button is currently showing, then turn on the loading state as we make this call:
+        if (!documentCtx.documentDetails.isLoggedIn) {
+            updateLoadingState({ loginLoading: true });
+        }
+
         chrome.runtime.sendMessage({ type: "fetchAccessToken" }, (response: AuthTokenResponse | undefined) => {
             console.log("raw resp FRONTEND", response);
             if (response && response.token) {
@@ -26,6 +32,7 @@ export const useFetchAccessToken = () => {
                 } catch (error) {
                     console.log("failed while processing authorization response: ", error);
                 }
+                updateLoadingState({ loginLoading: false });
             } else {
                 console.log(
                     "Error while logging in. Invalid response back from background.js. Please refresh page and try again"
