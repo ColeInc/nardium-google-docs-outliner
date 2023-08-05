@@ -15,8 +15,6 @@ export const fetchFileContents = async (
     const { setRetryCount, incrementRetryCount } = loadCtx;
     const { loginLoading, retryCount } = loadCtx.loadingState;
 
-    // const fetchAccessToken = useFetchAccessToken();
-
     const checkErrorCount = () => {
         // try refetch() 3 times, if it still fails then log user out:
         if (retryCount >= 2) {
@@ -528,7 +526,7 @@ export const fetchFileContents = async (
     // return Promise.resolve(contents);
 
     try {
-        console.log("sending request w/ these:", { isLoggedIn, token, documentId });
+        // console.log("sending request w/ these:", { isLoggedIn, token, documentId });
 
         if (isLoggedIn && token && documentId && retryCount < 3) {
             // const token = "ya29.a0AWY7CkluOwa2uyHj2ETZ2GvCuznYyKPXTRsRLIZRO8aieAigBlPbfwrghseGUNs-w3KcW5DqBWLRyuqnPg2jgwJN2u1rQjsIN6iegTF_yYGSZjHSEMwMR0T3yAiVjy4YJ43_9mnqJKhk_FBHjFvwDy_Jpr_AtwaCgYKAYsSARMSFQG1tDrpK6yl6HCz-w2wIPGps_qoPQ0165";
@@ -555,21 +553,12 @@ export const fetchFileContents = async (
                 .catch(error => {
                     console.log("Error while fetching:", error);
 
-                    // if response status 401, log user out instantly
                     // if (error.message === "UNAUTHENTICATED") {
-                    //     setUserLoggedOut();
+                    //     // setUserLoggedOut();
                     // } else {
                     //     checkErrorCount();
-                    //     return undefined;
                     // }
-                    if (error.message === "UNAUTHENTICATED") {
-                        // setUserLoggedOut();
-                        // // // go off and try to fetch a new access token from either localstorage or via refresh token:
-                        // // fetchNewAccessToken();
-                    } else {
-                        checkErrorCount();
-                        // return undefined;
-                    }
+                    checkErrorCount();
                     return undefined;
                 });
         } else {

@@ -60,7 +60,6 @@ const SidePanel = () => {
     // set retry count back to 0 when user revisits back to current tab:
     useEffect(() => {
         setRetryCount(0);
-        console.log("user came back to tab! trig fetchAccessToken!");
         fetchAccessToken();
     }, [activeTab]);
 
