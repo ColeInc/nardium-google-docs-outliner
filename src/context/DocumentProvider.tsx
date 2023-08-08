@@ -12,7 +12,7 @@ const DocumentProvider = (props: DocumentProviderProps) => {
     const updateDocumentDetails = (details: Partial<DocumentInfo>) => {
         setDocumentDetails(prevState => {
             // console.log("prevState", prevState);
-            console.log("new Document Provider:", { ...prevState, ...details });
+            // console.log("new Document Provider:", { ...prevState, ...details });
             return { ...prevState, ...details };
         });
     };

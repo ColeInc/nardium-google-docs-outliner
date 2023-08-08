@@ -8,8 +8,6 @@ import { ILoadingContext } from "../models/loading";
 export const useFetchAccessToken = () => {
     const documentCtx = useContext(DocumentContext);
     const loadingCtx = useContext(LoadingContext);
-    // const { updateLoadingState } = loadingCtx;
-
     const documentCtxRef = useRef(documentCtx);
     const loadingCtxRef = useRef(loadingCtx);
 
@@ -32,7 +30,6 @@ export const useFetchAccessToken = () => {
         const docCtx = documentCtxRef.current;
         const loadingCtx = loadingCtxRef.current;
 
-        console.log("documentCtx.documentDetails @ fetchAccesstoken", docCtx.documentDetails);
         // if the "SIGN IN WITH GOOGLE" button is currently showing, then turn on the loading state as we make this call:
         if (!docCtx.documentDetails.isLoggedIn) {
             loadingCtx.updateLoadingState({ loginLoading: true });
@@ -53,17 +50,12 @@ export const useFetchAccessToken = () => {
                 } catch (error) {
                     console.log("failed while processing authorization response: ", error);
                 }
-                console.log("has clicked login?", docCtx.documentDetails.hasClickedLogin);
                 if (!docCtx.documentDetails.hasClickedLogin) {
-                    console.log("cole setting login OFF here 1)");
                     loadingCtx.updateLoadingState({ loginLoading: false });
                 }
             } else {
                 // console.log("Error while logging in. Invalid response back from background.js. Please refresh page and try again");
                 docCtx.updateDocumentDetails({ isLoggedIn: false });
-                console.log("cole setting login OFF here 222)");
-                // updateLoadingState({ loginLoading: false });
-                console.log("has clicked login?", docCtx.documentDetails.hasClickedLogin);
                 if (!docCtx.documentDetails.hasClickedLogin) {
                     loadingCtx.updateLoadingState({ loginLoading: false });
                 }

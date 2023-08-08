@@ -187,7 +187,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                 const newToken = await fetchNewAccessToken();
                 sendResponse({ token: newToken });
             } catch (e) {
-                console.log("fetchAccessToken Error", e);
+                console.warn("Failed attempt to fetch Access Token.");
                 sendResponse(null);
             }
         };
