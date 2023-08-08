@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 
                 // Check for errors:
                 if (chrome.runtime.lastError) {
-                    console.log(chrome.runtime.lastError.message);
+                    console.log("authenticateUser Error:", chrome.runtime.lastError.message);
                     throw new Error(chrome.runtime.lastError.message);
                 }
                 if (!responseURL) {
@@ -89,7 +89,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                         }
                     })
                     .catch(error => {
-                        console.log(error);
+                        console.log("Failed to login user - Stage 2 of 3 Legged Auth Flow.", error);
                         sendResponse("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
                     });
             });
@@ -112,7 +112,6 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     }
     // Fetch User Details:
     else if (request.type === "fetchUserDetails") {
-        console.log("cole gets here 3");
         chrome.identity.getProfileUserInfo(userInfo => {
             if (chrome.runtime.lastError || !userInfo) {
                 console.error("Failed to retrieve user info", chrome?.runtime?.lastError);
@@ -127,21 +126,23 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     else if (request.type === "getDocumentId") {
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
             try {
-                setTimeout(() => {
-                    const url = tabs[0].url;
-                    const match = /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(
-                        url
-                    );
-                    const documentId = match?.[1];
-                    // console.log("Document ID found:", documentId);
-                    if (!documentId) {
-                        sendResponse({ error: "Failed to get document ID" });
-                    } else {
-                        sendResponse({ documentId });
-                    }
-                }, 300);
+                const currentTab = tabs[0];
+                if (currentTab && currentTab.url.includes("docs.google.com/document/d")) {
+                    setTimeout(() => {
+                        const url = tabs[0].url;
+                        const match =
+                            /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(url);
+                        const documentId = match?.[1];
+                        // console.log("Document ID found:", documentId);
+                        if (!documentId) {
+                            sendResponse({ error: "Failed to get document ID" });
+                        } else {
+                            sendResponse({ documentId });
+                        }
+                    }, 300);
+                }
             } catch (error) {
-                console.log(error);
+                console.log("getDocumentId Error:", error);
             }
         });
         return true;
@@ -186,7 +187,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                 const newToken = await fetchNewAccessToken();
                 sendResponse({ token: newToken });
             } catch (e) {
-                console.log(e);
+                console.log("fetchAccessToken Error", e);
                 sendResponse(null);
             }
         };

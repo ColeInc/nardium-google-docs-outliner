@@ -82,7 +82,7 @@ export const useInitialAppLoad = () => {
 
                 return () => clearInterval(interval);
             } catch (error) {
-                updateLoadingState({ loginLoading: false });
+                // updateLoadingState({ loginLoading: false });
                 console.log(error);
             }
         };

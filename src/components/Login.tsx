@@ -4,8 +4,8 @@ import { useFetchAccessToken } from "../hooks/useFetchAccessToken";
 import GoogleLogo from "../../public/assets/google-logo.svg";
 import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
-import "./Login.css";
 import { AuthTokenResponse } from "../models/token";
+import "./Login.css";
 
 interface LoginProps {
     isLoading: boolean;
@@ -36,6 +36,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     }, []);
 
     const handleLogin = () => {
+        console.log("trying to set hasClickedLogin TRUE");
         documentCtx.updateDocumentDetails({ hasClickedLogin: true }); // update context to say that login button has been clicked
 
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens

@@ -4,6 +4,7 @@ import { UnfilteredBody } from "../models/body";
 import { ILoadingContext } from "../models/loading";
 
 // Gets access token of logged in user, then use it to call google docs API to fetch document info
+//TODO: move these props into interface
 export const fetchFileContents = async (
     documentId: string | null,
     docCtx: React.MutableRefObject<IDocumentContext>,
