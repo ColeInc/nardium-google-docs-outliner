@@ -31,7 +31,7 @@ const SidePanel = () => {
     const { loadingState, setRetryCount } = loadingCtx;
     const isLoading = loadingState.loginLoading;
 
-    const VERSION_NUMBER = "v1.0.1";
+    const VERSION_NUMBER = "v1.2.0";
 
     useInitialAppLoad(); // trigger all logic that should run on first app load
 
