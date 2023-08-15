@@ -1,6 +1,6 @@
-export const startAccessTokenTimer = (expiresIn: number | undefined) => {
-    if (!expiresIn) {
-        // console.log("No timer started. Invalid expires_in provided.");
+export const startAccessTokenTimer = (expiresIn: number | undefined, userEmail: string) => {
+    if (!expiresIn || !userEmail) {
+        console.log("No timer started. Invalid expires_in or userEmail provided.");
         return;
     }
 
@@ -15,9 +15,8 @@ export const startAccessTokenTimer = (expiresIn: number | undefined) => {
     const timeSeconds = expiresIn - 60;
     // TODO: can toggle this for 10second token timeout instead of 1hr:
     const timeMins = timeSeconds / 60;
-    // const timeMins = 0.2;
+    // const timeMins = 0.1;
 
-    // Set an alarm to go off after that time
-    chrome.alarms.create("accessTokenTimer", { delayInMinutes: timeMins });
-    // console.log("TIMER CREATED TO GO OFF IN --->", timeMins, "mins");
+    // Set an alarm to go off after that time & pass users email in with that alarm name for future reference:
+    chrome.alarms.create(`accessTokenTimer-${userEmail}`, { delayInMinutes: timeMins });
 };

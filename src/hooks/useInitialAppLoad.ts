@@ -83,7 +83,7 @@ export const useInitialAppLoad = () => {
                 return () => clearInterval(interval);
             } catch (error) {
                 // updateLoadingState({ loginLoading: false });
-                console.log(error);
+                console.log("onLoad Error:", error);
             }
         };
 

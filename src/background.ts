@@ -70,7 +70,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                 token = appendUserJWTInfo(token);
 
                                 // 1) store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-                                storeOAuthToken(token);
+                                storeOAuthToken(token, token.email ?? "");
 
                                 // 2) store refresh token into chrome.storage with user email as key:
                                 if (!token.refresh_token) {
@@ -81,7 +81,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                     storeRefreshToken(token.email ?? "", token.refresh_token);
                                 }
                             }
-                            startAccessTokenTimer(token?.expires_in);
+                            startAccessTokenTimer(token?.expires_in, token.email ?? "");
                             // send access_token back to FE so we can store in state for subsequent HTTP requests:
                             sendResponse({ token });
                         } catch (error) {
@@ -106,7 +106,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 
         if (chrome.identity && request.token) {
             logout(request.token).catch(e => {
-                console.log(e);
+                console.log("Failed to logout user", e);
             });
         }
     }
@@ -184,7 +184,8 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     else if (request.type === "fetchAccessToken") {
         const fetchAccessToken = async () => {
             try {
-                const newToken = await fetchNewAccessToken();
+                const userEmail = request.email ?? "";
+                const newToken = await fetchNewAccessToken(userEmail);
                 sendResponse({ token: newToken });
             } catch (e) {
                 console.warn("Failed attempt to fetch Access Token.");
@@ -197,10 +198,21 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     }
 });
 
+const extractAlarmEmail = (alarmName: string) => {
+    const index = alarmName.indexOf("-");
+    if (index !== -1) {
+        return alarmName.slice(index + 1);
+    }
+    return "";
+};
+
 // When timer goes off, fetch new access_token with refresh_token:
 chrome.alarms.onAlarm.addListener(alarm => {
-    if (alarm.name === "accessTokenTimer") {
-        // console.log("Timer finished! Access token has expired.");
-        fetchNewAccessToken();
+    if (alarm.name.startsWith("accessTokenTimer-")) {
+        console.log("Timer finished! Access token has expired.");
+
+        // extract the email out of the timer when finished and pass into this:
+        const userEmail = extractAlarmEmail(alarm.name);
+        fetchNewAccessToken(userEmail);
     }
 });

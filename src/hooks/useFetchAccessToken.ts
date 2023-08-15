@@ -4,6 +4,7 @@ import LoadingContext from "../context/loading-context";
 import { AuthTokenResponse } from "../models/token";
 import { IDocumentContext } from "../models";
 import { ILoadingContext } from "../models/loading";
+import { fetchCurrentTabGoogleAccount } from "../helpers/fetchCurrentTabGoogleAccount";
 
 export const useFetchAccessToken = () => {
     const documentCtx = useContext(DocumentContext);
@@ -35,32 +36,37 @@ export const useFetchAccessToken = () => {
             loadingCtx.updateLoadingState({ loginLoading: true });
         }
 
-        chrome.runtime.sendMessage({ type: "fetchAccessToken" }, (response: AuthTokenResponse | undefined) => {
-            // console.log("raw resp FRONTEND", response);
+        const userEmail = fetchCurrentTabGoogleAccount();
 
-            if (response && response.token) {
-                try {
-                    docCtx.updateDocumentDetails({
-                        isLoggedIn: true,
-                        token: response.token.access_token,
-                        email: response.token.email,
-                        userId: response.token.userId,
-                        hasClickedLogin: false,
-                    });
-                } catch (error) {
-                    console.log("failed while processing authorization response: ", error);
-                }
-                if (!docCtx.documentDetails.hasClickedLogin) {
-                    loadingCtx.updateLoadingState({ loginLoading: false });
-                }
-            } else {
-                // console.log("Error while logging in. Invalid response back from background.js. Please refresh page and try again");
-                docCtx.updateDocumentDetails({ isLoggedIn: false });
-                if (!docCtx.documentDetails.hasClickedLogin) {
-                    loadingCtx.updateLoadingState({ loginLoading: false });
+        chrome.runtime.sendMessage(
+            { type: "fetchAccessToken", email: userEmail },
+            (response: AuthTokenResponse | undefined) => {
+                // console.log("raw resp FRONTEND", response);
+
+                if (response && response.token) {
+                    try {
+                        docCtx.updateDocumentDetails({
+                            isLoggedIn: true,
+                            token: response.token.access_token,
+                            email: response.token.email,
+                            userId: response.token.userId,
+                            hasClickedLogin: false,
+                        });
+                    } catch (error) {
+                        console.log("failed while processing authorization response: ", error);
+                    }
+                    if (!docCtx.documentDetails.hasClickedLogin) {
+                        loadingCtx.updateLoadingState({ loginLoading: false });
+                    }
+                } else {
+                    // console.log("Error while logging in. Invalid response back from background.js. Please refresh page and try again");
+                    docCtx.updateDocumentDetails({ isLoggedIn: false });
+                    if (!docCtx.documentDetails.hasClickedLogin) {
+                        loadingCtx.updateLoadingState({ loginLoading: false });
+                    }
                 }
             }
-        });
+        );
     };
 
     return fetchAccessToken;

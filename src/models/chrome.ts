@@ -8,4 +8,5 @@ interface ChromeMessageRequest {
         [key: string]: number;
     };
     interactive?: boolean;
+    email?: string;
 }
