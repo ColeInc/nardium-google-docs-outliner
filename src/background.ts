@@ -5,6 +5,7 @@ import { fetchNewAccessToken } from "./background-helpers/fetchNewAccessToken";
 import { appendUserJWTInfo } from "./background-helpers/appendUserJWTInfo";
 import { startAccessTokenTimer } from "./background-helpers/startAccessTokenTimer";
 import { logout } from "./background-helpers/logout";
+import { extractAlarmEmail } from "./background-helpers/extractAlarmEmail";
 
 const clientId = process.env["REACT_GOOGLE_CLOUD_CLIENT_ID"] ?? "";
 const scopes = process.env["REACT_GOOGLE_CLOUD_SCOPES"] ?? "";
@@ -197,14 +198,6 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         return true;
     }
 });
-
-const extractAlarmEmail = (alarmName: string) => {
-    const index = alarmName.indexOf("-");
-    if (index !== -1) {
-        return alarmName.slice(index + 1);
-    }
-    return "";
-};
 
 // When timer goes off, fetch new access_token with refresh_token:
 chrome.alarms.onAlarm.addListener(alarm => {
