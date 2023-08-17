@@ -202,7 +202,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 // When timer goes off, fetch new access_token with refresh_token:
 chrome.alarms.onAlarm.addListener(alarm => {
     if (alarm.name.startsWith("accessTokenTimer-")) {
-        console.log("Timer finished! Access token has expired.");
+        // console.log("Timer finished! Access token has expired.");
 
         // extract the email out of the timer when finished and pass into this:
         const userEmail = extractAlarmEmail(alarm.name);
