@@ -53,7 +53,7 @@ export const useInitialAppLoad = () => {
         const filteredHeadings = filterDocumentContent(fileContents);
 
         // generateHeadingsHierarchy & render it out
-        const headingsHierarchy = generateHeadingsHierarchy(filteredHeadings);
+        const headingsHierarchy = await generateHeadingsHierarchy(filteredHeadings);
         docCtx.updateDocumentDetails({ documentContent: headingsHierarchy });
 
         loadingCtx.updateLoadingState({ loginLoading: false });

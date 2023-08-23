@@ -56,7 +56,7 @@ export const useFetchAccessToken = () => {
                         console.log("failed while processing authorization response: ", error);
                     }
                     if (!docCtx.documentDetails.hasClickedLogin) {
-                        loadingCtx.updateLoadingState({ loginLoading: false });
+                        // loadingCtx.updateLoadingState({ loginLoading: false }); // disabling this because we assume that the one after generateHeadingsHierarchy() will set loading to false at the correct time.
                     }
                 } else {
                     // console.log("Error while logging in. Invalid response back from background.js. Please refresh page and try again");

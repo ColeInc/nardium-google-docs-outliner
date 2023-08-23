@@ -2,7 +2,7 @@ import React from "react";
 import { BodyContent } from "../models/body";
 import { IHeading } from "../models/heading";
 
-export const generateHeadingsHierarchy = (filteredHeadings: BodyContent[]): IHeading[] => {
+export const generateHeadingsHierarchy = async (filteredHeadings: BodyContent[]): Promise<IHeading[]> => {
     let headingsHierarchy: IHeading[] = [];
     let currentParentPath: string[] = [];
     let prevHeadingDigit = 0;
