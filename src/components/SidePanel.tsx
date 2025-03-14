@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import SettingsContext from "../context/settings-context";
 import { useInitialAppLoad } from "../hooks/useInitialAppLoad";
 import { useActiveTab } from "../hooks/useActiveTab";
@@ -31,7 +31,8 @@ const SidePanel = () => {
     const { loadingState, setRetryCount } = loadingCtx;
     const isLoading = loadingState.loginLoading;
 
-    const VERSION_NUMBER = "v1.2.0";
+    // Get version from manifest.json at build time
+    const VERSION_NUMBER = `v${process.env['REACT_APP_VERSION'] || '1.2.5'}`;
 
     useInitialAppLoad(); // trigger all logic that should run on first app load
 
