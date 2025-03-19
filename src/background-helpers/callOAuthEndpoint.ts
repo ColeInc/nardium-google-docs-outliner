@@ -1,11 +1,11 @@
 import { Token } from "../models/token";
 
-const googleAppScriptUrl = process.env["REACT_GOOGLE_APP_SCRIPT_URL"] ?? "";
+const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 
 export const callOAuthEndpoint = async (authCode: string | null): Promise<Token | null> => {
     if (!authCode) return null;
 
-    const url = googleAppScriptUrl + "?code=" + encodeURIComponent(authCode) + "&type=authenticateUser";
+    const url = nardiumAuthBackendUrl + "?code=" + encodeURIComponent(authCode) + "&type=authenticateUser";
 
     try {
         const response = await fetch(url, {
