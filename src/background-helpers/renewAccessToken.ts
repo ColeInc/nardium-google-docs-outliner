@@ -1,6 +1,7 @@
 import { Token } from "../models/token";
 
-const googleAppScriptUrl = process.env["REACT_GOOGLE_APP_SCRIPT_URL"] ?? "";
+// const nardiumAuthBackendUrl = process.env["REACT_GOOGLE_APP_SCRIPT_URL"] ?? "";
+const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 
 export const renewAccessToken = async (refreshToken: string): Promise<Token | null> => {
     try {
@@ -8,7 +9,7 @@ export const renewAccessToken = async (refreshToken: string): Promise<Token | nu
             return null;
         }
 
-        const url = googleAppScriptUrl + "?type=renewAccessToken&refreshToken=" + encodeURIComponent(refreshToken);
+        const url = nardiumAuthBackendUrl + "?type=renewAccessToken&refreshToken=" + encodeURIComponent(refreshToken);
         // console.log("renewAccessToken url going out:", url);
         const response = await fetch(url, {
             method: "GET",
