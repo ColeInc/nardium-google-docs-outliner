@@ -2,6 +2,7 @@ import { Token } from "../models/token";
 
 // const nardiumAuthBackendUrl = process.env["REACT_GOOGLE_APP_SCRIPT_URL"] ?? "";
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
+const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
 
 export const renewAccessToken = async (refreshToken: string): Promise<Token | null> => {
     try {
@@ -13,6 +14,9 @@ export const renewAccessToken = async (refreshToken: string): Promise<Token | nu
         // console.log("renewAccessToken url going out:", url);
         const response = await fetch(url, {
             method: "GET",
+            headers: {
+                'x-client-id': expectedClientId
+            }
         });
 
         if (!response.ok) {

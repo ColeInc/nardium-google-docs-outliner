@@ -2,6 +2,7 @@ import { AuthResponse } from "../models";
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 const isDevelopment = process.env.NODE_ENV === 'development';
+const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
 
 export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthResponse | null> => {
     if (!authCode) {
@@ -20,6 +21,7 @@ export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthRe
             credentials: 'include' as RequestCredentials,
             headers: {
                 'Content-Type': 'application/json',
+                'x-client-id': expectedClientId,
                 // Add any additional headers needed for production
                 ...(isDevelopment ? {} : {
                     'X-Requested-With': 'XMLHttpRequest',

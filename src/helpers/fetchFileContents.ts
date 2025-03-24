@@ -22,7 +22,7 @@ export const fetchFileContents = async (
             setUserLoggedOut();
         } else {
             // go off and try to fetch a new access token from either localstorage or via refresh token:
-            fetchNewAccessToken();
+            // fetchNewAccessToken();
             console.log("No authToken or google docs documentId found. RetryCount", retryCount);
         }
         !hasClickedLogin && loginLoading && incrementRetryCount(); // as long as user hasn't currently clicked the login button (aka is half way through logging in via popup), AND if loading screen is showing, then increment counter.

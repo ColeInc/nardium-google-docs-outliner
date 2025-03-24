@@ -1,4 +1,3 @@
-
 interface TokenResponse {
     success: boolean;
     access_token: string;
@@ -6,7 +5,7 @@ interface TokenResponse {
 }
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
-
+const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
 
 export const refreshAccessToken = async (): Promise<TokenResponse | null> => {
     try {
@@ -19,6 +18,7 @@ export const refreshAccessToken = async (): Promise<TokenResponse | null> => {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
+                'x-client-id': expectedClientId
             },
             // body: JSON.stringify({ refreshToken }),
         });

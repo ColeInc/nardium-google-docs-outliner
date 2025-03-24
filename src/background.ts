@@ -1,5 +1,5 @@
 import { callOAuthEndpoint } from "./background-helpers/callOAuthEndpoint";
-import { fetchNewAccessToken } from "./background-helpers/fetchNewAccessToken";
+// import { fetchNewAccessToken } from "./background-helpers/fetchNewAccessToken";
 import { startAccessTokenTimer } from "./background-helpers/startAccessTokenTimer";
 import { logout } from "./background-helpers/logout";
 import { extractAlarmEmail } from "./background-helpers/extractAlarmEmail";
@@ -200,21 +200,21 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         return true;
     }
     // Fetch valid access_token and return back to user:
-    else if (request.type === "fetchAccessToken") {
-        const fetchAccessToken = async () => {
-            try {
-                const userEmail = request.email ?? "";
-                const newToken = await fetchNewAccessToken(userEmail);
-                sendResponse({ token: newToken });
-            } catch (e) {
-                console.warn("Failed attempt to fetch Access Token.");
-                sendResponse(null);
-            }
-        };
+    // else if (request.type === "fetchAccessToken") {
+    //     const fetchAccessToken = async () => {
+    //         try {
+    //             const userEmail = request.email ?? "";
+    //             const newToken = await fetchNewAccessToken(userEmail);
+    //             sendResponse({ token: newToken });
+    //         } catch (e) {
+    //             console.warn("Failed attempt to fetch Access Token.");
+    //             sendResponse(null);
+    //         }
+    //     };
 
-        fetchAccessToken();
-        return true;
-    }
+    //     fetchAccessToken();
+    //     return true;
+    // }
 });
 
 // When timer goes off, fetch new access_token with refresh_token:
@@ -224,6 +224,7 @@ chrome.alarms.onAlarm.addListener(alarm => {
 
         // extract the email out of the timer when finished and pass into this:
         const userEmail = extractAlarmEmail(alarm.name);
-        fetchNewAccessToken(userEmail);
+        // fetchNewAccessToken(userEmail);
+        refreshAccessToken();
     }
 });
