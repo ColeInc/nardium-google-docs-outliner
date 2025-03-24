@@ -14,3 +14,14 @@ export interface IDocumentContext {
     updateDocumentDetails: (details: Partial<DocumentInfo>) => void;
     clearDocumentDetails: () => void;
 }
+
+export interface AuthResponse {
+    success: boolean;
+    csrfToken: string;
+    user: {
+        email: string;
+        sub: string;
+        subscription_tier: string;
+    }
+}
+

@@ -1,16 +1,16 @@
-import { Token } from "../models/token";
+import { AuthResponse } from "../models";
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-export const callOAuthEndpoint = async (authCode: string | null): Promise<Token | null> => {
+export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthResponse | null> => {
     if (!authCode) {
         console.log("[OAuth] No auth code provided, skipping request");
         return null;
     }
 
     // const url = nardiumAuthBackendUrl + "?code=" + encodeURIComponent(authCode) + "&type=authenticateUser";
-    const url = nardiumAuthBackendUrl + "?code=" + encodeURIComponent(authCode)
+    const url = nardiumAuthBackendUrl + "/auth/google/callback" + "?code=" + encodeURIComponent(authCode)
     console.log("[OAuth] Making request to:", url);
     console.log("[OAuth] Environment:", isDevelopment ? "development" : "production");
 
@@ -46,7 +46,7 @@ export const callOAuthEndpoint = async (authCode: string | null): Promise<Token 
 
         const responseData = await response.json();
         console.log("[OAuth] Successfully received response data");
-        return responseData as Token;
+        return responseData as AuthResponse;
     } catch (error) {
         console.error("[OAuth] Error while fetching nardium auth:", error);
         return null;

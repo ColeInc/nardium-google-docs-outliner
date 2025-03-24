@@ -9,7 +9,7 @@ export const renewAccessToken = async (refreshToken: string): Promise<Token | nu
             return null;
         }
 
-        const url = nardiumAuthBackendUrl + "?type=renewAccessToken&refreshToken=" + encodeURIComponent(refreshToken);
+        const url = nardiumAuthBackendUrl + "/auth/google/callback" + "?type=renewAccessToken&refreshToken=" + encodeURIComponent(refreshToken);
         // console.log("renewAccessToken url going out:", url);
         const response = await fetch(url, {
             method: "GET",

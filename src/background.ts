@@ -1,11 +1,10 @@
 import { callOAuthEndpoint } from "./background-helpers/callOAuthEndpoint";
-import { storeOAuthToken } from "./background-helpers/storeOAuthToken";
-import { storeRefreshToken } from "./background-helpers/storeRefreshToken";
 import { fetchNewAccessToken } from "./background-helpers/fetchNewAccessToken";
-import { appendUserJWTInfo } from "./background-helpers/appendUserJWTInfo";
 import { startAccessTokenTimer } from "./background-helpers/startAccessTokenTimer";
 import { logout } from "./background-helpers/logout";
 import { extractAlarmEmail } from "./background-helpers/extractAlarmEmail";
+import { refreshAccessToken } from "./background-helpers/refreshAccessToken";
+import { storeAccessToken } from "./background-helpers/storeAccessToken";
 
 const clientId = process.env["REACT_GOOGLE_CLOUD_CLIENT_ID"] ?? "";
 const scopes = process.env["REACT_GOOGLE_CLOUD_SCOPES"] ?? "";
@@ -62,31 +61,50 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 
                 // call our google apps script middleware to send req to oauth with secret key in payload:
                 callOAuthEndpoint(authCode)
-                    .then(token => {
+                    .then(resp => {
                         try {
-                            // console.log("token returned to first authenticateUser fn:", token);
-                            if (!token) {
+                            if (!resp) {
                                 throw new Error("No valid auth token returned :(");
                             } else {
-                                token = appendUserJWTInfo(token);
+                                // appendUserJWTInfo(resp);
 
-                                // 1) store oauth response token into chrome.storage PER BROWSER TAB with tabId as key:
-                                storeOAuthToken(token, token.email ?? "");
+                                // Store refresh token for future use
+                                // if (!enhancedToken.refresh_token) {
+                                //     console.warn(
+                                //         "No refresh token found in response. Not user's first time logging in."
+                                //     );
+                                // } else {
+                                // }
+                                // storeRefreshToken(resp.user.email ?? "", enhancedToken.refresh_token);
 
-                                // 2) store refresh token into chrome.storage with user email as key:
-                                if (!token.refresh_token) {
-                                    console.warn(
-                                        "No refresh token found in response. Not user's first time logging in."
-                                    );
-                                } else {
-                                    storeRefreshToken(token.email ?? "", token.refresh_token);
-                                }
+                                // Call refresh token endpoint to get a new access token
+                                // if (enhancedToken.refresh_token) {
+                                refreshAccessToken()
+                                    .then(accessTokenResponse => {
+                                        if (accessTokenResponse) {
+                                            // Store the new access token in session storage
+                                            storeAccessToken(accessTokenResponse, resp.user.email ?? "");
+
+                                            // Start the access token timer
+                                            startAccessTokenTimer(accessTokenResponse?.expires_in, resp.user.email  ?? "");
+
+                                            // Send response back to frontend
+                                            sendResponse({ token: accessTokenResponse });
+                                        } else {
+                                            throw new Error("Failed to get new access token from refresh token endpoint");
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.log("Failed to refresh access token:", error);
+                                        sendResponse("Failed to refresh access token");
+                                    });
+                                // } else {
+                                //     throw new Error("No refresh token available to get new access token");
+                                // }
                             }
-                            startAccessTokenTimer(token?.expires_in, token.email ?? "");
-                            // send access_token back to FE so we can store in state for subsequent HTTP requests:
-                            sendResponse({ token });
                         } catch (error) {
                             console.log("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
+                            sendResponse("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
                         }
                     })
                     .catch(error => {
