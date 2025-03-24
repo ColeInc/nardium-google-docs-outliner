@@ -1,4 +1,5 @@
 import { Token } from "../models/token";
+import { getAuthToken } from "./getAuthToken";
 
 // const nardiumAuthBackendUrl = process.env["REACT_GOOGLE_APP_SCRIPT_URL"] ?? "";
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
@@ -10,12 +11,20 @@ export const renewAccessToken = async (refreshToken: string): Promise<Token | nu
             return null;
         }
 
+        const authToken = await getAuthToken();
+        if (!authToken) {
+            console.error("[Renew] No auth token found in storage");
+            return null;
+        }
+
         const url = nardiumAuthBackendUrl + "/auth/google/callback" + "?type=renewAccessToken&refreshToken=" + encodeURIComponent(refreshToken);
         // console.log("renewAccessToken url going out:", url);
         const response = await fetch(url, {
             method: "GET",
             headers: {
-                'x-client-id': expectedClientId
+                'Content-Type': 'application/json',
+                'x-client-id': expectedClientId,
+                'Authorization': `Bearer ${authToken}`
             }
         });
 

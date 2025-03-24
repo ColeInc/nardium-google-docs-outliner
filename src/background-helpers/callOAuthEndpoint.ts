@@ -1,4 +1,5 @@
 import { AuthResponse } from "../models";
+import { getAuthToken } from "./getAuthToken";
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -7,6 +8,12 @@ const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
 export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthResponse | null> => {
     if (!authCode) {
         console.log("[OAuth] No auth code provided, skipping request");
+        return null;
+    }
+
+    const authToken = await getAuthToken();
+    if (!authToken) {
+        console.error("[OAuth] No auth token found in storage");
         return null;
     }
 
@@ -22,6 +29,7 @@ export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthRe
             headers: {
                 'Content-Type': 'application/json',
                 'x-client-id': expectedClientId,
+                'Authorization': `Bearer ${authToken}`,
                 // Add any additional headers needed for production
                 ...(isDevelopment ? {} : {
                     'X-Requested-With': 'XMLHttpRequest',

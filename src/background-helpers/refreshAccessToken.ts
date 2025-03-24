@@ -1,3 +1,5 @@
+import { getAuthToken } from "./getAuthToken";
+
 interface TokenResponse {
     success: boolean;
     access_token: string;
@@ -9,18 +11,20 @@ const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
 
 export const refreshAccessToken = async (): Promise<TokenResponse | null> => {
     try {
-        // if (!refreshToken) {
-        //     return null;
-        // }
+        const authToken = await getAuthToken();
+        if (!authToken) {
+            console.error("[Refresh] No auth token found in storage");
+            return null;
+        }
 
         const url = `${nardiumAuthBackendUrl}/auth/google/refresh-token`;
         const response = await fetch(url, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
-                'x-client-id': expectedClientId
+                'x-client-id': expectedClientId,
+                'Authorization': `Bearer ${authToken}`
             },
-            // body: JSON.stringify({ refreshToken }),
         });
 
         if (!response.ok) {

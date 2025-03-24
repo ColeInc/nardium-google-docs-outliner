@@ -68,6 +68,14 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                             } else {
                                 // appendUserJWTInfo(resp);
 
+                                // add new step here
+                                if (!resp.auth_token) {
+                                    throw new Error("No auth token found in response");
+                                }
+                                chrome.storage.local.set({ frontendBackendAuthToken: resp.auth_token }, () => {
+                                    console.log("Frontend-Backend auth token stored successfully");
+                                });
+
                                 // Store refresh token for future use
                                 // if (!enhancedToken.refresh_token) {
                                 //     console.warn(

@@ -17,6 +17,7 @@ export interface IDocumentContext {
 
 export interface AuthResponse {
     success: boolean;
+    auth_token: string;
     csrfToken: string;
     user: {
         email: string;
