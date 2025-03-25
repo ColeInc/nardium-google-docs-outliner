@@ -5,6 +5,7 @@ import { logout } from "./background-helpers/logout";
 import { extractAlarmEmail } from "./background-helpers/extractAlarmEmail";
 import { refreshAccessToken } from "./background-helpers/refreshAccessToken";
 import { storeAccessToken } from "./background-helpers/storeAccessToken";
+import { Token } from "./models/token";
 
 const clientId = process.env["REACT_GOOGLE_CLOUD_CLIENT_ID"] ?? "";
 const scopes = process.env["REACT_GOOGLE_CLOUD_SCOPES"] ?? "";
@@ -69,10 +70,10 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                 // appendUserJWTInfo(resp);
 
                                 // add new step here
-                                if (!resp.auth_token) {
+                                if (!resp.jwt_token) {
                                     throw new Error("No auth token found in response");
                                 }
-                                chrome.storage.local.set({ 'fe-to-be-auth-token': resp.auth_token }, () => {
+                                chrome.storage.local.set({ 'fe-to-be-auth-token': resp.jwt_token }, () => {
                                     console.log("Frontend-Backend auth token stored successfully");
                                 });
 
@@ -97,7 +98,14 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                             startAccessTokenTimer(accessTokenResponse?.expires_in, resp.user.email  ?? "");
 
                                             // Send response back to frontend
-                                            sendResponse({ token: accessTokenResponse });
+
+                                            const token:Token = {
+                                                access_token: accessTokenResponse.access_token,
+                                                email: resp.user.email ?? "",
+                                                userId: resp.user.sub ?? "",
+                                                expires_in: accessTokenResponse.expires_in,
+                                            }
+                                            sendResponse({ token: token });
                                         } else {
                                             throw new Error("Failed to get new access token from refresh token endpoint");
                                         }

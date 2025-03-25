@@ -17,12 +17,12 @@ export interface IDocumentContext {
 
 export interface AuthResponse {
     success: boolean;
-    auth_token: string;
-    csrfToken: string;
+    jwt_token: string;
+    csrf_token: string;
     user: {
         email: string;
         sub: string;
-        subscription_tier: string;
+        subscription_tier?: string;
     }
 }
 

@@ -5,7 +5,7 @@ export interface AuthTokenResponse {
 export interface Token {
     access_token: string;
     id_token?: string;
-    refresh_token?: string;
+    // refresh_token?: string;
     expires_in?: number;
     expiry_date?: string;
     scope?: string;

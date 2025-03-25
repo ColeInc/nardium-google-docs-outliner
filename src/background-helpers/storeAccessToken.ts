@@ -16,7 +16,7 @@ export const storeAccessToken = (token: Token | undefined | null, userEmail: str
         }
 
         // store token into session storage
-        chrome.storage.session.set({ [`nardium-access-${userEmail}`]: JSON.stringify(token) }, () => {
+        chrome.storage.session.set({ [`nardium-access-${userEmail}`]: JSON.stringify(token.access_token) }, () => {
             // console.log(`Data saved to session storage for key >nardium-access-${userEmail}<`, token);
         });
 
