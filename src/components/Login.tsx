@@ -27,6 +27,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
 
     // Attempt to log user in on page load:
     useEffect(() => {
+        console.log("cole trig Login.tsx attempt to login user")
         if (isFirstRender.current) {
             fetchAccessToken().then(() => {
                 identifyUser();

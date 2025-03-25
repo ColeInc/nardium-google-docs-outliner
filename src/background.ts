@@ -5,7 +5,6 @@ import { logout } from "./background-helpers/logout";
 import { extractAlarmEmail } from "./background-helpers/extractAlarmEmail";
 import { refreshAccessToken } from "./background-helpers/refreshAccessToken";
 import { storeAccessToken } from "./background-helpers/storeAccessToken";
-import { Token } from "./models/token";
 
 const clientId = process.env["REACT_GOOGLE_CLOUD_CLIENT_ID"] ?? "";
 const scopes = process.env["REACT_GOOGLE_CLOUD_SCOPES"] ?? "";
@@ -91,6 +90,15 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                         .then(accessTokenResponse => {
                                             if (accessTokenResponse) {
                                                 console.log("starting storeAccessToken");
+
+                                                // reformat into proper token
+                                                // const token: Token = {
+                                                //     access_token: accessTokenResponse.access_token,
+                                                //     email: resp.user.email ?? "",
+                                                //     userId: resp.user.sub ?? "",
+                                                //     expires_in: accessTokenResponse.expires_in,
+                                                // }
+
                                                 // Store the new access token in session storage
                                                 // Create a promise to ensure storeAccessToken completes
                                                 const storePromise = new Promise<void>((resolve) => {
@@ -109,13 +117,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                                     startAccessTokenTimer(accessTokenResponse?.expires_in, resp.user.email ?? "");
 
                                                     // Send response back to frontend
-                                                    const token: Token = {
-                                                        access_token: accessTokenResponse.access_token,
-                                                        email: resp.user.email ?? "",
-                                                        userId: resp.user.sub ?? "",
-                                                        expires_in: accessTokenResponse.expires_in,
-                                                    }
-                                                    sendResponse({ token: token });
+                                                    sendResponse({ token: accessTokenResponse });
                                                 });
                                             } else {
                                                 throw new Error("Failed to get new access token from refresh token endpoint");
@@ -231,25 +233,14 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     }
     // Fetch valid access_token and return back to user:
     else if (request.type === "fetchAccessToken") {
-        // const fetchAccessToken = async () => {
-        //     try {
-        //         const userEmail = request.email ?? "";
-        //         const newToken = await fetchNewAccessToken(userEmail);
-        //         sendResponse({ token: newToken });
-        //     } catch (e) {
-        //         console.warn("Failed attempt to fetch Access Token.");
-        //         sendResponse(null);
-        //     }
-        // };
-
-        // fetchAccessToken();
-        // return true;
+        console.log("cole starting fetchAccessToken...")
 
         const fetchAccessToken = async () => {
             try {
                 const userEmail = request.email ?? "";
 
                 const token = await refreshAccessToken(userEmail);
+                console.log("cole token back from refreshAccessToken at background.ts", token)
 
                 sendResponse({ token });
             } catch (e) {

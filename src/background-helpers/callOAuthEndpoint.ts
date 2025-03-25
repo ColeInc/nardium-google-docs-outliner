@@ -1,10 +1,10 @@
-import { AuthResponse } from "../models";
+import { FEtoBETokenResponse } from "../models";
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 const isDevelopment = process.env.NODE_ENV === 'development';
 const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
 
-export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthResponse | null> => {
+export const callOAuthEndpoint = async (authCode: string | null): Promise<FEtoBETokenResponse | null> => {
     if (!authCode) {
         console.log("[OAuth] No auth code provided, skipping request");
         return null;
@@ -55,7 +55,7 @@ export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthRe
 
         const responseData = await response.json();
         console.log("[OAuth] Successfully received response data");
-        return responseData as AuthResponse;
+        return responseData as FEtoBETokenResponse;
     } catch (error) {
         console.error("[OAuth] Error while fetching nardium auth:", error);
         return null;

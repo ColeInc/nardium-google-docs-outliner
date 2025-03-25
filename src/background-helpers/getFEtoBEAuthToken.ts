@@ -1,6 +1,6 @@
-import { AuthResponse } from "../models";
+import { FEtoBETokenResponse } from "../models";
 
-export const getFEtoBEAuthToken = (userEmail: string = ""): Promise<AuthResponse | null> => {
+export const getFEtoBEAuthToken = (userEmail: string = ""): Promise<FEtoBETokenResponse | null> => {
     const storageKey = userEmail ? `fe-to-be-auth-token-${userEmail}` : 'fe-to-be-auth-token';
     
     return new Promise((resolve) => {
@@ -17,7 +17,7 @@ export const getFEtoBEAuthToken = (userEmail: string = ""): Promise<AuthResponse
                     // const tokenData = result[storageKey];
                     
                     // console.log('Token validation successful');
-                    resolve(result[storageKey] as AuthResponse);
+                    resolve(result[storageKey] as FEtoBETokenResponse);
                 } catch (error) {
                     console.error('Failed to parse auth token:', error);
                     resolve(null);

@@ -1,7 +1,7 @@
-import { AuthResponse } from "../models";
+import { FEtoBETokenResponse } from "../models";
 import { Token } from "../models/token";
 
-export const appendUserJWTInfo = (resp: AuthResponse): Token => {
+export const appendUserJWTInfo = (resp: FEtoBETokenResponse): Token => {
     try {
         // const { id_token } = token;
 

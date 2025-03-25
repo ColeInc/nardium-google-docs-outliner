@@ -1,16 +1,13 @@
+import { AccessTokenResponse } from "../models";
 import { getAccessTokenFromSessionStorage } from "./getAccessTokenFromSessionStorage";
 import { getFEtoBEAuthToken } from "./getFEtoBEAuthToken";
 
-interface TokenResponse {
-    success: boolean;
-    access_token: string;
-    expires_in: number;
-}
+
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
 
-export const refreshAccessToken = async (userEmail: string): Promise<TokenResponse | null> => {
+export const refreshAccessToken = async (userEmail: string): Promise<AccessTokenResponse | null> => {
     console.log(`Starting refreshAccessToken for user: ${userEmail}`);
     try {
         const FEtoBEToken = await getFEtoBEAuthToken(userEmail);
@@ -20,24 +17,24 @@ export const refreshAccessToken = async (userEmail: string): Promise<TokenRespon
         }
 
          // Check whether we already have non expired access token. If so, don't need to send request.        
-        let authToken;
+        let accessToken;
         try {
-            authToken = await getAccessTokenFromSessionStorage(userEmail);
+            accessToken = await getAccessTokenFromSessionStorage(userEmail);
         } catch (error) {
             console.log(`Error fetching access token from session storage: ${error}`);
-            authToken = null;
+            accessToken = null;
         }
         
         // Now that we have the token (or null), we can proceed with the rest of the function
-        if (!authToken) {
+        if (!accessToken) {
             console.log(`No access token found in session storage for key: nardium-access-${userEmail}`);
         } else {
             const now = Math.floor(Date.now() / 1000);
-            const tokenExpirationTime = authToken.expires_in;
+            const tokenExpirationTime = accessToken.expires_in;
             
             if (tokenExpirationTime && now < tokenExpirationTime) {
-                console.log(`Access token is still valid for user: ${userEmail}, expiration time: ${tokenExpirationTime}, current time: ${now}`);
-                return authToken as TokenResponse;  // Token is still valid, return it instead of firing new request
+                console.log(`FOUND Access token. Returning ${accessToken}`);
+                return accessToken as AccessTokenResponse;  // Token is still valid, return it instead of firing new request
             }
         }
 
@@ -58,7 +55,7 @@ export const refreshAccessToken = async (userEmail: string): Promise<TokenRespon
         }
 
         const tokenResponse = await response.json();
-        return tokenResponse as TokenResponse;
+        return tokenResponse as AccessTokenResponse;
     } catch (error) {
         console.log("failed at refreshAccessToken", error);
         return null;
