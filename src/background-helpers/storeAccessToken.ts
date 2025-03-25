@@ -2,6 +2,7 @@ import { Token } from "../models/token";
 
 export const storeAccessToken = (token: Token | undefined | null, userEmail: string) => {
     try {
+        console.log("Storing access token...");
         if (typeof token === "string") {
             try {
                 token = JSON.parse(token);
@@ -16,7 +17,7 @@ export const storeAccessToken = (token: Token | undefined | null, userEmail: str
         }
 
         const storageKey = `nardium-access-${userEmail}`;
-        const tokenValue = JSON.stringify(token.access_token);
+        const tokenValue = JSON.stringify(token);
         
         // store token into session storage
         chrome.storage.session.set({ [storageKey]: tokenValue }, () => {

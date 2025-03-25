@@ -78,7 +78,7 @@ export const useInitialAppLoad = () => {
                 // Every 5 secs check headings data for new changes:
                 const interval = setInterval(async () => {
                     refetch(documentId, documentCtxRef, loadingCtxRef, fetchAccessToken);
-                }, 4000);
+                }, 5000);
 
                 return () => clearInterval(interval);
             } catch (error) {

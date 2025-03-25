@@ -172,6 +172,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     }
     // Fetch documentId:
     else if (request.type === "getDocumentId") {
+        console.log("Starting to fetch document ID...");
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
             try {
                 const currentTab = tabs[0];
@@ -181,10 +182,10 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                         const match =
                             /\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9-_]+)(?:\/[a-zA-Z0-9-_]+)?(?:\/edit)?/.exec(url);
                         const documentId = match?.[1];
-                        // console.log("Document ID found:", documentId);
                         if (!documentId) {
                             sendResponse({ error: "Failed to get document ID" });
                         } else {
+                            console.log("Successfully retrieved document ID:", documentId);
                             sendResponse({ documentId });
                         }
                     }, 300);
@@ -270,6 +271,6 @@ chrome.alarms.onAlarm.addListener(alarm => {
         // extract the email out of the timer when finished and pass into this:
         const userEmail = extractAlarmEmail(alarm.name);
         // fetchNewAccessToken(userEmail);
-        refreshAccessToken();
+        refreshAccessToken(userEmail);
     }
 });
