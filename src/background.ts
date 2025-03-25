@@ -73,47 +73,60 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                 if (!resp.jwt_token) {
                                     throw new Error("No auth token found in response");
                                 }
-                                chrome.storage.local.set({ 'fe-to-be-auth-token': resp.jwt_token }, () => {
+                                chrome.storage.local.set({ [`fe-to-be-auth-token-${resp.user.email || ""}`]: resp }, () => {
                                     console.log("Frontend-Backend auth token stored successfully");
+
+                                    // Store refresh token for future use
+                                    // if (!enhancedToken.refresh_token) {
+                                    //     console.warn(
+                                    //         "No refresh token found in response. Not user's first time logging in."
+                                    //     );
+                                    // } else {
+                                    // }
+                                    // storeRefreshToken(resp.user.email ?? "", enhancedToken.refresh_token);
+
+                                    // Call refresh token endpoint to get a new access token only after storage is complete
+                                    // if (enhancedToken.refresh_token) {
+                                    refreshAccessToken(resp.user.email ?? "")
+                                        .then(accessTokenResponse => {
+                                            if (accessTokenResponse) {
+                                                console.log("starting storeAccessToken");
+                                                // Store the new access token in session storage
+                                                // Create a promise to ensure storeAccessToken completes
+                                                const storePromise = new Promise<void>((resolve) => {
+                                                    storeAccessToken(accessTokenResponse, resp.user.email ?? "");
+                                                    // Use chrome.runtime.lastError to check for completion
+                                                    if (chrome.runtime.lastError) {
+                                                        console.error("Error storing access token:", chrome.runtime.lastError);
+                                                    }
+                                                    resolve();
+                                                });
+
+                                                console.log("starting storeAcessTokenTimer");
+                                                // Wait for storage to complete before continuing
+                                                storePromise.then(() => {
+                                                    // Start the access token timer
+                                                    startAccessTokenTimer(accessTokenResponse?.expires_in, resp.user.email ?? "");
+
+                                                    // Send response back to frontend
+                                                    const token: Token = {
+                                                        access_token: accessTokenResponse.access_token,
+                                                        email: resp.user.email ?? "",
+                                                        userId: resp.user.sub ?? "",
+                                                        expires_in: accessTokenResponse.expires_in,
+                                                    }
+                                                    sendResponse({ token: token });
+                                                });
+                                            } else {
+                                                throw new Error("Failed to get new access token from refresh token endpoint");
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.log("Failed to refresh access token:", error);
+                                            sendResponse("Failed to refresh access token");
+                                        });
                                 });
 
-                                // Store refresh token for future use
-                                // if (!enhancedToken.refresh_token) {
-                                //     console.warn(
-                                //         "No refresh token found in response. Not user's first time logging in."
-                                //     );
-                                // } else {
-                                // }
-                                // storeRefreshToken(resp.user.email ?? "", enhancedToken.refresh_token);
-
-                                // Call refresh token endpoint to get a new access token
-                                // if (enhancedToken.refresh_token) {
-                                refreshAccessToken()
-                                    .then(accessTokenResponse => {
-                                        if (accessTokenResponse) {
-                                            // Store the new access token in session storage
-                                            storeAccessToken(accessTokenResponse, resp.user.email ?? "");
-
-                                            // Start the access token timer
-                                            startAccessTokenTimer(accessTokenResponse?.expires_in, resp.user.email  ?? "");
-
-                                            // Send response back to frontend
-
-                                            const token:Token = {
-                                                access_token: accessTokenResponse.access_token,
-                                                email: resp.user.email ?? "",
-                                                userId: resp.user.sub ?? "",
-                                                expires_in: accessTokenResponse.expires_in,
-                                            }
-                                            sendResponse({ token: token });
-                                        } else {
-                                            throw new Error("Failed to get new access token from refresh token endpoint");
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.log("Failed to refresh access token:", error);
-                                        sendResponse("Failed to refresh access token");
-                                    });
                                 // } else {
                                 //     throw new Error("No refresh token available to get new access token");
                                 // }
@@ -216,21 +229,37 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         return true;
     }
     // Fetch valid access_token and return back to user:
-    // else if (request.type === "fetchAccessToken") {
-    //     const fetchAccessToken = async () => {
-    //         try {
-    //             const userEmail = request.email ?? "";
-    //             const newToken = await fetchNewAccessToken(userEmail);
-    //             sendResponse({ token: newToken });
-    //         } catch (e) {
-    //             console.warn("Failed attempt to fetch Access Token.");
-    //             sendResponse(null);
-    //         }
-    //     };
+    else if (request.type === "fetchAccessToken") {
+        // const fetchAccessToken = async () => {
+        //     try {
+        //         const userEmail = request.email ?? "";
+        //         const newToken = await fetchNewAccessToken(userEmail);
+        //         sendResponse({ token: newToken });
+        //     } catch (e) {
+        //         console.warn("Failed attempt to fetch Access Token.");
+        //         sendResponse(null);
+        //     }
+        // };
 
-    //     fetchAccessToken();
-    //     return true;
-    // }
+        // fetchAccessToken();
+        // return true;
+
+        const fetchAccessToken = async () => {
+            try {
+                const userEmail = request.email ?? "";
+
+                const token = await refreshAccessToken(userEmail);
+
+                sendResponse({ token });
+            } catch (e) {
+                console.warn("Failed attempt to fetch Access Token.");
+                sendResponse(null);
+            }
+        };
+
+        fetchAccessToken();
+        return true;
+    }
 });
 
 // When timer goes off, fetch new access_token with refresh_token:

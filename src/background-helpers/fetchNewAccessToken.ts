@@ -1,4 +1,4 @@
-// import { getAuthTokenFromLocalStorage } from "./getAuthTokenFromLocalStorage";
+// import { getFEtoBEAuthTokenFromLocalStorage } from "./getFEtoBEAuthTokenFromLocalStorage";
 // import { getRefreshTokenFromLocalStorage } from "./getRefreshTokenFromLocalStorage";
 // import { startAccessTokenTimer } from "./startAccessTokenTimer";
 // import { appendUserJWTInfo } from "./appendUserJWTInfo";
@@ -16,7 +16,7 @@
 //         return;
 //     }
 
-//     const authToken = await getAuthTokenFromLocalStorage(userEmail);
+//     const authToken = await getFEtoBEAuthTokenFromLocalStorage(userEmail);
 //     if (!authToken) {
 //         logout(undefined);
 //         throw new Error("No valid access token found in localstorage. User must login manually.");

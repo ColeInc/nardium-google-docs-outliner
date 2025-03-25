@@ -1,4 +1,4 @@
-export const getAuthTokenFromLocalStorage = (userEmail: string) => {
+export const getFEtoBEAuthTokenFromLocalStorage = (userEmail: string) => {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get(`nardium-access-${userEmail}`, resp => {
             if (chrome.runtime.lastError || Object.keys(resp).length === 0) {

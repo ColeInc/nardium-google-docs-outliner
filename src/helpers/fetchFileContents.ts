@@ -11,7 +11,7 @@ export const fetchFileContents = async (
     loadingCtx: React.MutableRefObject<ILoadingContext>,
     fetchNewAccessToken: () => void
 ): Promise<UnfilteredBody | undefined> => {
-    const { token, isLoggedIn, hasClickedLogin } = docCtx.current.documentDetails;
+    const { token, isLoggedIn, hasClickedLogin,  } = docCtx.current.documentDetails;
     const loadCtx = loadingCtx.current;
     const { setRetryCount, incrementRetryCount } = loadCtx;
     const { loginLoading, retryCount } = loadCtx.loadingState;

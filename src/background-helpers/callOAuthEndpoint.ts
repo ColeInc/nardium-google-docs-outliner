@@ -10,7 +10,7 @@ export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthRe
         return null;
     }
 
-    // const authToken = await getAuthToken();
+    // const authToken = await getFEtoBEAuthToken();
     // if (!authToken) {
     //     console.error("[OAuth] No auth token found in storage");
     //     return null;

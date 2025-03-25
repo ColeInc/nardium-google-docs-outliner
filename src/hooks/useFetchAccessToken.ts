@@ -47,7 +47,7 @@ export const useFetchAccessToken = () => {
                     try {
                         docCtx.updateDocumentDetails({
                             isLoggedIn: true,
-                            token: response.token.access_token,
+                            token: response.token,
                             email: response.token.email,
                             userId: response.token.userId,
                             hasClickedLogin: false,

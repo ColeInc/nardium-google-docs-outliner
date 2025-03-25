@@ -1,4 +1,4 @@
-import { getAuthToken } from "./getAuthToken";
+import { getFEtoBEAuthToken } from "./getFEtoBEAuthToken";
 
 interface TokenResponse {
     success: boolean;
@@ -9,13 +9,21 @@ interface TokenResponse {
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
 
-export const refreshAccessToken = async (): Promise<TokenResponse | null> => {
+export const refreshAccessToken = async (userEmail: string): Promise<TokenResponse | null> => {
     try {
-        const authToken = await getAuthToken();
+        const authToken = await getFEtoBEAuthToken(userEmail);
         if (!authToken) {
             console.error("[Refresh] No auth token found in storage");
             return null;
         }
+
+        // Check if token is expired
+        const now = Math.floor(Date.now() / 1000);
+        const tokenExpirationTime = authToken.expires_in;
+        
+        if (now < tokenExpirationTime) {
+            return authToken as TokenResponse;  // Token is still valid, return it
+        } 
 
         const url = `${nardiumAuthBackendUrl}/auth/google/refresh-token`;
         const response = await fetch(url, {
@@ -23,7 +31,7 @@ export const refreshAccessToken = async (): Promise<TokenResponse | null> => {
             headers: {
                 'Content-Type': 'application/json',
                 'x-client-id': expectedClientId,
-                'Authorization': `Bearer ${authToken}`
+                'Authorization': `Bearer ${authToken.access_token}`
             },
         });
 

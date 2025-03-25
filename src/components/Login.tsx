@@ -52,7 +52,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
                 try {
                     documentCtx.updateDocumentDetails({
                         isLoggedIn: true,
-                        token: response.token.access_token,
+                        token: response.token,
                         email: response.token.email,
                         userId: response.token.userId,
                         hasClickedLogin: false,
