@@ -72,7 +72,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                 if (!resp.auth_token) {
                                     throw new Error("No auth token found in response");
                                 }
-                                chrome.storage.local.set({ frontendBackendAuthToken: resp.auth_token }, () => {
+                                chrome.storage.local.set({ 'fe-to-be-auth-token': resp.auth_token }, () => {
                                     console.log("Frontend-Backend auth token stored successfully");
                                 });
 

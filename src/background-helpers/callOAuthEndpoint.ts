@@ -1,5 +1,4 @@
 import { AuthResponse } from "../models";
-import { getAuthToken } from "./getAuthToken";
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -11,11 +10,11 @@ export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthRe
         return null;
     }
 
-    const authToken = await getAuthToken();
-    if (!authToken) {
-        console.error("[OAuth] No auth token found in storage");
-        return null;
-    }
+    // const authToken = await getAuthToken();
+    // if (!authToken) {
+    //     console.error("[OAuth] No auth token found in storage");
+    //     return null;
+    // }
 
     // const url = nardiumAuthBackendUrl + "?code=" + encodeURIComponent(authCode) + "&type=authenticateUser";
     const url = nardiumAuthBackendUrl + "/auth/google/callback" + "?code=" + encodeURIComponent(authCode)
@@ -29,7 +28,7 @@ export const callOAuthEndpoint = async (authCode: string | null): Promise<AuthRe
             headers: {
                 'Content-Type': 'application/json',
                 'x-client-id': expectedClientId,
-                'Authorization': `Bearer ${authToken}`,
+                // 'Authorization': `Bearer ${authToken}`,
                 // Add any additional headers needed for production
                 ...(isDevelopment ? {} : {
                     'X-Requested-With': 'XMLHttpRequest',
