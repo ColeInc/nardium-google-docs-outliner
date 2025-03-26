@@ -1,7 +1,6 @@
-import { FEtoBETokenResponse } from "../models";
-import { Token } from "../models/token";
+import { AccessToken } from "../models";
 
-export const appendUserJWTInfo = (resp: FEtoBETokenResponse): Token => {
+export const appendUserJWTInfo = (resp: AccessToken): AccessToken => {
     try {
         // const { id_token } = token;
 
@@ -14,12 +13,12 @@ export const appendUserJWTInfo = (resp: FEtoBETokenResponse): Token => {
         // }
         // const payloadJsonString = atob(resp);
         // const decodedPayload = JSON.parse(payloadJsonString);
-        const email = resp.user.email ?? "";
-        const userId = resp.user.sub ?? "";
+        // const email = resp.email ?? "";
+        // const userId = resp.userId ?? "";
         // console.log("Decoded email:", email);
         // console.log("Decoded user id:", userId);
         // const finalToken = { ...resp, email, userId };
-        // return resp;
+        return resp;
     } catch (error) {
         console.error("Error in appendUserJWTInfo:", error);
         throw new Error(`Failed to process JWT token: ${error}`);

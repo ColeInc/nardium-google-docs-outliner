@@ -16,9 +16,9 @@ export interface IDocumentContext {
     clearDocumentDetails: () => void;
 }
 
-// export interface AuthTokenResponse {
-//     token: Token;
-// }
+export interface AuthTokenResponse {
+    token: AccessToken;
+}
 
 // export interface Token {
 //     access_token: string;

@@ -1,4 +1,3 @@
-// import { Token } from "../models/token";
 // import { getFEtoBEAuthToken } from "./getFEtoBEAuthToken";
 
 // // const nardiumAuthBackendUrl = process.env["REACT_GOOGLE_APP_SCRIPT_URL"] ?? "";

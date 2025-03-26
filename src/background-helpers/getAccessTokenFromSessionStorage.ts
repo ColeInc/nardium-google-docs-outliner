@@ -1,6 +1,6 @@
-import { Token } from "../models/token";
+import { AccessToken } from "../models";
 
-export const getAccessTokenFromSessionStorage = async (userEmail: string): Promise<Token> => {
+export const getAccessTokenFromSessionStorage = async (userEmail: string): Promise<AccessToken> => {
     console.log(`Starting to fetch access token from session storage for user: ${userEmail}`);
     return new Promise((resolve, reject) => {
         const storageKey = `nardium-access-${userEmail}`;
@@ -10,7 +10,7 @@ export const getAccessTokenFromSessionStorage = async (userEmail: string): Promi
                 reject(chrome.runtime.lastError);
             } else {
                 // Parse the token from string to object since it's stored as a stringified JSON
-                let token: Token;
+                let token: AccessToken;
                 try {
                     token = JSON.parse(resp[storageKey]);
                     console.log(`Successfully fetched access token from session storage for key: ${storageKey}`, {

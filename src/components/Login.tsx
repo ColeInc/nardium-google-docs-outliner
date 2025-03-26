@@ -4,8 +4,8 @@ import { useFetchAccessToken } from "../hooks/useFetchAccessToken";
 import GoogleLogo from "../../public/assets/google-logo.svg";
 import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
-import { AuthTokenResponse } from "../models/token";
 import "./Login.css";
+import { AccessToken } from "../models";
 
 interface LoginProps {
     isLoading: boolean;
@@ -46,16 +46,16 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     };
 
     const sendChromeMessage = (type: string, interactive = true) => {
-        chrome.runtime.sendMessage({ type, interactive }, (response: AuthTokenResponse | undefined) => {
+        chrome.runtime.sendMessage({ type, interactive }, (response: AccessToken | undefined) => {
             // console.log("raw resp FRONTEND", response);
 
-            if (response && response.token) {
+            if (response && response.access_token) {
                 try {
                     documentCtx.updateDocumentDetails({
                         isLoggedIn: true,
-                        token: response.token,
-                        email: response.token.email,
-                        userId: response.token.userId,
+                        token: response.access_token,
+                        email: response.email,
+                        userId: response.userId,
                         hasClickedLogin: false,
                     });
                 } catch (error) {

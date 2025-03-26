@@ -6,7 +6,6 @@
 // import { getCurrentTabId } from "./getCurrentTabId";
 // import { storeOAuthToken } from "./storeOAuthToken";
 // import { checkIfExpired } from "./checkIfExpired";
-// import { Token } from "../models/token";
 // import { logout } from "./logout";
 
 // export const fetchNewAccessToken = async (userEmail: string) => {

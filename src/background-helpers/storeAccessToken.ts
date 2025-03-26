@@ -1,6 +1,6 @@
-import { Token } from "../models/token";
+import { AccessToken } from "../models";
 
-export const storeAccessToken = (token: Token | undefined | null, userEmail: string) => {
+export const storeAccessToken = (token: AccessToken | undefined | null, userEmail: string) => {
     try {
         console.log("Storing access token...");
         if (typeof token === "string") {

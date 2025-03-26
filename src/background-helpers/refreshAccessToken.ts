@@ -1,13 +1,12 @@
-import { AccessTokenResponse } from "../models";
+import { AccessToken } from "../models";
 import { getAccessTokenFromSessionStorage } from "./getAccessTokenFromSessionStorage";
 import { getFEtoBEAuthToken } from "./getFEtoBEAuthToken";
-
 
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
 
-export const refreshAccessToken = async (userEmail: string): Promise<AccessTokenResponse | null> => {
+export const refreshAccessToken = async (userEmail: string): Promise<AccessToken | null> => {
     console.log(`Starting refreshAccessToken for user: ${userEmail}`);
     try {
         const FEtoBEToken = await getFEtoBEAuthToken(userEmail);
@@ -34,7 +33,7 @@ export const refreshAccessToken = async (userEmail: string): Promise<AccessToken
             
             if (tokenExpirationTime && now < tokenExpirationTime) {
                 console.log(`FOUND Access token. Returning ${accessToken}`);
-                return accessToken as AccessTokenResponse;  // Token is still valid, return it instead of firing new request
+                return accessToken;  // Token is still valid, return it instead of firing new request
             }
         }
 
@@ -55,7 +54,7 @@ export const refreshAccessToken = async (userEmail: string): Promise<AccessToken
         }
 
         const tokenResponse = await response.json();
-        return tokenResponse as AccessTokenResponse;
+        return tokenResponse as AccessToken;
     } catch (error) {
         console.log("failed at refreshAccessToken", error);
         return null;

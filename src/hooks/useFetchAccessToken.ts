@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useRef } from "react";
 import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
-import { AccessToken, IDocumentContext } from "../models";
+import { IDocumentContext } from "../models";
 import { ILoadingContext } from "../models/loading";
 import { fetchCurrentTabGoogleAccount } from "../helpers/fetchCurrentTabGoogleAccount";
+import { AuthTokenResponse } from "../models/auth";
 
 export const useFetchAccessToken = () => {
     console.log("cole starting useFetchAccessToken...")
@@ -42,18 +43,19 @@ export const useFetchAccessToken = () => {
         console.log("cole userEmail", userEmail)
         chrome.runtime.sendMessage(
             { type: "fetchAccessToken", email: userEmail },
-            // (response: AuthTokenResponse | undefined) => {
-            (response: AccessToken | undefined) => {
+            (response: AuthTokenResponse | undefined) => {
+            // (response: any | undefined) => {
                 console.log("gets this access token back at content.js from background.ts", response)
                 // console.log("raw resp FRONTEND", response);
-
-                if (response && response.access_token) {
+                console.log("xxx response && response.token.access_token,", response, response?.token.access_token)  
+                // console.log("xxx where is the token where is the token,", response.token,response?.token.access_token,response.acces_token)
+                if (response && response.token.access_token) {
                     try {
                         docCtx.updateDocumentDetails({
                             isLoggedIn: true,
-                            token: response.access_token,
-                            email: response.email ?? "",
-                            userId: response.userId ?? "",
+                            token: response.token.access_token,
+                            email: response.token.email ?? "",
+                            userId: response.token.userId ?? "",
                             hasClickedLogin: false,
                         });
                         console.log("cole successfully updated document details state!")

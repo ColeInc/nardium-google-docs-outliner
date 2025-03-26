@@ -117,7 +117,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                                     startAccessTokenTimer(accessTokenResponse?.expires_in, resp.user.email ?? "");
 
                                                     // Send response back to frontend
-                                                    sendResponse({ token: accessTokenResponse });
+                                                    sendResponse(accessTokenResponse);
                                                 });
                                             } else {
                                                 throw new Error("Failed to get new access token from refresh token endpoint");
