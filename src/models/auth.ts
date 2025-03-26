@@ -37,6 +37,7 @@ export interface AccessToken {
     success: boolean;
     access_token: string;
     expires_in: number;
+    expiry_time: string;
     email?: string;
     userId?: string;
 }

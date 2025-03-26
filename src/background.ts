@@ -155,7 +155,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         // console.log("Attempting to log out user...");
 
         if (chrome.identity && request.token) {
-            logout(request.token).catch(e => {
+            logout(request.token, request.userEmail).catch(e => {
                 console.log("Failed to logout user", e);
             });
         }

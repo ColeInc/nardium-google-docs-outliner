@@ -29,9 +29,8 @@ export const refreshAccessToken = async (userEmail: string): Promise<AccessToken
             console.log(`No access token found in session storage for key: nardium-access-${userEmail}`);
         } else {
             const now = Math.floor(Date.now() / 1000);
-            const tokenExpirationTime = accessToken.expires_in;
             
-            if (tokenExpirationTime && now < tokenExpirationTime) {
+            if (accessToken.expiry_time && now < Number(accessToken.expiry_time)) {
                 console.log(`FOUND Access token. Returning ${accessToken}`);
                 return accessToken;  // Token is still valid, return it instead of firing new request
             }

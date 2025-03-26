@@ -1,6 +1,7 @@
-import { removeAccessTokensFromLocalStorage } from "./removeAccessTokensFromLocalStorage";
+import { removeAccessTokenFromSessionStorage } from "./removeAccessTokenFromSessionStorage";
+import { removeFromLocalStorage } from "./removeFromLocalStorage";
 
-export const logout = async (token: string | undefined) => {
+export const logout = async (token: string | undefined, userEmail: string) => {
     if (token) {
         // remove user's token from cache
         await chrome.identity.removeCachedAuthToken({ token });
@@ -9,8 +10,9 @@ export const logout = async (token: string | undefined) => {
     // Clear all cached auth tokens.
     await chrome.identity.clearAllCachedAuthTokens();
 
+    removeAccessTokenFromSessionStorage(userEmail ?? "");
     // Clear localstorage of any JWT tokens stored:
-    removeAccessTokensFromLocalStorage();
+    removeFromLocalStorage("fe-to-be-auth-token-");
 
     // console.log("Successfully logged out user!");
 };
