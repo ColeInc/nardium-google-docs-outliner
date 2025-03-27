@@ -18,24 +18,39 @@ export const useInitialAppLoad = () => {
 
     const documentCtx = useContext(DocumentContext);
     const loadingCtx = useContext(LoadingContext);
-    const { updateLoadingState } = loadingCtx;
+    // const { updateLoadingState } = loadingCtx;
 
     const documentCtxRef = useRef(documentCtx);
     const loadingCtxRef = useRef(loadingCtx);
+    const fetchAccessTokenRef = useRef<() => Promise<void>>(fetchAccessToken);
+
+    // Update the reference whenever documentCtx changes
+    useEffect(() => {
+        documentCtxRef.current = documentCtx;
+        loadingCtxRef.current = loadingCtx;
+    }, [documentCtx, loadingCtx]);
+
+    // Update fetchAccessTokenRef when fetchAccessToken changes
+    useEffect(() => {
+        fetchAccessTokenRef.current = fetchAccessToken;
+    }, [fetchAccessToken]);
 
     const refetch = async (
         documentId: string | null,
         documentCtxRef: React.MutableRefObject<IDocumentContext>,
         loadingCtxRef: React.MutableRefObject<ILoadingContext>,
-        fetchNewAccessToken: () => void
+        fetchNewAccessToken: React.MutableRefObject<() => Promise<void>>
     ) => {
         // Access the updated documentCtx using the useRef. Must to do this because referencing the original one gave me a stale closure which only stored the original state of the ctx.
         const docCtx = documentCtxRef.current;
         const loadingCtx = loadingCtxRef.current;
 
-        // console.log("data @ refetch", docCtx.documentDetails);
+        console.log("cole data @ refetch", docCtx.documentDetails);
 
-        const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef, fetchAccessToken);
+        // const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef, fetchAccessToken);
+        console.log("fetching new file contents @ refetch")
+        const fileContents = await fetchFileContents(documentId, documentCtxRef, loadingCtxRef, fetchNewAccessToken);
+        console.log("FETCHED contents @ refetch:", fileContents)
 
         if (!fileContents) {
             return new Error("Document content was not able to be fetched.");
@@ -73,11 +88,12 @@ export const useInitialAppLoad = () => {
                     documentCtx.updateDocumentDetails({ documentId });
                 }
 
-                await refetch(documentId, documentCtxRef, loadingCtxRef, fetchAccessToken);
+                await refetch(documentId, documentCtxRef, loadingCtxRef, fetchAccessTokenRef);
 
                 // Every 5 secs check headings data for new changes:
                 const interval = setInterval(async () => {
-                    refetch(documentId, documentCtxRef, loadingCtxRef, fetchAccessToken);
+                    console.log("cole trig refetch()")
+                    refetch(documentId, documentCtxRef, loadingCtxRef, fetchAccessTokenRef);
                 }, 5000);
 
                 return () => clearInterval(interval);
@@ -92,9 +108,5 @@ export const useInitialAppLoad = () => {
         });
     }, []);
 
-    // Update the reference whenever documentCtx changes
-    useEffect(() => {
-        documentCtxRef.current = documentCtx;
-        loadingCtxRef.current = loadingCtx;
-    }, [documentCtx, loadingCtx]);
+
 };

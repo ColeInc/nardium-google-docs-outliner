@@ -15,7 +15,7 @@ export const refreshAccessToken = async (userEmail: string): Promise<AccessToken
             return null;
         }
 
-         // Check whether we already have non expired access token. If so, don't need to send request.        
+        // Check whether we already have non expired access token. If so, don't need to send request.        
         let accessToken;
         try {
             accessToken = await getAccessTokenFromSessionStorage(userEmail);
@@ -23,16 +23,18 @@ export const refreshAccessToken = async (userEmail: string): Promise<AccessToken
             console.log(`Error fetching access token from session storage: ${error}`);
             accessToken = null;
         }
-        
+
         // Now that we have the token (or null), we can proceed with the rest of the function
         if (!accessToken) {
             console.log(`No access token found in session storage for key: nardium-access-${userEmail}`);
         } else {
+            // now check if accessToken found is expired
             const now = Math.floor(Date.now() / 1000);
-            
+
+            // if token is still valid, return it instead of firing new request
             if (accessToken.expiry_time && now < Number(accessToken.expiry_time)) {
                 console.log(`FOUND Access token. Returning ${accessToken}`);
-                return accessToken;  // Token is still valid, return it instead of firing new request
+                return accessToken;
             }
         }
 

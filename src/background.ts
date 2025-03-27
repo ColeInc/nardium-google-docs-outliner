@@ -65,77 +65,56 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                         try {
                             if (!resp) {
                                 throw new Error("No valid auth token returned :(");
-                            } else {
-                                // appendUserJWTInfo(resp);
-
-                                // add new step here
-                                if (!resp.jwt_token) {
-                                    throw new Error("No auth token found in response");
-                                }
-                                chrome.storage.local.set({ [`fe-to-be-auth-token-${resp.user.email || ""}`]: resp }, () => {
-                                    console.log("Frontend-Backend auth token stored successfully");
-
-                                    // Store refresh token for future use
-                                    // if (!enhancedToken.refresh_token) {
-                                    //     console.warn(
-                                    //         "No refresh token found in response. Not user's first time logging in."
-                                    //     );
-                                    // } else {
-                                    // }
-                                    // storeRefreshToken(resp.user.email ?? "", enhancedToken.refresh_token);
-
-                                    // Call refresh token endpoint to get a new access token only after storage is complete
-                                    // if (enhancedToken.refresh_token) {
-                                    refreshAccessToken(resp.user.email ?? "")
-                                        .then(accessTokenResponse => {
-                                            if (accessTokenResponse) {
-                                                console.log("starting storeAccessToken");
-
-                                                // reformat into proper token
-                                                // const token: Token = {
-                                                //     access_token: accessTokenResponse.access_token,
-                                                //     email: resp.user.email ?? "",
-                                                //     userId: resp.user.sub ?? "",
-                                                //     expires_in: accessTokenResponse.expires_in,
-                                                // }
-
-                                                // Store the new access token in session storage
-                                                // Create a promise to ensure storeAccessToken completes
-                                                const storePromise = new Promise<void>((resolve) => {
-                                                    storeAccessToken(accessTokenResponse, resp.user.email ?? "");
-                                                    // Use chrome.runtime.lastError to check for completion
-                                                    if (chrome.runtime.lastError) {
-                                                        console.error("Error storing access token:", chrome.runtime.lastError);
-                                                    }
-                                                    resolve();
-                                                });
-
-                                                console.log("starting storeAcessTokenTimer");
-                                                // Wait for storage to complete before continuing
-                                                storePromise.then(() => {
-                                                    // Start the access token timer
-                                                    startAccessTokenTimer(accessTokenResponse?.expires_in, resp.user.email ?? "");
-
-                                                    // Send response back to frontend
-                                                    sendResponse(accessTokenResponse);
-                                                });
-                                            } else {
-                                                throw new Error("Failed to get new access token from refresh token endpoint");
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.log("Failed to refresh access token:", error);
-                                            sendResponse("Failed to refresh access token");
-                                        });
-                                });
-
-                                // } else {
-                                //     throw new Error("No refresh token available to get new access token");
-                                // }
                             }
+                            if (!resp.jwt_token) {
+                                throw new Error("No auth token found in response");
+                            }
+
+                            // Return a promise that resolves when storage is complete
+                            return new Promise<void>((resolve, reject) => {
+                                chrome.storage.local.set(
+                                    { [`fe-to-be-auth-token-${resp.user.email || ""}`]: resp },
+                                    () => {
+                                        if (chrome.runtime.lastError) {
+                                            reject(chrome.runtime.lastError);
+                                        } else {
+                                            console.log("Frontend-Backend auth token stored successfully");
+                                            resolve();
+                                        }
+                                    }
+                                );
+                            }).then(() => {
+                                // Only after storage is complete, wait 5 seconds and then refresh
+                                return new Promise<void>((resolve) => {
+                                    setTimeout(() => {
+                                        resolve();
+                                    }, 5000);
+                                });
+                            }).then(() => {
+                                // Now we can safely call refreshAccessToken
+                                return refreshAccessToken(resp.user.email ?? "");
+                            }).then(accessTokenResponse => {
+                                if (!accessTokenResponse) {
+                                    throw new Error("Failed to get new access token from refresh token endpoint");
+                                }
+                                
+                                // Store the new access token
+                                return new Promise<void>((resolve) => {
+                                    storeAccessToken(accessTokenResponse, resp.user.email ?? "");
+                                    if (chrome.runtime.lastError) {
+                                        console.error("Error storing access token:", chrome.runtime.lastError);
+                                    }
+                                    resolve();
+                                }).then(() => accessTokenResponse); // Pass accessTokenResponse through
+                            }).then(accessTokenResponse => {
+                                // Start the access token timer
+                                startAccessTokenTimer(accessTokenResponse?.expires_in, resp.user.email ?? "");
+                                // Send response back to frontend
+                                sendResponse(accessTokenResponse);
+                            });
                         } catch (error) {
-                            console.log("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
-                            sendResponse("Failed to login user - Stage 2 of 3 Legged Auth Flow.");
+                            console.log("Failed in authentication flow:", error);
+                            sendResponse("Failed in authentication flow");
                         }
                     })
                     .catch(error => {
@@ -155,7 +134,7 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         // console.log("Attempting to log out user...");
 
         if (chrome.identity && request.token) {
-            logout(request.token, request.userEmail).catch(e => {
+            logout(request.token, request.email ?? "").catch(e => {
                 console.log("Failed to logout user", e);
             });
         }

@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect } from "react";
+import React, { FC, useContext } from "react";
 import { useMixPanelAnalytics } from "../hooks/useMixPanelAnalytics";
 import { useFetchAccessToken } from "../hooks/useFetchAccessToken";
 import GoogleLogo from "../../public/assets/google-logo.svg";
@@ -26,21 +26,22 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     const fetchAccessToken = useFetchAccessToken();
 
     // Attempt to log user in on page load:
-    useEffect(() => {
-        console.log("cole trig Login.tsx attempt to login user")
-        if (isFirstRender.current) {
-            fetchAccessToken().then(() => {
-                identifyUser();
-                isFirstRender.current = false;
-            });
-        }
-    }, []);
+    // useEffect(() => {
+    //     console.log("cole trig Login.tsx attempt to login user")
+    //     if (isFirstRender.current) {
+    //         fetchAccessToken().then(() => {
+    //             identifyUser();
+    //             isFirstRender.current = false;
+    //         });
+    //     }
+    // }, []);
 
     const handleLogin = () => {
         documentCtx.updateDocumentDetails({ hasClickedLogin: true }); // update context to say that login button has been clicked
 
         updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens
         sendChromeMessage("authenticateUser", true);
+        // fetchAccessToken()
 
         mixPanelAnalyticsClick("Login Button");
     };
@@ -77,6 +78,9 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
                         <GoogleLogo />
                         <p>Sign in with Google</p>
                     </button>
+                    {/* <button className="login-button" onClick={fetchAccessToken}>
+                        <p>Refresh Token</p>
+                    </button> */}
                 </div>
             )}
         </>

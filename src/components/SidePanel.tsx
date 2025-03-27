@@ -61,7 +61,11 @@ const SidePanel = () => {
     // set retry count back to 0 when user revisits back to current tab:
     useEffect(() => {
         setRetryCount(0);
-        fetchAccessToken();
+
+        // checks loadingctx and documentctx to see if user is logged in or in loginloading state. if neither, then fetch new access token:
+        if (!isLoggedIn && !isLoading) {
+            fetchAccessToken();
+        }
     }, [activeTab]);
 
     if (thirdPartyCookiesEnabled) {
