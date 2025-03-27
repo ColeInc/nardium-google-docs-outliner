@@ -84,20 +84,13 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
                                     }
                                 );
                             }).then(() => {
-                                // Only after storage is complete, wait 5 seconds and then refresh
-                                return new Promise<void>((resolve) => {
-                                    setTimeout(() => {
-                                        resolve();
-                                    }, 5000);
-                                });
-                            }).then(() => {
                                 // Now we can safely call refreshAccessToken
                                 return refreshAccessToken(resp.user.email ?? "");
                             }).then(accessTokenResponse => {
                                 if (!accessTokenResponse) {
                                     throw new Error("Failed to get new access token from refresh token endpoint");
                                 }
-                                
+
                                 // Store the new access token
                                 return new Promise<void>((resolve) => {
                                     storeAccessToken(accessTokenResponse, resp.user.email ?? "");
@@ -216,14 +209,19 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
 
         const fetchAccessToken = async () => {
             try {
-                const userEmail = request.email ?? "";
+                console.log("request.email", request.email)
+                const userEmail = request.email;
+
+                if (!userEmail) {
+                    throw new Error("No email received as parameter to fetchAccessToken in background.ts!");
+                }
 
                 const token = await refreshAccessToken(userEmail);
                 console.log("cole token back from refreshAccessToken at background.ts", token)
 
                 sendResponse({ token });
             } catch (e) {
-                console.warn("Failed attempt to fetch Access Token.");
+                console.warn("Failed attempt to fetch Access Token.", e);
                 sendResponse(null);
             }
         };

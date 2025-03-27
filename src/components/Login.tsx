@@ -5,6 +5,7 @@ import GoogleLogo from "../../public/assets/google-logo.svg";
 import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
 import "./Login.css";
+import { useAttemptLogin } from "../hooks/useAttemptLogin";
 import { AccessToken } from "../models";
 
 interface LoginProps {
@@ -24,6 +25,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
 
     const { identifyUser, mixPanelAnalyticsClick } = useMixPanelAnalytics();
     const fetchAccessToken = useFetchAccessToken();
+    const attemptToLoginUser = useAttemptLogin();
 
     // Attempt to log user in on page load:
     // useEffect(() => {
@@ -36,39 +38,57 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     //     }
     // }, []);
 
-    const handleLogin = () => {
-        documentCtx.updateDocumentDetails({ hasClickedLogin: true }); // update context to say that login button has been clicked
-
-        updateLoadingState({ loginLoading: true }); // as soon as user clicks login, show loading spinner until either success or fail happens
-        sendChromeMessage("authenticateUser", true);
-        // fetchAccessToken()
-
-        mixPanelAnalyticsClick("Login Button");
-    };
-
-    const sendChromeMessage = (type: string, interactive = true) => {
-        chrome.runtime.sendMessage({ type, interactive }, (response: AccessToken | undefined) => {
-            // console.log("raw resp FRONTEND", response);
-
-            if (response && response.access_token) {
-                try {
-                    documentCtx.updateDocumentDetails({
-                        isLoggedIn: true,
-                        token: response.access_token,
-                        email: response.email,
-                        userId: response.userId,
-                        hasClickedLogin: false,
-                    });
-                } catch (error) {
-                    console.log("failed while processing authorization response: ", error);
-                }
-            } else {
-                // console.log("Error while logging in. Invalid response back from background.js. Please refresh page and try again");
-                documentCtx.updateDocumentDetails({ isLoggedIn: false });
-                updateLoadingState({ loginLoading: false });
-            }
+    const initialLogin = () => {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ type: "authenticateUser", interactive: true }, (response: AccessToken | undefined) => {
+                response ? resolve(response) : reject(new Error("Invalid response from background.js"));
+            });
         });
     };
+
+    const handleLogin = async () => {
+        try {
+            documentCtx.updateDocumentDetails({ hasClickedLogin: true });
+            updateLoadingState({ loginLoading: true });
+            mixPanelAnalyticsClick("Login Button");
+
+            const loginResponse = await initialLogin(); // Wait for the login response
+            if (loginResponse) {
+                await attemptToLoginUser();
+            }
+
+            updateLoadingState({ loginLoading: false });
+        } catch (error) {
+            documentCtx.updateDocumentDetails({ isLoggedIn: false });
+            console.error("Login failed:", error);
+        } finally {
+            updateLoadingState({ loginLoading: false });
+        }
+    };
+
+    // const sendChromeMessage = (type: string, interactive = true) => {
+    //     chrome.runtime.sendMessage({ type, interactive }, (response: AccessToken | undefined) => {
+    //         // console.log("raw resp FRONTEND", response);
+
+    //         if (response && response.access_token) {
+    //             try {
+    //                 documentCtx.updateDocumentDetails({
+    //                     isLoggedIn: true,
+    //                     token: response.access_token,
+    //                     email: response.email,
+    //                     userId: response.userId,
+    //                     hasClickedLogin: false,
+    //                 });
+    //             } catch (error) {
+    //                 console.log("failed while processing authorization response: ", error);
+    //             }
+    //         } else {
+    //             // console.log("Error while logging in. Invalid response back from background.js. Please refresh page and try again");
+    //             documentCtx.updateDocumentDetails({ isLoggedIn: false });
+    //             updateLoadingState({ loginLoading: false });
+    //         }
+    //     });
+    // };
 
     return (
         <>

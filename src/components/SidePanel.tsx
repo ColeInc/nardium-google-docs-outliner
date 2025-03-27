@@ -12,6 +12,7 @@ import SettingsPanel from "./SettingsPanel";
 import Login from "./Login";
 import "./SidePanel.css";
 import { useFetchAccessToken } from "../hooks/useFetchAccessToken";
+import { useAttemptLogin } from "../hooks/useAttemptLogin";
 
 const SidePanel = () => {
     const [thirdPartyCookiesEnabled, setThirdPartyCookiesEnabled] = useState(false);
@@ -19,6 +20,7 @@ const SidePanel = () => {
     const isFirstRender = useRef(true);
     const activeTab = useActiveTab();
     const fetchAccessToken = useFetchAccessToken();
+    const attemptToLoginUser = useAttemptLogin();
 
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;
@@ -64,7 +66,8 @@ const SidePanel = () => {
 
         // checks loadingctx and documentctx to see if user is logged in or in loginloading state. if neither, then fetch new access token:
         if (!isLoggedIn && !isLoading) {
-            fetchAccessToken();
+            // fetchAccessToken();
+            attemptToLoginUser();
         }
     }, [activeTab]);
 
