@@ -1,6 +1,5 @@
 import React, { FC, useContext } from "react";
 import { useMixPanelAnalytics } from "../hooks/useMixPanelAnalytics";
-import { useFetchAccessToken } from "../hooks/useFetchAccessToken";
 import GoogleLogo from "../../public/assets/google-logo.svg";
 import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
@@ -24,8 +23,8 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     const { updateLoadingState } = loadingCtx;
 
     const { identifyUser, mixPanelAnalyticsClick } = useMixPanelAnalytics();
-    const fetchAccessToken = useFetchAccessToken();
-    const attemptToLoginUser = useAttemptLogin();
+    // const fetchAccessToken = useFetchAccessToken();
+    const { attemptToLoginUser } = useAttemptLogin();
 
     // Attempt to log user in on page load:
     // useEffect(() => {

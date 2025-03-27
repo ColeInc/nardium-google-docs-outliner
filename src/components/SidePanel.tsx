@@ -11,7 +11,6 @@ import LoadingSpinner from "./LoadingSpinner";
 import SettingsPanel from "./SettingsPanel";
 import Login from "./Login";
 import "./SidePanel.css";
-import { useFetchAccessToken } from "../hooks/useFetchAccessToken";
 import { useAttemptLogin } from "../hooks/useAttemptLogin";
 
 const SidePanel = () => {
@@ -19,8 +18,8 @@ const SidePanel = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const isFirstRender = useRef(true);
     const activeTab = useActiveTab();
-    const fetchAccessToken = useFetchAccessToken();
-    const attemptToLoginUser = useAttemptLogin();
+    // const fetchAccessToken = useFetchAccessToken();
+    const { attemptToLoginUser } = useAttemptLogin();
 
     const documentCtx = useContext(DocumentContext);
     const { isLoggedIn } = documentCtx.documentDetails;

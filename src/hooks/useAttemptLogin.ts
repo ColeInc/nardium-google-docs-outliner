@@ -40,13 +40,13 @@ const fetchAccessTokenV2 = async (documentCtx: any, loadingCtx: any, userEmail: 
     });
 }
 
-const fetchFileContentsV2 = async (token: AccessToken) => {
+const fetchFileContentsV2 = async (token: string) => {
     const documentId = await getDocumentId();
 
-    if (token.access_token && documentId) {
+    if (token && documentId) {
         return fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
             method: "GET",
-            headers: new Headers({ Authorization: "Bearer " + token.access_token }),
+            headers: new Headers({ Authorization: "Bearer " + token }),
         })
             .then(res => {
                 return res.json().then(response => {
@@ -69,10 +69,49 @@ const fetchFileContentsV2 = async (token: AccessToken) => {
     }
 }
 
+
+
 export const useAttemptLogin = () => {
     const { checkHeadingsDifference } = useHeadingsDifference();
     const documentCtx = useContext(DocumentContext);
     const loadingCtx = useContext(LoadingContext);
+
+    const checkDocumentDifferences = async (
+        accessToken: string,
+        // documentCtx: IDocumentContext,
+        // loadingCtx: ILoadingContext,
+        // checkHeadingsDifference: (fileContents: string) => boolean
+    ) => {
+        console.log("Fetching document contents...");
+        const fileContents = await fetchFileContentsV2(accessToken);
+        console.log("Document contents fetch status:", !!fileContents);
+
+        if (!fileContents) {
+            console.error("Failed to fetch document contents");
+            return new Error("Document content was not able to be fetched :(");
+        }
+
+        console.log("Checking for heading differences...");
+        const hasChanges = checkHeadingsDifference(fileContents);
+        console.log("Heading changes detected:", hasChanges);
+
+        if (!hasChanges) {
+            console.log("No heading changes found, updating loading state and returning");
+            loadingCtx.updateLoadingState({ loginLoading: false });
+            return;
+        }
+
+        console.log("Processing document content...");
+        const filteredHeadings = filterDocumentContent(fileContents);
+        console.log("Filtered headings count:", filteredHeadings.length);
+
+        console.log("Generating headings hierarchy...");
+        const headingsHierarchy = await generateHeadingsHierarchy(filteredHeadings);
+        console.log("Headings hierarchy generated successfully");
+
+        console.log("Updating document context with new hierarchy...");
+        documentCtx.updateDocumentDetails({ documentContent: headingsHierarchy });
+    }
 
     const attemptToLoginUser = async () => {
         try {
@@ -114,35 +153,7 @@ export const useAttemptLogin = () => {
                 return;
             }
 
-            console.log("Fetching document contents...");
-            const fileContents = await fetchFileContentsV2(accessToken);
-            console.log("Document contents fetch status:", !!fileContents);
-
-            if (!fileContents) {
-                console.error("Failed to fetch document contents");
-                return new Error("Document content was not able to be fetched :(");
-            }
-
-            console.log("Checking for heading differences...");
-            const hasChanges = checkHeadingsDifference(fileContents);
-            console.log("Heading changes detected:", hasChanges);
-
-            if (!hasChanges) {
-                console.log("No heading changes found, updating loading state and returning");
-                loadingCtx.updateLoadingState({ loginLoading: false });
-                return;
-            }
-
-            console.log("Processing document content...");
-            const filteredHeadings = filterDocumentContent(fileContents);
-            console.log("Filtered headings count:", filteredHeadings.length);
-
-            console.log("Generating headings hierarchy...");
-            const headingsHierarchy = await generateHeadingsHierarchy(filteredHeadings);
-            console.log("Headings hierarchy generated successfully");
-
-            console.log("Updating document context with new hierarchy...");
-            documentCtx.updateDocumentDetails({ documentContent: headingsHierarchy });
+            await checkDocumentDifferences(accessToken.access_token);
 
             console.log("Finishing login process, setting loading state to false");
             loadingCtx.updateLoadingState({ loginLoading: false });
@@ -153,5 +164,5 @@ export const useAttemptLogin = () => {
         }
     }
 
-    return attemptToLoginUser;
+    return { attemptToLoginUser, checkDocumentDifferences };
 }; 
