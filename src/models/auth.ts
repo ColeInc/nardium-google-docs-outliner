@@ -1,4 +1,3 @@
-
 // TODO: convert documentContent from any to proper type
 export interface DocumentInfo {
     isLoggedIn: boolean;
@@ -8,6 +7,7 @@ export interface DocumentInfo {
     userId: string;
     documentId: string;
     documentContent: any;
+    tabId?: number;  // Optional since it might not be set in all cases
 }
 
 export interface IDocumentContext {

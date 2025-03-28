@@ -6,7 +6,6 @@ import { generateHeadingsHierarchy } from "../helpers/generateHeadingsHierarchy"
 import { AccessToken } from "../models";
 import { useHeadingsDifference } from "./useHeadingsDifference";
 import { fetchCurrentTabGoogleAccount } from "../helpers/fetchCurrentTabGoogleAccount";
-import { getDocumentId } from "../helpers/getDocumentId";
 import { UnfilteredBody } from "../models/body";
 
 const fetchAccessTokenV2 = async (documentCtx: any, loadingCtx: any, userEmail: string) => {
@@ -40,8 +39,8 @@ const fetchAccessTokenV2 = async (documentCtx: any, loadingCtx: any, userEmail: 
     });
 }
 
-const fetchFileContentsV2 = async (token: string) => {
-    const documentId = await getDocumentId();
+const fetchFileContentsV2 = async (documentId: string, token: string) => {
+    // const documentId = await getDocumentId();
 
     if (token && documentId) {
         return fetch("https://docs.googleapis.com/v1/documents/" + documentId, {
@@ -78,12 +77,11 @@ export const useAttemptLogin = () => {
 
     const checkDocumentDifferences = async (
         accessToken: string,
-        // documentCtx: IDocumentContext,
-        // loadingCtx: ILoadingContext,
-        // checkHeadingsDifference: (fileContents: string) => boolean
     ) => {
+        console.log("yyy document we're checking differences for!", documentCtx.documentDetails.documentId)
+
         console.log("Fetching document contents...");
-        const fileContents = await fetchFileContentsV2(accessToken);
+        const fileContents = await fetchFileContentsV2(documentCtx.documentDetails.documentId, accessToken);
         console.log("Document contents fetch status:", !!fileContents);
 
         if (!fileContents) {
@@ -109,6 +107,15 @@ export const useAttemptLogin = () => {
         const headingsHierarchy = await generateHeadingsHierarchy(filteredHeadings);
         console.log("Headings hierarchy generated successfully");
 
+        // check if current tab's documentId is the same as the documentId in the documentCtx
+        // const currentTabDocumentId = await getDocumentId();
+        // console.log("xxx api call document id vs. current tab's documentId", documentId, currentTabDocumentId)
+
+        // if (documentId !== currentTabDocumentId) {
+        //     console.log("Document ID doesn't match one we made request for, not updating document state.");
+        //     return;
+        // }
+
         console.log("Updating document context with new hierarchy...");
         documentCtx.updateDocumentDetails({ documentContent: headingsHierarchy });
     }
@@ -120,6 +127,7 @@ export const useAttemptLogin = () => {
             // Check for user email
             console.log("Fetching current tab Google account...");
             const userEmail = fetchCurrentTabGoogleAccount();
+            // const documentId = await getDocumentId();
             console.log("Current user email:", userEmail);
 
             const tokenKey = `fe-to-be-auth-token-${userEmail}`;

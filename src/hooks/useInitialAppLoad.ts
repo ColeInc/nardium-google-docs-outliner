@@ -4,6 +4,12 @@ import LoadingContext from "../context/loading-context";
 import DocumentContext from "../context/document-context";
 import { IDocumentContext } from "../models";
 
+function extractGoogleDocId() {
+    const url = window.location.href;
+    const match = url.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
+    return match ? match[1] : null;
+}
+
 export const useInitialAppLoad = () => {
     // const { checkHeadingsDifference } = useHeadingsDifference();
     // const { logoutUser } = useLogoutUser();
@@ -18,13 +24,25 @@ export const useInitialAppLoad = () => {
 
     // Main onLoad steps:
     useEffect(() => {
+        // const initializeApp = async () => {
         updateLoadingState({ loginLoading: true });
+
+        // const documentId = await getDocumentId();
+        const documentId = extractGoogleDocId();
+        console.log("cole got dis documentId", documentId)
+
+        if (!documentId) return;
+        documentCtx.updateDocumentDetails({ documentId });
+
         attemptToLoginUser();
+        // };
+
+        // initializeApp();
 
         // Interval to check for document changes every 5 seconds
         const intervalId = setInterval(async () => {
             // console.log("starting interval 5secs...")
-            refetchV2(documentCtxRef);
+            refetchV2(documentId, documentCtxRef);
             // if (documentCtx.documentDetails.isLoggedIn && documentCtx.documentDetails.token) {
             //     checkDocumentDifferences(documentCtx.documentDetails.token);
             // }
@@ -54,13 +72,20 @@ export const useInitialAppLoad = () => {
 
 
     const refetchV2 = async (
-        // documentId: string | null,
+        documentId: string,
         documentCtxRef: React.MutableRefObject<IDocumentContext>,
         // loadingCtxRef: React.MutableRefObject<ILoadingContext>,
         // fetchNewAccessToken: React.MutableRefObject<() => Promise<void>>
     ) => {
         // Access the updated documentCtx using the useRef. Must to do this because referencing the original one gave me a stale closure which only stored the original state of the ctx.
         const docCtx = documentCtxRef.current;
+        // const documentId = await getDocumentId();
+
+        // if (!documentId) {
+        //     console.log("No documentId found, returning early");
+        //     return;
+        // }
+
         // const loadingCtx = loadingCtxRef.current;
 
         if (docCtx.documentDetails.isLoggedIn && docCtx.documentDetails.token) {

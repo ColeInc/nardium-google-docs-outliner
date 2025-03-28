@@ -1,5 +1,3 @@
-import React from "react";
-import { DocumentInfo, IDocumentContext } from "../models";
 
 interface Document {
     documentId: string;

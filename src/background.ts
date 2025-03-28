@@ -229,6 +229,13 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
         fetchAccessToken();
         return true;
     }
+    // Get current tab ID:
+    else if (request.type === "getCurrentTabId") {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            sendResponse({ tabId: tabs[0]?.id ?? 0 });
+        });
+        return true; // Required for async response
+    }
 });
 
 // When timer goes off, fetch new access_token with refresh_token:
