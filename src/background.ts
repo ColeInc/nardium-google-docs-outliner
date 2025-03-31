@@ -3,8 +3,9 @@ import { callOAuthEndpoint } from "./background-helpers/callOAuthEndpoint";
 import { startAccessTokenTimer } from "./background-helpers/startAccessTokenTimer";
 import { logout } from "./background-helpers/logout";
 import { extractAlarmEmail } from "./background-helpers/extractAlarmEmail";
-import { refreshAccessToken } from "./background-helpers/refreshAccessToken";
+import { refreshAccessToken, nardiumAuthBackendUrl, expectedClientId } from "./background-helpers/refreshAccessToken";
 import { storeAccessToken } from "./background-helpers/storeAccessToken";
+import { getFEtoBEAuthToken } from "./background-helpers/getFEtoBEAuthToken";
 
 const clientId = process.env["REACT_GOOGLE_CLOUD_CLIENT_ID"] ?? "";
 const scopes = process.env["REACT_GOOGLE_CLOUD_SCOPES"] ?? "";
@@ -235,6 +236,42 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
             sendResponse({ tabId: tabs[0]?.id ?? 0 });
         });
         return true; // Required for async response
+    }
+    // Check document access limit:
+    else if (request.type === "checkDocumentLimit") {
+        const checkDocumentAccess = async () => {
+            try {
+                // // Get the FEtoBEToken first
+                // const FEtoBEToken = await chrome.storage.local.get(`fe-to-be-auth-token-${request.email}`);
+                // if (!FEtoBEToken?.['jwt_token']) {
+                //     throw new Error("No valid auth token found");
+                // }
+
+                const FEtoBEToken = await getFEtoBEAuthToken(request.email);
+                if (!FEtoBEToken) {
+                    console.error("[Refresh] No auth token found in storage");
+                    return null;
+                }
+
+                const response = await fetch(`${nardiumAuthBackendUrl}/documents/access`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-client-id': expectedClientId,
+                        'Authorization': `Bearer ${FEtoBEToken.jwt_token}`
+                    }
+                });
+
+                const data = await response.json();
+                sendResponse({ success: data.success });
+            } catch (error) {
+                console.error("Error checking document access:", error);
+                sendResponse({ success: false });
+            }
+        };
+
+        checkDocumentAccess();
+        return true;
     }
 });
 

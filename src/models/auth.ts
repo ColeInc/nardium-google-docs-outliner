@@ -8,6 +8,7 @@ export interface DocumentInfo {
     documentId: string;
     documentContent: any;
     tabId?: number;  // Optional since it might not be set in all cases
+    documentLimit?: boolean;  // Whether user has hit their document limit
 }
 
 export interface IDocumentContext {

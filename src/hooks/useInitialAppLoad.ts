@@ -4,6 +4,7 @@ import LoadingContext from "../context/loading-context";
 import DocumentContext from "../context/document-context";
 import { IDocumentContext } from "../models";
 import { extractGoogleDocId } from "../helpers/extractGoogleDocId";
+import { checkDocumentLimit } from "../helpers/checkDocumentLimit";
 
 
 export const useInitialAppLoad = () => {
@@ -27,8 +28,19 @@ export const useInitialAppLoad = () => {
         const documentId = extractGoogleDocId();
         console.log("cole got dis documentId", documentId)
 
-        if (!documentId) return;
+        if (!documentId) {
+            documentCtx.updateDocumentDetails({ isLoggedIn: false });
+            loadingCtx.updateLoadingState({ loginLoading: false });
+            console.log("Failed to fetch documentId from current tab. Please refresh.")
+            return;
+        };
         documentCtx.updateDocumentDetails({ documentId });
+
+        const checkLimit = async () => {
+            const hasHitLimit = await checkDocumentLimit(documentId);
+            documentCtx.updateDocumentDetails({ documentLimit: hasHitLimit });
+        };
+        checkLimit();
 
         attemptToLoginUser();
         // };

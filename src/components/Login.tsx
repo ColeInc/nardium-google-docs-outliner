@@ -38,12 +38,10 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     // }, []);
 
 
-
     const handleLogin = async () => {
         try {
             documentCtx.updateDocumentDetails({ hasClickedLogin: true });
             updateLoadingState({ loginLoading: true });
-            mixPanelAnalyticsClick("Login Button");
 
             const loginResponse = await authenticateFirstTimeUser(); // Wait for the login response
             if (loginResponse) {
@@ -51,6 +49,13 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
             }
 
             updateLoadingState({ loginLoading: false });
+
+            // Mixpanel analytics
+            mixPanelAnalyticsClick("Login Button");
+            if (isFirstRender.current) {
+                identifyUser();
+                isFirstRender.current = false;
+            }
         } catch (error) {
             documentCtx.updateDocumentDetails({ isLoggedIn: false });
             console.error("Login failed:", error);

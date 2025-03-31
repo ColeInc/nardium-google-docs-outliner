@@ -10,6 +10,7 @@ import HeadingsWrapper from "./HeadingsWrapper";
 import LoadingSpinner from "./LoadingSpinner";
 import SettingsPanel from "./SettingsPanel";
 import Login from "./Login";
+import DocumentLimit from "./DocumentLimit";
 import "./SidePanel.css";
 import { useAttemptLogin } from "../hooks/useAttemptLogin";
 
@@ -99,8 +100,8 @@ const SidePanel = () => {
                     )}
 
                     {!isLoggedIn && <Login isLoading={isLoading} isFirstRender={isFirstRender} />}
-                    {/* <Login isLoading={isLoading} isFirstRender={isFirstRender} /> */}
-                    {isLoggedIn && <HeadingsWrapper />}
+                    {isLoggedIn && documentCtx.documentDetails.documentLimit && <DocumentLimit />}
+                    {isLoggedIn && !documentCtx.documentDetails.documentLimit && <HeadingsWrapper />}
 
                     <div className="side-panel-config-container">
                         <SettingsPanel isVisible={isLoggedIn && settingsPanelCollapsed} />
