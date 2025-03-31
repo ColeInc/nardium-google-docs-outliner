@@ -11,9 +11,13 @@ const DocumentProvider = (props: DocumentProviderProps) => {
 
     const updateDocumentDetails = (details: Partial<DocumentInfo>) => {
         setDocumentDetails(prevState => {
-            // console.log("prevState", prevState);
-            console.log("new Document Provider:", { ...prevState, ...details });
-            return { ...prevState, ...details };
+            // Preserve all existing state and only update the provided fields
+            const updatedState = {
+                ...prevState,
+                ...details
+            };
+            console.log("new Document Provider:", updatedState);
+            return updatedState;
         });
     };
     const clearDocumentDetails = () => {

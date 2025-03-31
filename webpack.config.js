@@ -6,6 +6,7 @@ const Dotenv = require("dotenv-webpack");
 
 module.exports = {
     mode: "development",
+    devtool: "source-map",
     entry: {
         content: "./src/index.tsx",
         background: "./src/background.ts",

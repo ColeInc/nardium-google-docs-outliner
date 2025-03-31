@@ -5,7 +5,7 @@ import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
 import "./Login.css";
 import { useAttemptLogin } from "../hooks/useAttemptLogin";
-import { AccessToken } from "../models";
+import { authenticateFirstTimeUser } from "../helpers/authenticateFirstTimeUser";
 
 interface LoginProps {
     isLoading: boolean;
@@ -37,13 +37,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
     //     }
     // }, []);
 
-    const initialLogin = () => {
-        return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ type: "authenticateUser", interactive: true }, (response: AccessToken | undefined) => {
-                response ? resolve(response) : reject(new Error("Invalid response from background.js"));
-            });
-        });
-    };
+
 
     const handleLogin = async () => {
         try {
@@ -51,7 +45,7 @@ const Login: FC<LoginProps> = ({ isLoading, isFirstRender }) => {
             updateLoadingState({ loginLoading: true });
             mixPanelAnalyticsClick("Login Button");
 
-            const loginResponse = await initialLogin(); // Wait for the login response
+            const loginResponse = await authenticateFirstTimeUser(); // Wait for the login response
             if (loginResponse) {
                 await attemptToLoginUser();
             }

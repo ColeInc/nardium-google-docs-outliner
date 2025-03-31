@@ -3,12 +3,8 @@ import { useAttemptLogin } from "./useAttemptLogin";
 import LoadingContext from "../context/loading-context";
 import DocumentContext from "../context/document-context";
 import { IDocumentContext } from "../models";
+import { extractGoogleDocId } from "../helpers/extractGoogleDocId";
 
-function extractGoogleDocId() {
-    const url = window.location.href;
-    const match = url.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
-    return match ? match[1] : null;
-}
 
 export const useInitialAppLoad = () => {
     // const { checkHeadingsDifference } = useHeadingsDifference();
@@ -41,7 +37,7 @@ export const useInitialAppLoad = () => {
 
         // Interval to check for document changes every 5 seconds
         const intervalId = setInterval(async () => {
-            // console.log("starting interval 5secs...")
+            console.log("starting interval 5secs...", documentId)
             refetchV2(documentId, documentCtxRef);
             // if (documentCtx.documentDetails.isLoggedIn && documentCtx.documentDetails.token) {
             //     checkDocumentDifferences(documentCtx.documentDetails.token);

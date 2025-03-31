@@ -7,6 +7,9 @@ import { AccessToken } from "../models";
 import { useHeadingsDifference } from "./useHeadingsDifference";
 import { fetchCurrentTabGoogleAccount } from "../helpers/fetchCurrentTabGoogleAccount";
 import { UnfilteredBody } from "../models/body";
+import { useLogoutUser } from "./useLogoutUser";
+import { extractGoogleDocId } from "../helpers/extractGoogleDocId";
+import { authenticateFirstTimeUser } from "../helpers/authenticateFirstTimeUser";
 
 const fetchAccessTokenV2 = async (documentCtx: any, loadingCtx: any, userEmail: string) => {
     return new Promise<AccessToken | null>((resolve) => {
@@ -65,23 +68,37 @@ const fetchFileContentsV2 = async (documentId: string, token: string) => {
             });
     } else {
         console.log("failed to fetch google doc api data. no token or documentId found")
+        throw new Error("No token or documentId found");
     }
 }
 
 
 
 export const useAttemptLogin = () => {
-    const { checkHeadingsDifference } = useHeadingsDifference();
     const documentCtx = useContext(DocumentContext);
     const loadingCtx = useContext(LoadingContext);
+
+    const { checkHeadingsDifference } = useHeadingsDifference();
+    const { logoutUser } = useLogoutUser();
 
     const checkDocumentDifferences = async (
         accessToken: string,
     ) => {
+
         console.log("yyy document we're checking differences for!", documentCtx.documentDetails.documentId)
+        const documentId = extractGoogleDocId();
+        console.log("yyy v2 cole got dis documentId @ useAttemptLogin.ts", documentId)
+
+        if (!documentId) {
+            const error = new Error("Document ID not found! Very bad!");
+            console.error(error);
+            throw error;
+        }
+        documentCtx.updateDocumentDetails({ documentId });
 
         console.log("Fetching document contents...");
-        const fileContents = await fetchFileContentsV2(documentCtx.documentDetails.documentId, accessToken);
+        // const fileContents = await fetchFileContentsV2(documentCtx.documentDetails.documentId, accessToken);
+        const fileContents = await fetchFileContentsV2(documentId, accessToken);
         console.log("Document contents fetch status:", !!fileContents);
 
         if (!fileContents) {
@@ -147,9 +164,17 @@ export const useAttemptLogin = () => {
                 });
             });
 
+            // no fe-to-be token found, treat user as brand new
             if (!FEtoBEToken) {
-                console.log("No FE-to-BE token found, returning early");
-                return null;
+                console.log("No FE-to-BE token found, calling authenticateUser at background.ts");
+                // throw new Error("No FE-to-BE token found");
+                const loginResponse = await authenticateFirstTimeUser();
+                // if response is successful, means fe-to-be token was created successfully, so try calling this function again, then return.
+                if (loginResponse) {
+                    console.log("calling attemptToLoginUser...")
+                    await attemptToLoginUser();
+                }
+                return;
             }
 
             console.log("Attempting to fetch access token...");
@@ -158,7 +183,7 @@ export const useAttemptLogin = () => {
 
             if (!accessToken) {
                 console.log("No access token received, returning early");
-                return;
+                throw new Error("No access token received");
             }
 
             await checkDocumentDifferences(accessToken.access_token);
@@ -168,6 +193,9 @@ export const useAttemptLogin = () => {
 
         } catch (error) {
             console.error("attemptToLoginUser failed with error:", error);
+            documentCtx.clearDocumentDetails();
+            loadingCtx.updateLoadingState({ loginLoading: false });
+            logoutUser();
             return false;
         }
     }
