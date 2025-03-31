@@ -94,7 +94,7 @@ export const useAttemptLogin = () => {
             console.error(error);
             throw error;
         }
-        documentCtx.updateDocumentDetails({ documentId });
+        // documentCtx.updateDocumentDetails({ documentId });
 
         console.log("Fetching document contents...");
         // const fileContents = await fetchFileContentsV2(documentCtx.documentDetails.documentId, accessToken);
