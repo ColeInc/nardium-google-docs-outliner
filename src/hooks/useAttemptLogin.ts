@@ -199,7 +199,9 @@ export const useAttemptLogin = () => {
             documentCtx.updateDocumentDetails({ documentLimit: hasHitDocumentLimit });
             if (hasHitDocumentLimit) {
                 console.log("User has hit document limit, returning early");
-                throw new Error("Document limit reached");
+                loadingCtx.updateLoadingState({ loginLoading: false });
+                // throw new Error("Document limit reached");
+                return;
             }
 
             await checkDocumentDifferences(accessToken.access_token);
