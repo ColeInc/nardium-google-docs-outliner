@@ -1,14 +1,14 @@
 import { callOAuthEndpoint } from "./background-helpers/callOAuthEndpoint";
-// import { fetchNewAccessToken } from "./background-helpers/fetchNewAccessToken";
 import { startAccessTokenTimer } from "./background-helpers/startAccessTokenTimer";
 import { logout } from "./background-helpers/logout";
 import { extractAlarmEmail } from "./background-helpers/extractAlarmEmail";
-import { refreshAccessToken, nardiumAuthBackendUrl, expectedClientId } from "./background-helpers/refreshAccessToken";
+import { refreshAccessToken } from "./background-helpers/refreshAccessToken";
 import { storeAccessToken } from "./background-helpers/storeAccessToken";
-import { getFEtoBEAuthToken } from "./background-helpers/getFEtoBEAuthToken";
 
 const clientId = process.env["REACT_GOOGLE_CLOUD_CLIENT_ID"] ?? "";
 const scopes = process.env["REACT_GOOGLE_CLOUD_SCOPES"] ?? "";
+const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
+const expectedClientId = process.env["REACT_EXPECTED_CLIENT_ID"] ?? "";
 
 chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sendResponse) => {
     // Login User:
@@ -241,31 +241,36 @@ chrome.runtime.onMessage.addListener((request: ChromeMessageRequest, sender, sen
     else if (request.type === "checkDocumentLimit") {
         const checkDocumentAccess = async () => {
             try {
-                // // Get the FEtoBEToken first
-                // const FEtoBEToken = await chrome.storage.local.get(`fe-to-be-auth-token-${request.email}`);
-                // if (!FEtoBEToken?.['jwt_token']) {
-                //     throw new Error("No valid auth token found");
-                // }
-
-                const FEtoBEToken = await getFEtoBEAuthToken(request.email);
-                if (!FEtoBEToken) {
-                    console.error("[Refresh] No auth token found in storage");
-                    return null;
+                console.log("doc) starting checkDocumentLimit at background.ts for documentId: ", request.documentId)
+                // const FEtoBEToken = await getFEtoBEAuthToken(request.email);
+                if (!request.token) {
+                    console.error("No fe-to-be-auth-token found in request.");
+                    sendResponse({ success: false });
+                    return;
                 }
 
+                console.log("doc) sending request to: ", `${nardiumAuthBackendUrl}/documents/access`)
                 const response = await fetch(`${nardiumAuthBackendUrl}/documents/access`, {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'x-client-id': expectedClientId,
-                        'Authorization': `Bearer ${FEtoBEToken.jwt_token}`
-                    }
+                        'Authorization': `Bearer ${request.token}`
+                    },
+                    body: JSON.stringify({ documentId: request.documentId })
                 });
 
                 const data = await response.json();
-                sendResponse({ success: data.success });
+                console.log("doc) response from nardiumAuthBackendUrl/documents/access: ", data)
+                if (data.error) {
+                    console.error("doc) Document limit reached:", data.error);
+                    sendResponse({ success: false });
+                } else {
+                    console.log("doc) Document access granted:", data.documentAccess);
+                    sendResponse({ success: true });
+                }
             } catch (error) {
-                console.error("Error checking document access:", error);
+                console.error("doc) Error checking document access:", error);
                 sendResponse({ success: false });
             }
         };

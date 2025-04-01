@@ -4,7 +4,7 @@ import { getFEtoBEAuthToken } from "./getFEtoBEAuthToken";
 
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
-const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
+const expectedClientId = process.env["REACT_EXPECTED_CLIENT_ID"] ?? "";
 
 export const refreshAccessToken = async (userEmail: string): Promise<AccessToken | null> => {
     console.log(`Starting refreshAccessToken for user: ${userEmail}`);

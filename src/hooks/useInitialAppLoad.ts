@@ -4,7 +4,6 @@ import LoadingContext from "../context/loading-context";
 import DocumentContext from "../context/document-context";
 import { IDocumentContext } from "../models";
 import { extractGoogleDocId } from "../helpers/extractGoogleDocId";
-import { checkDocumentLimit } from "../helpers/checkDocumentLimit";
 
 
 export const useInitialAppLoad = () => {
@@ -18,6 +17,7 @@ export const useInitialAppLoad = () => {
     const { updateLoadingState } = loadingCtx;
 
     const documentCtxRef = useRef(documentCtx);
+    const isFirstRender = useRef(true);
 
     // Main onLoad steps:
     useEffect(() => {
@@ -36,14 +36,18 @@ export const useInitialAppLoad = () => {
         };
         documentCtx.updateDocumentDetails({ documentId });
 
-        const checkLimit = async () => {
-            const hasHitLimit = await checkDocumentLimit(documentId);
-            documentCtx.updateDocumentDetails({ documentLimit: hasHitLimit });
-        };
-        checkLimit();
-
-        attemptToLoginUser();
+        // const checkLimit = async () => {
+        //     console.log("doc) checking document limit for: ", documentId)
+        //     const hasHitLimit = await checkDocumentLimit(documentId);
+        //     documentCtx.updateDocumentDetails({ documentLimit: hasHitLimit });
         // };
+        // checkLimit();
+
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+        } else {
+            attemptToLoginUser();
+        }
 
         // initializeApp();
 

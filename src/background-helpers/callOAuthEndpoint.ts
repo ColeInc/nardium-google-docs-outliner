@@ -2,7 +2,7 @@ import { FEtoBETokenResponse } from "../models";
 
 const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
 const isDevelopment = process.env.NODE_ENV === 'development';
-const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
+const expectedClientId = process.env["REACT_EXPECTED_CLIENT_ID"] ?? "";
 
 export const callOAuthEndpoint = async (authCode: string | null): Promise<FEtoBETokenResponse | null> => {
     if (!authCode) {

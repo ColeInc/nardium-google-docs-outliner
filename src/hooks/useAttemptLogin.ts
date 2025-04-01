@@ -3,13 +3,14 @@ import DocumentContext from "../context/document-context";
 import LoadingContext from "../context/loading-context";
 import { filterDocumentContent } from "../helpers/filterDocumentContent";
 import { generateHeadingsHierarchy } from "../helpers/generateHeadingsHierarchy";
-import { AccessToken } from "../models";
+import { AccessToken, FEtoBETokenResponse } from "../models";
 import { useHeadingsDifference } from "./useHeadingsDifference";
 import { fetchCurrentTabGoogleAccount } from "../helpers/fetchCurrentTabGoogleAccount";
 import { UnfilteredBody } from "../models/body";
 import { useLogoutUser } from "./useLogoutUser";
 import { extractGoogleDocId } from "../helpers/extractGoogleDocId";
 import { authenticateFirstTimeUser } from "../helpers/authenticateFirstTimeUser";
+import { checkDocumentLimit } from "../helpers/checkDocumentLimit";
 
 const fetchAccessTokenV2 = async (documentCtx: any, loadingCtx: any, userEmail: string) => {
     return new Promise<AccessToken | null>((resolve) => {
@@ -151,7 +152,7 @@ export const useAttemptLogin = () => {
             console.log("Generated token key:", tokenKey);
 
             console.log("Checking chrome.storage.local for FE-to-BE token...");
-            const FEtoBEToken = await new Promise<string>((resolve, reject) => {
+            const FEtoBEToken = await new Promise<FEtoBETokenResponse>((resolve, reject) => {
                 chrome.storage.local.get(tokenKey, (result) => {
                     console.log(`Storage response for ${tokenKey}:`, result);
                     if (chrome.runtime.lastError) {
@@ -159,7 +160,8 @@ export const useAttemptLogin = () => {
                         reject(chrome.runtime.lastError);
                     } else {
                         console.log("FE-to-BE token found:", !!result[tokenKey]);
-                        resolve(result[tokenKey]);
+                        // resolve(result[tokenKey]);
+                        resolve(result[tokenKey] as FEtoBETokenResponse);
                     }
                 });
             });
@@ -184,6 +186,20 @@ export const useAttemptLogin = () => {
             if (!accessToken) {
                 console.log("No access token received, returning early");
                 throw new Error("No access token received");
+            }
+
+            // check if user has hit document limit
+            const documentId = extractGoogleDocId();
+            if (!documentId) {
+                console.log("No document ID found, returning early");
+                throw new Error("No document ID found");
+            }
+
+            const hasHitDocumentLimit = await checkDocumentLimit(documentId, FEtoBEToken.jwt_token);
+            documentCtx.updateDocumentDetails({ documentLimit: hasHitDocumentLimit });
+            if (hasHitDocumentLimit) {
+                console.log("User has hit document limit, returning early");
+                throw new Error("Document limit reached");
             }
 
             await checkDocumentDifferences(accessToken.access_token);

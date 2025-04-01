@@ -2,7 +2,7 @@
 
 // // const nardiumAuthBackendUrl = process.env["REACT_GOOGLE_APP_SCRIPT_URL"] ?? "";
 // const nardiumAuthBackendUrl = process.env["REACT_NARDIUM_AUTH_BACKEND_URL"] ?? "";
-// const expectedClientId = process.env["EXPECTED_CLIENT_ID"] ?? "";
+// const expectedClientId = process.env["REACT_EXPECTED_CLIENT_ID"] ?? "";
 
 // export const renewAccessToken = async (userEmail: string = ""): Promise<Token | null> => {
 //     try {
