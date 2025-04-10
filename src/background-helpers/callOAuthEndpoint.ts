@@ -28,7 +28,7 @@ export const callOAuthEndpoint = async (authCode: string | null): Promise<FEtoBE
             headers: {
                 'Content-Type': 'application/json',
                 'x-client-id': expectedClientId,
-                // 'Authorization': `Bearer ${authToken}`,
+                // 'Authorization': `Bearer ${authToken}`, // no auth token needed for dis flow since it's the very initial one.
                 // Add any additional headers needed for production
                 ...(isDevelopment ? {} : {
                     'X-Requested-With': 'XMLHttpRequest',

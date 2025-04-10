@@ -45,8 +45,9 @@ export const refreshAccessToken = async (userEmail: string): Promise<AccessToken
             headers: {
                 'Content-Type': 'application/json',
                 'x-client-id': expectedClientId,
-                'Authorization': `Bearer ${FEtoBEToken.jwt_token}`
+                'Authorization': `Bearer ${FEtoBEToken.jwt_token}`,
             },
+            mode: 'cors'
         });
 
         if (!response.ok) {
