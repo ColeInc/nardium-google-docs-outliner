@@ -12,6 +12,9 @@ import { extractGoogleDocId } from "../helpers/extractGoogleDocId";
 import { authenticateFirstTimeUser } from "../helpers/authenticateFirstTimeUser";
 import { checkDocumentLimit } from "../helpers/checkDocumentLimit";
 
+// Maximum number of login retry attempts
+const MAX_LOGIN_RETRIES = 10;
+
 const fetchAccessTokenV2 = async (documentCtx: any, loadingCtx: any, userEmail: string) => {
     return new Promise<AccessToken | null>((resolve) => {
         // const userEmail = documentCtx.documentDetails.email;
@@ -138,9 +141,16 @@ export const useAttemptLogin = () => {
         documentCtx.updateDocumentDetails({ documentContent: headingsHierarchy });
     }
 
-    const attemptToLoginUser = async () => {
+    const attemptToLoginUser = async (retryCount = 0) => {
         try {
-            console.log("Starting attemptToLoginUser process...");
+            console.log(`Starting attemptToLoginUser process... (Attempt ${retryCount + 1}/${MAX_LOGIN_RETRIES})`);
+
+            // Check if maximum retry attempts reached
+            if (retryCount >= MAX_LOGIN_RETRIES) {
+                console.error(`Maximum login retry attempts (${MAX_LOGIN_RETRIES}) reached. Giving up.`);
+                loadingCtx.updateLoadingState({ loginLoading: false });
+                return false;
+            }
 
             // Check for user email
             console.log("Fetching current tab Google account...");
@@ -173,8 +183,8 @@ export const useAttemptLogin = () => {
                 const loginResponse = await authenticateFirstTimeUser();
                 // if response is successful, means fe-to-be token was created successfully, so try calling this function again, then return.
                 if (loginResponse) {
-                    console.log("calling attemptToLoginUser...")
-                    await attemptToLoginUser();
+                    console.log(`Calling attemptToLoginUser... (Next attempt: ${retryCount + 2}/${MAX_LOGIN_RETRIES})`);
+                    await attemptToLoginUser(retryCount + 1);
                 }
                 return;
             }
