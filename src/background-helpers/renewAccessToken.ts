@@ -22,7 +22,7 @@
 //         //     return null;
 //         // }
 
-//         const url = nardiumAuthBackendUrl + "/auth/google/refresh-token"
+//         const url = nardiumAuthBackendUrl + "/backend-/google/refresh-token"
 //         // console.log("renewAccessToken url going out:", url);
 //         const response = await fetch(url, {
 //             method: "GET",

@@ -39,7 +39,7 @@ export const refreshAccessToken = async (userEmail: string): Promise<AccessToken
         }
 
         console.log(`sending refresh-token api request: ${userEmail}`);
-        const url = `${nardiumAuthBackendUrl}/auth/google/refresh-token`;
+        const url = `${nardiumAuthBackendUrl}/backend-/google/refresh-token`;
         const response = await fetch(url, {
             method: "GET",
             headers: {
